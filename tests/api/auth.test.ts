@@ -41,7 +41,7 @@ const SEEDED_USER = {
   id: 'user-1',
   email: 'admin@eval.com',
   name: 'Admin',
-  hashedPassword: '$2b$10$hashedpassword',
+  passwordHash: '$2b$10$hashedpassword',
   role: 'ADMIN' as const,
 }
 

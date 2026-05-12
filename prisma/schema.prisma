@@ -6,6 +6,8 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
 enum Role {
   ADMIN
   PEDAGOGY_EVALUATOR
@@ -13,12 +15,218 @@ enum Role {
   VIEWER
 }
 
+enum EvaluationState {
+  IN_PROGRESS
+  MERGED
+  FINALISED
+}
+
+enum EvaluatorType {
+  COMPLIANCE
+  PEDAGOGY
+  TECHNICAL
+}
+
+// Quality ranking (highest → lowest): TRIAL > DEMO > DOCUMENTATION > VENDOR_CLAIM
+enum EvidenceType {
+  TRIAL
+  DEMO
+  DOCUMENTATION
+  VENDOR_CLAIM
+}
+
+enum WeightLevel {
+  HIGH   // multiplier 3
+  MEDIUM // multiplier 2
+  LOW    // multiplier 1
+}
+
+enum PlatformStatus {
+  ACTIVE
+  DISQUALIFIED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  hashedPassword String
-  name           String
-  role           Role     @default(VIEWER)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignments     EvaluatorAssignment[]
+  scores          Score[]
+  scoreAuditLogs  ScoreAuditLog[]
+  conflictMessages ConflictMessage[]
+  closedThreads   ConflictThread[]
+}
+
+model Platform {
+  id        String         @id @default(cuid())
+  name      String
+  vendor    String
+  status    PlatformStatus @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  evaluations Evaluation[]
+  contexts    PlatformContext[]
+}
+
+// Central aggregate for one scoring run on a Platform.
+// Owns the state machine. Platform can have multiple Evaluations over time.
+model Evaluation {
+  id         String          @id @default(cuid())
+  platformId String
+  state      EvaluationState @default(IN_PROGRESS)
+  lockedAt   DateTime?       // set when state transitions to FINALISED
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  platform        Platform              @relation(fields: [platformId], references: [id])
+  assignments     EvaluatorAssignment[]
+  scores          Score[]
+  conflictThreads ConflictThread[]
+}
+
+// Links a User to an Evaluation with an explicit team role.
+// Tracks per-evaluator submission state for the IN_PROGRESS → MERGED gate.
+model EvaluatorAssignment {
+  id            String        @id @default(cuid())
+  evaluationId  String
+  userId        String
+  evaluatorType EvaluatorType
+  hasSubmitted  Boolean       @default(false)
+  submittedAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([evaluationId, userId])
+}
+
+model Context {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  platforms    PlatformContext[]
+  requirements RequirementContext[]
+}
+
+model PlatformContext {
+  platformId String
+  contextId  String
+
+  platform Platform @relation(fields: [platformId], references: [id])
+  context  Context  @relation(fields: [contextId], references: [id])
+
+  @@id([platformId, contextId])
+}
+
+model Requirement {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  evaluatorType   EvaluatorType
+  weight          WeightLevel
+  // FAIL on a compliance gate requirement immediately disqualifies the Platform
+  isComplianceGate Boolean      @default(false)
+  category        String?
+  order           Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  contexts        RequirementContext[]
+  scores          Score[]
+  conflictThreads ConflictThread[]
+}
+
+model RequirementContext {
+  requirementId String
+  contextId     String
+
+  requirement Requirement @relation(fields: [requirementId], references: [id])
+  context     Context     @relation(fields: [contextId], references: [id])
+
+  @@id([requirementId, contextId])
+}
+
+// One evaluator's score for one requirement within one evaluation.
+// value: null = N/A (excluded from weighted calc); 0 = FAIL (compliance gate only); 1–5 = numeric.
+// Score isolation is enforced at the API layer — during IN_PROGRESS, cross-team scores are never returned.
+model Score {
+  id            String       @id @default(cuid())
+  evaluationId  String
+  requirementId String
+  userId        String
+  value         Int?
+  evidenceType  EvidenceType?
+  comment       String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  evaluation  Evaluation      @relation(fields: [evaluationId], references: [id])
+  requirement Requirement     @relation(fields: [requirementId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+  auditLogs   ScoreAuditLog[]
+
+  @@unique([evaluationId, requirementId, userId])
+}
+
+// Immutable audit trail — one row per score write (create or update).
+// Never update or delete rows from this table.
+model ScoreAuditLog {
+  id                  String        @id @default(cuid())
+  scoreId             String
+  changedById         String
+  previousValue       Int?
+  newValue            Int?
+  previousEvidenceType EvidenceType?
+  newEvidenceType     EvidenceType?
+  previousComment     String?
+  newComment          String?
+  // Required when an admin reopens a FINALISED evaluation
+  reason              String?
+  changedAt           DateTime      @default(now())
+
+  score     Score @relation(fields: [scoreId], references: [id])
+  changedBy User  @relation(fields: [changedById], references: [id])
+}
+
+// Auto-created when score diff > 1 between any two evaluators on the same requirement.
+// All threads must be closed before Evaluation can advance from MERGED → FINALISED.
+model ConflictThread {
+  id            String    @id @default(cuid())
+  evaluationId  String
+  requirementId String
+  isClosed      Boolean   @default(false)
+  closedAt      DateTime?
+  closedById    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  evaluation  Evaluation       @relation(fields: [evaluationId], references: [id])
+  requirement Requirement      @relation(fields: [requirementId], references: [id])
+  closedBy    User?            @relation(fields: [closedById], references: [id])
+  messages    ConflictMessage[]
+
+  @@unique([evaluationId, requirementId])
+}
+
+// Append-only message log within a ConflictThread. Messages are never edited or deleted.
+model ConflictMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  thread ConflictThread @relation(fields: [threadId], references: [id])
+  author User           @relation(fields: [authorId], references: [id])
 }

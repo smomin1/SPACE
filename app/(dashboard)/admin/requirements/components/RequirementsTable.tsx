@@ -70,6 +70,7 @@ import {
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { ComplianceGateBadge } from './ComplianceGateBadge'
+import { BulkImportDialog } from '@/components/admin/requirements/BulkImportDialog'
 
 const PAGE_SIZE = 25
 
@@ -429,7 +430,8 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
           </Button>
         )}
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <BulkImportDialog onSuccess={() => router.refresh()} />
           <Button size="sm" asChild>
             <Link href="/admin/requirements/new">
               <PlusIcon className="mr-1.5 size-4" />

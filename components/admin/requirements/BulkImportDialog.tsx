@@ -31,6 +31,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
   const [step, setStep] = React.useState<ImportStep>("idle")
   const [file, setFile] = React.useState<File | null>(null)
   const [importedCount, setImportedCount] = React.useState(0)
+  const [skippedCount, setSkippedCount] = React.useState(0)
   const [failures, setFailures] = React.useState<RowFailure[]>([])
   const [globalError, setGlobalError] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -39,6 +40,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
     setStep("idle")
     setFile(null)
     setImportedCount(0)
+    setSkippedCount(0)
     setFailures([])
     setGlobalError(null)
     if (fileInputRef.current) fileInputRef.current.value = ""
@@ -76,6 +78,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
 
       if (res.ok) {
         setImportedCount(data.imported ?? 0)
+        setSkippedCount(data.skipped ?? 0)
         setFailures([])
         setGlobalError(null)
         onSuccess?.()
@@ -166,6 +169,11 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
             <p className="text-lg font-medium">Import successful</p>
             <p className="text-sm text-muted-foreground">
               {importedCount} requirement{importedCount !== 1 ? "s" : ""} imported
+              {skippedCount > 0 && (
+                <span className="block text-xs mt-0.5">
+                  {skippedCount} skipped (already exist)
+                </span>
+              )}
             </p>
           </div>
         )}

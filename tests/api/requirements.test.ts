@@ -33,12 +33,11 @@ vi.mock('xlsx', () => ({
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import * as XLSX from 'xlsx'
-import { GET as listGET, POST as createPOST } from '@/app/api/admin/requirements/route'
+import { GET as listGET, POST as createPOST } from '@/app/api/requirements/route'
 import {
-  GET as getOne,
   PUT as updateOne,
   DELETE as deleteOne,
-} from '@/app/api/admin/requirements/[id]/route'
+} from '@/app/api/requirements/[id]/route'
 import { POST as bulkPOST } from '@/app/api/admin/requirements/bulk/route'
 
 const mockPrisma = prisma as {
@@ -105,20 +104,20 @@ describe('GET /api/admin/requirements', () => {
     expect(body.code).toBe('UNAUTHORIZED')
   })
 
-  it('returns 403 when role is VIEWER', async () => {
+  it('returns 200 when role is VIEWER (GET is open to all authenticated users)', async () => {
     mockAuth.mockResolvedValueOnce(VIEWER_SESSION)
-    const res = await listGET(new Request('http://localhost/api/admin/requirements'))
-    expect(res.status).toBe(403)
-    const body = await res.json()
-    expect(body.code).toBe('FORBIDDEN')
+    mockPrisma.requirement.findMany.mockResolvedValueOnce([])
+    const res = await listGET(new Request('http://localhost/api/requirements'))
+    expect(res.status).toBe(200)
   })
 
-  it('returns 403 when role is PEDAGOGY_EVALUATOR', async () => {
+  it('returns 200 when role is PEDAGOGY_EVALUATOR', async () => {
     mockAuth.mockResolvedValueOnce({
       user: { ...ADMIN_SESSION.user, role: 'PEDAGOGY_EVALUATOR' },
     })
-    const res = await listGET(new Request('http://localhost/api/admin/requirements'))
-    expect(res.status).toBe(403)
+    mockPrisma.requirement.findMany.mockResolvedValueOnce([])
+    const res = await listGET(new Request('http://localhost/api/requirements'))
+    expect(res.status).toBe(200)
   })
 
   it('returns 200 with requirements array when ADMIN', async () => {
@@ -344,6 +343,7 @@ describe('POST /api/admin/requirements/bulk', () => {
     mockAuth.mockResolvedValueOnce(ADMIN_SESSION)
     mockXLSX.read.mockReturnValueOnce({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } })
     mockXLSX.utils.sheet_to_json.mockReturnValueOnce([VALID_ROW])
+    mockPrisma.requirement.findMany.mockResolvedValueOnce([]) // no existing titles
     mockPrisma.requirement.createMany.mockResolvedValueOnce({ count: 1 })
     const res = await bulkPOST(makeFormDataRequest(makeXlsxFile()))
     expect(res.status).toBe(201)

@@ -173,6 +173,19 @@ vi.mock('radix-ui', async () => {
       Root: ({ className }: { className?: string }) =>
         R.createElement('hr', { className }),
     },
+    Dialog: {
+      Root: passThrough,
+      Trigger: passThrough,
+      Portal: passThrough,
+      Overlay: hidden,
+      Content: ({ children }: { children?: R.ReactNode }) =>
+        R.createElement('div', { role: 'dialog' }, children),
+      Close: passThrough,
+      Title: ({ children, className }: { children?: R.ReactNode; className?: string }) =>
+        R.createElement('h2', { className }, children),
+      Description: ({ children, className }: { children?: R.ReactNode; className?: string }) =>
+        R.createElement('div', { className }, children),
+    },
   }
 })
 
@@ -203,6 +216,16 @@ vi.mock('lucide-react', async () => {
     ChevronUpIcon: Icon,
     MoreHorizontal: Icon,
     X: Icon,
+    UploadIcon: Icon,
+    DownloadIcon: Icon,
+    ListChecksIcon: Icon,
+    EyeIcon: Icon,
+    MonitorIcon: Icon,
+    TagsIcon: Icon,
+    XIcon: Icon,
+    LayoutDashboardIcon: Icon,
+    ClipboardListIcon: Icon,
+    BarChart2Icon: Icon,
   }
 })
 

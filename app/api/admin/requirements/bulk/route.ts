@@ -75,10 +75,10 @@ export async function POST(req: NextRequest) {
 
   const file = formData.get('file')
   if (!file || typeof file === 'string')
-    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
+    return NextResponse.json({ error: 'No file uploaded', code: 'NO_FILE' }, { status: 400 })
 
   if (!file.name.endsWith('.xlsx'))
-    return NextResponse.json({ error: 'Only .xlsx files are supported' }, { status: 400 })
+    return NextResponse.json({ error: 'Only .xlsx files are supported', code: 'INVALID_FILE_TYPE' }, { status: 400 })
 
   let workbook: XLSX.WorkBook
   try {

@@ -46,6 +46,47 @@ enum PlatformStatus {
   DISQUALIFIED
 }
 
+enum CEFRLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum LearningLevel {
+  EARLY_CHILDHOOD
+  K12
+  HIGHER_ED
+  ADULT_LEARNING
+  PROFESSIONAL
+}
+
+enum Skill {
+  READING
+  WRITING
+  LISTENING
+  SPEAKING
+  GRAMMAR
+  VOCABULARY
+  PRONUNCIATION
+}
+
+enum DeploymentMode {
+  CLOUD
+  ON_PREMISE
+  HYBRID
+}
+
+enum LicenceType {
+  PERPETUAL
+  SUBSCRIPTION
+  PER_SEAT
+  SITE_LICENCE
+  OPEN_SOURCE
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -57,23 +98,27 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  assignments     EvaluatorAssignment[]
-  scores          Score[]
-  scoreAuditLogs  ScoreAuditLog[]
-  conflictMessages ConflictMessage[]
-  closedThreads   ConflictThread[]
+  assignments              EvaluatorAssignment[]
+  scores                   Score[]
+  scoreAuditLogs           ScoreAuditLog[]
+  conflictMessages         ConflictMessage[]
+  closedThreads            ConflictThread[]
+  platformAssignments      PlatformEvaluatorAssignment[]
 }
 
 model Platform {
-  id        String         @id @default(cuid())
-  name      String
-  vendor    String
-  status    PlatformStatus @default(ACTIVE)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id             String         @id @default(cuid())
+  name           String
+  vendor         String
+  status         PlatformStatus @default(ACTIVE)
+  licenceType    LicenceType?
+  trialAvailable Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  evaluations Evaluation[]
-  contexts    PlatformContext[]
+  evaluations          Evaluation[]
+  contexts             PlatformContext[]
+  evaluatorAssignments PlatformEvaluatorAssignment[]
 }
 
 // Central aggregate for one scoring run on a Platform.
@@ -110,10 +155,15 @@ model EvaluatorAssignment {
 }
 
 model Context {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
+  id             String         @id @default(cuid())
+  name           String         @unique
+  description    String?
+  learningLevels LearningLevel[]
+  cefrMin        CEFRLevel?
+  cefrMax        CEFRLevel?
+  skills         Skill[]
+  deploymentMode DeploymentMode?
+  createdAt      DateTime       @default(now())
 
   platforms    PlatformContext[]
   requirements RequirementContext[]
@@ -217,6 +267,21 @@ model ConflictThread {
   messages    ConflictMessage[]
 
   @@unique([evaluationId, requirementId])
+}
+
+// Direct platform-level evaluator assignment (separate from Evaluation assignments).
+// Establishes who is responsible for evaluating this platform before an Evaluation is created.
+model PlatformEvaluatorAssignment {
+  id            String        @id @default(cuid())
+  platformId    String
+  userId        String
+  evaluatorType EvaluatorType
+  createdAt     DateTime      @default(now())
+
+  platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([platformId, userId])
 }
 
 // Append-only message log within a ConflictThread. Messages are never edited or deleted.

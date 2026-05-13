@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
+import { Sidebar } from '@/components/shared/Sidebar'
 
 export default async function DashboardLayout({
   children,
@@ -8,5 +9,13 @@ export default async function DashboardLayout({
 }) {
   const session = await auth()
   if (!session?.user) redirect('/login')
-  return <>{children}</>
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar role={session.user.role} />
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  )
 }

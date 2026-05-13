@@ -13,6 +13,7 @@ export type Action =
   | 'manage:users'
   | 'manage:platform'
   | 'manage:requirements'
+  | 'manage:contexts'
   | 'access:admin'
   | 'access:evaluate'
 
@@ -28,6 +29,7 @@ const PERMISSIONS: Record<Action, Role[]> = {
   'manage:users':           ['ADMIN'],
   'manage:platform':        ['ADMIN'],
   'manage:requirements':    ['ADMIN'],
+  'manage:contexts':        ['ADMIN'],
   'access:admin':           ['ADMIN'],
   'access:evaluate':        ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'],
 }

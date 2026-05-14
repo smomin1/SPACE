@@ -32,7 +32,7 @@ import {
   PlusCircleIcon,
   CheckIcon,
 } from 'lucide-react'
-import type { Context, DeploymentMode } from '@prisma/client'
+import type { CEFRLevel, DeploymentMode } from '@prisma/client'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -70,7 +70,13 @@ import {
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 
-type ContextRow = Context & {
+type ContextRow = {
+  id: string
+  name: string
+  learningLevels: string[]
+  cefrMin: CEFRLevel | null
+  cefrMax: CEFRLevel | null
+  deploymentMode: DeploymentMode | null
   _count: { requirements: number }
 }
 

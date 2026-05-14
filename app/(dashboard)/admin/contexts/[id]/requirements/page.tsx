@@ -22,6 +22,16 @@ export default async function ContextRequirementsPage({ params }: Props) {
 
   const [allRequirements, assigned] = await Promise.all([
     prisma.requirement.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        evaluatorType: true,
+        weight: true,
+        isComplianceGate: true,
+        category: true,
+        order: true,
+      },
       orderBy: [{ category: 'asc' }, { order: 'asc' }],
     }),
     prisma.requirementContext.findMany({

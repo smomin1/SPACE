@@ -11,14 +11,19 @@ export default async function PlatformsPage() {
 
   const platforms = await prisma.platform.findMany({
     orderBy: { name: 'asc' },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      vendor: true,
+      licenceType: true,
+      trialAvailable: true,
       evaluatorAssignments: {
-        include: { user: { select: { id: true, name: true, email: true, role: true } } },
+        select: { id: true, evaluatorType: true },
       },
       evaluations: {
         orderBy: { createdAt: 'desc' },
         take: 1,
-        select: { id: true, state: true, createdAt: true },
+        select: { id: true, state: true },
       },
     },
   })

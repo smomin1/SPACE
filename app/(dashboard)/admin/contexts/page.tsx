@@ -11,7 +11,13 @@ export default async function ContextsPage() {
 
   const contexts = await prisma.context.findMany({
     orderBy: { name: 'asc' },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      learningLevels: true,
+      cefrMin: true,
+      cefrMax: true,
+      deploymentMode: true,
       _count: { select: { requirements: true } },
     },
   })

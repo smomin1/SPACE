@@ -31,7 +31,7 @@ import {
   PlusCircleIcon,
   CheckIcon,
 } from 'lucide-react'
-import type { EvaluationState, LicenceType, PlatformStatus } from '@prisma/client'
+import type { EvaluationState, LicenceType } from '@prisma/client'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -73,11 +73,10 @@ type PlatformRow = {
   id: string
   name: string
   vendor: string
-  status: PlatformStatus
   licenceType: LicenceType | null
   trialAvailable: boolean
   evaluatorAssignments: { id: string; evaluatorType: string }[]
-  evaluations: { id: string; state: EvaluationState; createdAt: Date }[]
+  evaluations: { id: string; state: EvaluationState }[]
 }
 
 const PAGE_SIZE = 25
@@ -306,20 +305,6 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
         ),
     },
     {
-      id: 'contexts',
-      header: 'Contexts',
-      enableSorting: false,
-      cell: ({ row }) => {
-        const ctxs = row.original.contexts
-        if (!ctxs.length) return <span className="text-muted-foreground">—</span>
-        return (
-          <span className="text-sm">
-            {ctxs.map((c) => c.context.name).join(', ')}
-          </span>
-        )
-      },
-    },
-    {
       id: 'evaluators',
       header: 'Evaluators',
       enableSorting: false,
@@ -348,24 +333,6 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
           </span>
         )
       },
-    },
-    {
-      id: 'platformStatus',
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => (
-        <span
-          className={cn(
-            'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-            row.original.status === 'ACTIVE'
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
-              : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-          )}
-        >
-          {row.original.status.charAt(0) + row.original.status.slice(1).toLowerCase()}
-        </span>
-      ),
-      filterFn: (row, id, value: string[]) => value.includes(row.getValue(id)),
     },
     {
       id: 'actions',
@@ -435,15 +402,6 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
             { label: 'Per Seat', value: 'PER_SEAT' },
             { label: 'Site Licence', value: 'SITE_LICENCE' },
             { label: 'Open Source', value: 'OPEN_SOURCE' },
-          ]}
-        />
-
-        <FacetFilter
-          column={table.getColumn('platformStatus')!}
-          title="Status"
-          options={[
-            { label: 'Active', value: 'ACTIVE' },
-            { label: 'Disqualified', value: 'DISQUALIFIED' },
           ]}
         />
 

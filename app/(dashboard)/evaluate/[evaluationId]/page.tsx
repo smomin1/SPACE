@@ -45,6 +45,8 @@ export default async function EvaluationWorkspacePage({
           userId: true,
           evaluatorType: true,
           hasSubmitted: true,
+          isLead: true,
+          user: { select: { id: true, name: true } },
         },
       },
     },
@@ -53,22 +55,20 @@ export default async function EvaluationWorkspacePage({
   if (!evaluation) notFound()
 
   const isEvaluator = canDo(role, 'access:evaluate')
+  const isAdmin = canDo(role, 'lock:evaluation')
   const seeAll = canDo(role, 'view:all_scores')
 
   // Evaluators (non-admin/viewer) must be assigned
   const myAssignment = evaluation.assignments.find(a => a.userId === userId)
-  if (isEvaluator && !seeAll && !myAssignment) {
-    redirect('/dashboard')
-  }
+  if (isEvaluator && !seeAll && !myAssignment) redirect('/dashboard')
 
   // ── IN_PROGRESS ──────────────────────────────────────────────────────────────
   if (evaluation.state === 'IN_PROGRESS') {
-    if (!isEvaluator) redirect('/dashboard')
+    if (!isEvaluator || !myAssignment) redirect('/dashboard')
 
-    const assignment = myAssignment!
     const [requirements, ownScores] = await Promise.all([
       prisma.requirement.findMany({
-        where: { evaluatorType: assignment.evaluatorType },
+        where: { evaluatorType: myAssignment.evaluatorType },
         select: REQUIREMENT_SELECT,
         orderBy: [{ category: 'asc' }, { order: 'asc' }],
       }),
@@ -77,6 +77,11 @@ export default async function EvaluationWorkspacePage({
         select: { id: true, requirementId: true, value: true, evidenceType: true, comment: true },
       }),
     ])
+
+    // Team assignments: leads see their own team's submission status
+    const teamAssignments = evaluation.assignments
+      .filter(a => a.evaluatorType === myAssignment.evaluatorType)
+      .map(a => ({ userId: a.userId, name: a.user.name, hasSubmitted: a.hasSubmitted }))
 
     return (
       <main className="container mx-auto py-8 max-w-5xl">
@@ -94,18 +99,20 @@ export default async function EvaluationWorkspacePage({
           evaluationId={evaluationId}
           requirements={requirements}
           ownScores={ownScores}
-          assignment={assignment}
-          isAdmin={canDo(role, 'lock:evaluation')}
-          allAssignments={evaluation.assignments}
+          assignment={{ userId: myAssignment.userId, evaluatorType: myAssignment.evaluatorType, hasSubmitted: myAssignment.hasSubmitted, isLead: myAssignment.isLead }}
+          isAdmin={isAdmin}
+          teamAssignments={myAssignment.isLead ? teamAssignments : []}
+          allAssignments={evaluation.assignments.map(a => ({ userId: a.userId, evaluatorType: a.evaluatorType, hasSubmitted: a.hasSubmitted }))}
         />
       </main>
     )
   }
 
   // ── MERGED ───────────────────────────────────────────────────────────────────
-  // VIEWERs may only observe FINALISED evaluations; block them from the active resolution phase.
+  // VIEWERs may only observe FINALISED evaluations.
   if (evaluation.state === 'MERGED') {
     if (!isEvaluator) redirect('/dashboard')
+
     const [requirements, allScores, threads] = await Promise.all([
       prisma.requirement.findMany({
         select: REQUIREMENT_SELECT,
@@ -129,6 +136,8 @@ export default async function EvaluationWorkspacePage({
       }),
     ])
 
+    // Each team resolves their own conflicts independently
+    const myEvaluatorType = myAssignment?.evaluatorType ?? null
     const openThreadCount = threads.filter(t => !t.isClosed).length
 
     return (
@@ -151,7 +160,8 @@ export default async function EvaluationWorkspacePage({
           openThreadCount={openThreadCount}
           currentUserId={userId}
           currentUserRole={role}
-          isAdmin={canDo(role, 'lock:evaluation')}
+          currentEvaluatorType={myEvaluatorType}
+          isAdmin={isAdmin}
         />
       </main>
     )
@@ -195,7 +205,7 @@ export default async function EvaluationWorkspacePage({
         evaluatorTypeByUser={Object.fromEntries(evaluatorTypeByUser)}
         platform={evaluation.platform}
         lockedAt={evaluation.lockedAt!.toISOString()}
-        isAdmin={canDo(role, 'lock:evaluation')}
+        isAdmin={isAdmin}
       />
     </main>
   )

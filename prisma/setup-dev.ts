@@ -46,6 +46,8 @@ async function main() {
   console.log(`✓ ${users.length} users`)
 
   // ── Requirements ─────────────────────────────────────────────────────────────
+  await prisma.scoreAuditLog.deleteMany()
+  await prisma.score.deleteMany()
   await prisma.requirementContext.deleteMany()
   await prisma.requirement.deleteMany()
   await prisma.requirement.createMany({
@@ -81,10 +83,10 @@ async function main() {
       state: 'IN_PROGRESS',
       assignments: {
         create: [
-          { userId: users[1].id, evaluatorType: 'PEDAGOGY' },   // Alice
-          { userId: users[2].id, evaluatorType: 'PEDAGOGY' },   // Bob
-          { userId: users[3].id, evaluatorType: 'TECHNICAL' },  // Charlie
-          { userId: users[4].id, evaluatorType: 'TECHNICAL' },  // Dana
+          { userId: users[1].id, evaluatorType: 'PEDAGOGY',  isLead: true  },   // Alice — Pedagogy Lead
+          { userId: users[2].id, evaluatorType: 'PEDAGOGY',  isLead: false },   // Bob
+          { userId: users[3].id, evaluatorType: 'TECHNICAL', isLead: true  },   // Charlie — Technical Lead
+          { userId: users[4].id, evaluatorType: 'TECHNICAL', isLead: false },   // Dana
         ],
       },
     },

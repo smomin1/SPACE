@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
-/* ── CSS variable tokens ─────────────────────────────────────────────────── */
+/* ── CSS variable tokens — Forest Green theme ────────────────────────────── */
 :root {
-  --background:          #ffffff;
-  --foreground:          #0f0f11;
+  --background:          #f6f7f4;  /* warm sage canvas */
+  --foreground:          #022c22;  /* emerald-950 */
 
   --card:                #ffffff;
-  --card-foreground:     #0f0f11;
+  --card-foreground:     #022c22;
 
   --popover:             #ffffff;
-  --popover-foreground:  #0f0f11;
+  --popover-foreground:  #022c22;
 
-  --primary:             #18181b;
-  --primary-foreground:  #fafafa;
+  --primary:             #065f46;  /* emerald-800 */
+  --primary-foreground:  #fafaf5;
 
-  --secondary:           #f4f4f5;
-  --secondary-foreground:#18181b;
+  --secondary:           #f4f4ee;
+  --secondary-foreground:#042d1e;
 
-  --muted:               #f4f4f5;
-  --muted-foreground:    #71717a;
+  --muted:               #f2f2ec;
+  --muted-foreground:    #78716c;  /* stone-500 */
 
-  --accent:              #f4f4f5;
-  --accent-foreground:   #18181b;
+  --accent:              #dceee5;
+  --accent-foreground:   #042d1e;
 
-  --destructive:         #ef4444;
-  --destructive-foreground: #fafafa;
+  --destructive:         #92400e;  /* amber-800 — dignified ochre, not red */
+  --destructive-foreground: #fef3c7;
 
-  --border:              #e4e4e7;
-  --input:               #e4e4e7;
-  --ring:                #18181b;
+  --border:              #e7e5e4;  /* stone-200 */
+  --input:               #e7e5e4;
+  --ring:                #065f46;
 
-  --radius:              0.5rem;
+  --radius:              0.625rem;
   --radius-sm:           calc(var(--radius) - 2px);
   --radius-md:           var(--radius);
   --radius-lg:           calc(var(--radius) + 2px);
@@ -39,40 +39,41 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background:          #0a0a0a;
-    --foreground:          #fafafa;
+    --background:          #0b1410;
+    --foreground:          #f7f7f4;
 
-    --card:                #111113;
-    --card-foreground:     #fafafa;
+    --card:                #0f1b17;
+    --card-foreground:     #f7f7f4;
 
-    --popover:             #1c1c1f;
-    --popover-foreground:  #fafafa;
+    --popover:             #0f1b17;
+    --popover-foreground:  #f7f7f4;
 
-    --primary:             #fafafa;
-    --primary-foreground:  #18181b;
+    --primary:             #10b981;
+    --primary-foreground:  #022c22;
 
-    --secondary:           #27272a;
-    --secondary-foreground:#fafafa;
+    --secondary:           #182420;
+    --secondary-foreground:#f7f7f4;
 
-    --muted:               #27272a;
-    --muted-foreground:    #a1a1aa;
+    --muted:               #182320;
+    --muted-foreground:    #aaa89e;
 
-    --accent:              #2e2e32;
-    --accent-foreground:   #fafafa;
+    --accent:              #182420;
+    --accent-foreground:   #f7f7f4;
 
-    --destructive:         #7f1d1d;
-    --destructive-foreground: #fafafa;
+    --destructive:         #d0894d;
+    --destructive-foreground: #022c22;
 
-    --border:              #3f3f46;
-    --input:               #27272a;
-    --ring:                #a1a1aa;
+    --border:              #1c2a26;
+    --input:               #1c2a26;
+    --ring:                #10b981;
   }
 }
 
 /* ── Tailwind v4 theme mapping ───────────────────────────────────────────── */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans:  var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono:  var(--font-mono);
 
   --color-background:           var(--background);
   --color-foreground:           var(--foreground);
@@ -111,5 +112,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: 'ss01', 'cv11', 'cv05';
+  letter-spacing: -0.005em;
 }
+
+table, .tabular-nums { font-variant-numeric: tabular-nums; }

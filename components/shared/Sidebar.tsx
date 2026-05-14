@@ -13,7 +13,20 @@ import {
   BarChart2Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  LogOutIcon,
 } from 'lucide-react'
+import { signOut } from 'next-auth/react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 interface NavItem {
   href: string
@@ -57,9 +70,12 @@ const NAV_ITEMS: NavItem[] = [
 
 interface SidebarProps {
   role: Role
+  userName?: string
+  userInitials?: string
+  roleLabel?: string
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, userName, userInitials = '?', roleLabel }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = React.useState(false)
 
@@ -68,55 +84,133 @@ export function Sidebar({ role }: SidebarProps) {
   return (
     <nav
       className={cn(
-        'relative flex h-full flex-col border-r bg-background transition-all duration-200',
-        collapsed ? 'w-14' : 'w-56'
+        'relative flex h-full flex-col border-r border-emerald-950/15 bg-emerald-950 text-emerald-50/90 transition-all duration-200',
+        collapsed ? 'w-[60px]' : 'w-[232px]',
       )}
     >
-      {/* Logo / wordmark */}
-      <div className={cn('flex h-14 items-center border-b px-3', collapsed ? 'justify-center' : 'px-4')}>
-        {collapsed ? (
-          <MonitorIcon className="size-5 text-muted-foreground" />
-        ) : (
-          <span className="text-sm font-semibold tracking-tight">EvalPlatform</span>
+      {/* Brand block */}
+      <div
+        className={cn(
+          'flex h-16 items-center gap-2.5 border-b border-emerald-50/10',
+          collapsed ? 'justify-center px-2' : 'px-5',
+        )}
+      >
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-emerald-50/8 ring-1 ring-emerald-50/15">
+          <MonitorIcon className="size-4 text-emerald-200" />
+        </div>
+        {!collapsed && (
+          <div className="flex min-w-0 flex-col -space-y-0.5">
+            <span className="font-serif text-[16px] tracking-tight text-emerald-50">Eval</span>
+            <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-emerald-200/60">
+              Platform Evaluation
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Nav links */}
-      <ul className="flex-1 space-y-0.5 px-2 py-3">
-        {visible.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + '/')
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                title={collapsed ? item.label : undefined}
+      {/* Nav */}
+      <div className="flex-1 overflow-y-auto px-3 py-4">
+        {!collapsed && (
+          <p className="px-2 pb-2 pt-1 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-200/45">
+            Workspace
+          </p>
+        )}
+        <ul className="space-y-0.5">
+          {visible.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + '/')
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  title={collapsed ? item.label : undefined}
+                  className={cn(
+                    'group flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] transition-colors',
+                    collapsed && 'justify-center px-0',
+                    active
+                      ? 'bg-emerald-50/10 text-emerald-50 font-medium ring-1 ring-inset ring-emerald-50/12'
+                      : 'text-emerald-100/70 hover:text-emerald-50 hover:bg-emerald-50/[0.05]',
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      'size-4 shrink-0',
+                      active ? 'text-emerald-200' : 'text-emerald-200/55 group-hover:text-emerald-200',
+                    )}
+                  />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                  {!collapsed && active && (
+                    <span className="ml-auto size-1 rounded-full bg-emerald-300/80" />
+                  )}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+
+      {/* Footer / user */}
+      <div className="border-t border-emerald-50/10 p-3">
+        <AlertDialog>
+          <div
+            className={cn(
+              'flex items-center gap-2.5 rounded-md px-2 py-2',
+              collapsed && 'justify-center px-0',
+            )}
+          >
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-50/10 text-[11px] font-medium tracking-wide text-emerald-100 ring-1 ring-emerald-50/15">
+              {userInitials}
+            </div>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12.5px] font-medium text-emerald-50">
+                  {userName ?? 'Signed in'}
+                </p>
+                <p className="font-mono text-[10.5px] uppercase tracking-wider text-emerald-200/55">
+                  {roleLabel ?? role.replace(/_/g, ' ').toLowerCase()}
+                </p>
+              </div>
+            )}
+            <AlertDialogTrigger asChild>
+              <button
+                title="Sign out"
                 className={cn(
-                  'flex items-center gap-2.5 rounded-md px-2 py-2 text-sm transition-colors',
-                  collapsed && 'justify-center',
-                  active
-                    ? 'bg-accent text-accent-foreground font-medium'
-                    : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                  'flex size-7 items-center justify-center rounded-md text-emerald-200/55 transition-colors hover:bg-emerald-50/[0.06] hover:text-emerald-50',
+                  collapsed && 'mx-auto',
                 )}
               >
-                <item.icon className="size-4 shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+                <LogOutIcon className="size-4" />
+                <span className="sr-only">Sign out</span>
+              </button>
+            </AlertDialogTrigger>
+          </div>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sign out?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You will be returned to the login page.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => signOut({ callbackUrl: '/login' })}>
+                Sign out
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
 
       {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed((c) => !c)}
-        className={cn(
-          'absolute -right-3 top-[3.25rem] flex size-6 items-center justify-center rounded-full border bg-background shadow-sm text-muted-foreground hover:text-foreground transition-colors z-20',
-        )}
+        className="absolute -right-3 top-[3.25rem] z-20 flex size-6 items-center justify-center rounded-full border border-emerald-950/15 bg-white text-emerald-900 shadow-sm transition-colors hover:bg-emerald-50"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        {collapsed
-          ? <ChevronRightIcon className="size-3.5" />
-          : <ChevronLeftIcon className="size-3.5" />}
+        {collapsed ? (
+          <ChevronRightIcon className="size-3.5" />
+        ) : (
+          <ChevronLeftIcon className="size-3.5" />
+        )}
       </button>
     </nav>
   )

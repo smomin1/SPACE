@@ -15,7 +15,8 @@ export async function POST(
   }
 
   const { id: evaluationId } = await params
-  const result = await transitionEvaluation(evaluationId, 'MERGED', session.user.id)
+  // Admin force-merge bypasses the all-submitted guard
+  const result = await transitionEvaluation(evaluationId, 'MERGED', session.user.id, true)
 
   if (!result.ok) {
     return Response.json({ error: result.message, code: result.error }, { status: 422 })

@@ -30,6 +30,7 @@ import {
   ChevronsUpDownIcon,
   PlusCircleIcon,
   CheckIcon,
+  SearchIcon,
 } from 'lucide-react'
 import type { EvaluationState, LicenceType } from '@prisma/client'
 
@@ -68,6 +69,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
+import { EvalStateBadge } from '@/components/admin/_shared/badges'
 
 type PlatformRow = {
   id: string
@@ -80,12 +82,6 @@ type PlatformRow = {
 }
 
 const PAGE_SIZE = 25
-
-const EVAL_STATE_CLS: Record<EvaluationState, string> = {
-  IN_PROGRESS: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  MERGED:      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
-  FINALISED:   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-}
 
 const LICENCE_LABELS: Partial<Record<LicenceType, string>> = {
   PERPETUAL: 'Perpetual',
@@ -102,31 +98,45 @@ function ColHeader<T, V>({
   column: import('@tanstack/react-table').Column<T, V>
   title: string
 }) {
-  if (!column.getCanSort()) return <span>{title}</span>
+  if (!column.getCanSort()) {
+    return (
+      <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">
+        {title}
+      </span>
+    )
+  }
+  const sorted = column.getIsSorted()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="-ml-2 h-7">
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            '-ml-1.5 h-6 px-1.5 text-[11px] font-medium uppercase tracking-[0.08em]',
+            sorted ? 'text-emerald-900' : 'text-emerald-950/55 hover:text-emerald-950',
+          )}
+        >
           {title}
-          {column.getIsSorted() === 'desc' ? (
-            <ArrowDownIcon className="ml-1 size-3.5" />
-          ) : column.getIsSorted() === 'asc' ? (
-            <ArrowUpIcon className="ml-1 size-3.5" />
+          {sorted === 'desc' ? (
+            <ArrowDownIcon className="ml-1 size-3 text-emerald-800" />
+          ) : sorted === 'asc' ? (
+            <ArrowUpIcon className="ml-1 size-3 text-emerald-800" />
           ) : (
-            <ChevronsUpDownIcon className="ml-1 size-3.5 opacity-50" />
+            <ChevronsUpDownIcon className="ml-1 size-3 text-stone-400" />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-          <ArrowUpIcon className="mr-2 size-3.5" /> Asc
+          <ArrowUpIcon className="mr-2 size-3.5 text-emerald-800/70" /> Asc
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-          <ArrowDownIcon className="mr-2 size-3.5" /> Desc
+          <ArrowDownIcon className="mr-2 size-3.5 text-emerald-800/70" /> Desc
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => column.clearSorting()}>
-          <ChevronsUpDownIcon className="mr-2 size-3.5" /> Clear
+          <ChevronsUpDownIcon className="mr-2 size-3.5 text-stone-500" /> Clear
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -148,24 +158,35 @@ function FacetFilter<T, V>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <PlusCircleIcon className="mr-1.5 size-3.5" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 border-dashed border-stone-300 bg-transparent text-emerald-950/75 hover:border-emerald-900/30 hover:bg-stone-50 hover:text-emerald-950"
+        >
+          <PlusCircleIcon className="mr-1.5 size-3.5 text-emerald-800/70" />
           {title}
           {selected.size > 0 && (
             <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
-              <span className="font-mono text-xs">{selected.size}</span>
+              <Separator orientation="vertical" className="mx-2 h-3.5 bg-stone-300" />
+              <span className="font-mono text-[10.5px] tabular-nums text-emerald-800">
+                {selected.size}
+              </span>
             </>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-52 p-1">
+      <PopoverContent align="start" className="w-56 p-1">
+        <div className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
+          Filter by {title}
+        </div>
         {options.map((opt) => {
           const active = selected.has(opt.value)
           return (
             <div
               key={opt.value}
-              className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+              role="button"
+              tabIndex={0}
+              className="flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-[13px] text-emerald-950 hover:bg-emerald-900/[0.04]"
               onClick={() => {
                 if (active) selected.delete(opt.value)
                 else selected.add(opt.value)
@@ -175,15 +196,17 @@ function FacetFilter<T, V>({
             >
               <div
                 className={cn(
-                  'mr-2 flex size-4 items-center justify-center rounded-sm border border-primary',
-                  active ? 'bg-primary text-primary-foreground' : 'opacity-40'
+                  'mr-2.5 flex size-4 items-center justify-center rounded border transition-colors',
+                  active
+                    ? 'border-emerald-800 bg-emerald-700 text-white'
+                    : 'border-stone-300 [&_svg]:invisible',
                 )}
               >
-                <CheckIcon className="size-3" />
+                <CheckIcon className="size-3" strokeWidth={3} />
               </div>
               <span className="flex-1">{opt.label}</span>
               {facets.get(opt.value) != null && (
-                <span className="ml-auto text-xs text-muted-foreground">
+                <span className="ml-auto font-mono text-[10.5px] tabular-nums text-stone-500">
                   {facets.get(opt.value)}
                 </span>
               )}
@@ -192,9 +215,11 @@ function FacetFilter<T, V>({
         })}
         {selected.size > 0 && (
           <>
-            <Separator className="my-1" />
+            <Separator className="my-1 bg-stone-200" />
             <div
-              className="cursor-pointer rounded-sm px-2 py-1.5 text-center text-xs text-muted-foreground hover:bg-accent"
+              role="button"
+              tabIndex={0}
+              className="flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-[12px] text-stone-500 hover:bg-stone-50 hover:text-emerald-900"
               onClick={() => column.setFilterValue(undefined)}
             >
               Clear filter
@@ -220,7 +245,7 @@ function DeleteAction({ platform }: { platform: PlatformRow }) {
       setErr(
         data.code === 'HAS_EVALUATIONS'
           ? 'Cannot delete — this platform has existing evaluations.'
-          : (data.error ?? 'Delete failed.')
+          : (data.error ?? 'Delete failed.'),
       )
     }
   }
@@ -231,7 +256,7 @@ function DeleteAction({ platform }: { platform: PlatformRow }) {
         <Button
           variant="ghost"
           size="sm"
-          className="size-7 p-0 text-muted-foreground hover:text-destructive"
+          className="size-7 p-0 text-stone-500 hover:bg-amber-50 hover:text-amber-800"
         >
           <Trash2Icon className="size-3.5" />
           <span className="sr-only">Delete</span>
@@ -242,13 +267,13 @@ function DeleteAction({ platform }: { platform: PlatformRow }) {
           <AlertDialogTitle>Delete platform?</AlertDialogTitle>
           <AlertDialogDescription>
             <strong>&ldquo;{platform.name}&rdquo;</strong> and all its assignments will be permanently removed.
-            {err && <span className="mt-1 block font-medium text-destructive">{err}</span>}
+            {err && <span className="mt-1 block font-medium text-amber-800">{err}</span>}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-amber-700 text-amber-50 hover:bg-amber-800"
             onClick={handleDelete}
           >
             Delete
@@ -267,7 +292,7 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
       cell: ({ row }) => (
         <Link
           href={`/admin/platforms/${row.original.id}`}
-          className="font-medium hover:underline"
+          className="font-medium text-emerald-950 decoration-emerald-700/40 underline-offset-2 hover:text-emerald-800 hover:underline"
         >
           {row.original.name}
         </Link>
@@ -276,15 +301,20 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
     {
       accessorKey: 'vendor',
       header: ({ column }) => <ColHeader column={column} title="Vendor" />,
+      cell: ({ row }) => <span className="text-stone-600">{row.original.vendor}</span>,
     },
     {
       accessorKey: 'licenceType',
-      header: 'Licence',
+      header: () => (
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">
+          Licence
+        </span>
+      ),
       cell: ({ row }) =>
         row.original.licenceType ? (
-          <span className="text-sm">{LICENCE_LABELS[row.original.licenceType]}</span>
+          <span className="text-emerald-950/85">{LICENCE_LABELS[row.original.licenceType]}</span>
         ) : (
-          <span className="text-muted-foreground">—</span>
+          <span className="text-stone-400">—</span>
         ),
       filterFn: (row, id, value: string[]) => {
         const v = row.getValue(id)
@@ -293,53 +323,55 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
     },
     {
       id: 'trial',
-      header: 'Trial',
+      header: () => (
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">
+          Trial
+        </span>
+      ),
       enableSorting: false,
       cell: ({ row }) =>
         row.original.trialAvailable ? (
-          <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-            Yes
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-800">
+            <span className="size-1.5 rounded-full bg-emerald-600" />
+            Available
           </span>
         ) : (
-          <span className="text-muted-foreground text-sm">No</span>
+          <span className="text-[12px] text-stone-400">—</span>
         ),
     },
     {
       id: 'evaluators',
-      header: 'Evaluators',
+      header: () => (
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">
+          Evaluators
+        </span>
+      ),
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="tabular-nums text-sm">
+        <span className="font-mono text-[12.5px] tabular-nums text-emerald-950">
           {row.original.evaluatorAssignments.length}
         </span>
       ),
     },
     {
       id: 'evalState',
-      header: 'Eval Status',
+      header: () => (
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">
+          Eval Status
+        </span>
+      ),
       enableSorting: false,
       cell: ({ row }) => {
         const latest = row.original.evaluations[0]
-        if (!latest) {
-          return (
-            <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              None
-            </span>
-          )
-        }
-        return (
-          <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', EVAL_STATE_CLS[latest.state])}>
-            {latest.state.replace('_', ' ')}
-          </span>
-        )
+        return <EvalStateBadge value={latest?.state ?? null} />
       },
     },
     {
       id: 'actions',
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="sm" className="size-7 p-0" asChild>
+        <div className="flex items-center justify-end gap-0.5">
+          <Button variant="ghost" size="sm" className="size-7 p-0 text-stone-500 hover:text-emerald-900" asChild>
             <Link href={`/admin/platforms/${row.original.id}`}>
               <EyeIcon className="size-3.5" />
               <span className="sr-only">View</span>
@@ -382,16 +414,22 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
   const isFiltered = columnFilters.length > 0 || globalFilter !== ''
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
+  const totalPages = Math.max(1, table.getPageCount())
+  const from = totalRows === 0 ? 0 : pageIndex * pageSize + 1
+  const to = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Input
-          placeholder="Search platforms…"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="h-8 w-60"
-        />
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-stone-400" />
+          <Input
+            placeholder="Search platforms…"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="h-8 w-72 pl-8 text-[12.5px]"
+          />
+        </div>
 
         <FacetFilter
           column={table.getColumn('licenceType')!}
@@ -409,7 +447,7 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 px-2 text-muted-foreground"
+            className="h-8 px-2 text-stone-500 hover:text-emerald-900"
             onClick={() => {
               table.resetColumnFilters()
               setGlobalFilter('')
@@ -420,23 +458,26 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
           </Button>
         )}
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <span className="hidden text-[12px] text-stone-500 md:inline">
+            <span className="font-mono tabular-nums text-emerald-950">{initialData.length}</span> platforms
+          </span>
           <Button size="sm" asChild>
             <Link href="/admin/platforms/new">
-              <PlusIcon className="mr-1.5 size-4" />
+              <PlusIcon className="mr-1.5 size-3.5" />
               Register Platform
             </Link>
           </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border">
+      <div className="overflow-hidden rounded-xl border border-stone-200/80 bg-white">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
+              <TableRow key={hg.id} className="border-b border-stone-200/80 bg-stone-50/60 hover:bg-stone-50/60">
                 {hg.headers.map((h) => (
-                  <TableHead key={h.id}>
+                  <TableHead key={h.id} className="h-9">
                     {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
                   </TableHead>
                 ))}
@@ -446,9 +487,12 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
           <TableBody>
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="border-b border-stone-200/60 transition-colors last:border-b-0 hover:bg-emerald-900/[0.025]"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-2.5 align-middle">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -456,7 +500,7 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-stone-500">
                   No platforms registered yet.
                 </TableCell>
               </TableRow>
@@ -465,28 +509,35 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          {totalRows === 0
-            ? 'No results'
-            : `${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, totalRows)} of ${totalRows}`}
-        </span>
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="sm" className="size-8 p-0" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
-            <ChevronsLeftIcon className="size-4" />
-          </Button>
-          <Button variant="outline" size="sm" className="size-8 p-0" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            <ChevronLeftIcon className="size-4" />
-          </Button>
-          <span className="px-2 tabular-nums">
-            Page {pageIndex + 1} / {Math.max(table.getPageCount(), 1)}
+      <div className="flex items-center justify-between px-1 pt-1">
+        <p className="text-[12px] text-stone-500">
+          {totalRows === 0 ? 'No results' : (
+            <>
+              Showing <span className="font-mono tabular-nums text-emerald-950">{from}</span>–
+              <span className="font-mono tabular-nums text-emerald-950">{to}</span> of{' '}
+              <span className="font-mono tabular-nums text-emerald-950">{totalRows}</span>
+            </>
+          )}
+        </p>
+        <div className="flex items-center gap-3">
+          <span className="text-[12px] text-stone-500">
+            Page <span className="font-mono tabular-nums text-emerald-950">{pageIndex + 1}</span> /{' '}
+            <span className="font-mono tabular-nums text-emerald-950">{totalPages}</span>
           </span>
-          <Button variant="outline" size="sm" className="size-8 p-0" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            <ChevronRightIcon className="size-4" />
-          </Button>
-          <Button variant="outline" size="sm" className="size-8 p-0" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
-            <ChevronsRightIcon className="size-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" className="size-7 p-0" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
+              <ChevronsLeftIcon className="size-3.5" />
+            </Button>
+            <Button variant="outline" size="sm" className="size-7 p-0" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+              <ChevronLeftIcon className="size-3.5" />
+            </Button>
+            <Button variant="outline" size="sm" className="size-7 p-0" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+              <ChevronRightIcon className="size-3.5" />
+            </Button>
+            <Button variant="outline" size="sm" className="size-7 p-0" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
+              <ChevronsRightIcon className="size-3.5" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

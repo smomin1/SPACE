@@ -194,7 +194,7 @@ export function FinalisedView({
           <p className="text-sm font-medium text-destructive">Platform Disqualified</p>
           <p className="text-xs text-destructive/80 mt-0.5">
             This platform failed one or more compliance gate requirements and has been disqualified
-            from scoring.
+            from consideration.
           </p>
         </div>
       )}

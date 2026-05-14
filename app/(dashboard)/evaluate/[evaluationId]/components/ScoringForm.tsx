@@ -49,6 +49,13 @@ type Assignment = {
   userId: string
   evaluatorType: EvaluatorType
   hasSubmitted: boolean
+  isLead?: boolean
+}
+
+type TeamMember = {
+  userId: string
+  name: string | null
+  hasSubmitted: boolean
 }
 
 type Props = {
@@ -57,6 +64,7 @@ type Props = {
   ownScores: Score[]
   assignment: Assignment
   isAdmin: boolean
+  teamAssignments: TeamMember[]
   allAssignments: Assignment[]
 }
 
@@ -81,6 +89,7 @@ export function ScoringForm({
   ownScores,
   assignment,
   isAdmin,
+  teamAssignments,
   allAssignments,
 }: Props) {
   const router = useRouter()
@@ -191,6 +200,31 @@ export function ScoringForm({
         hasSubmitted={assignment.hasSubmitted}
       />
 
+      {/* Lead: team submission status panel */}
+      {teamAssignments.length > 0 && (
+        <div className="rounded-lg border bg-muted/40 px-4 py-3 space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Team submissions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {teamAssignments.map(m => (
+              <span
+                key={m.userId}
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                  m.hasSubmitted
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                <span className={`size-1.5 rounded-full ${m.hasSubmitted ? 'bg-green-500' : 'bg-muted-foreground/50'}`} />
+                {m.name ?? 'Unknown'}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Admin: force merge override */}
       {isAdmin && (
         <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-3">
           <span className="text-sm text-muted-foreground flex-1">
@@ -207,13 +241,13 @@ export function ScoringForm({
                 <AlertDialogTitle>Force merge scores?</AlertDialogTitle>
                 <AlertDialogDescription>
                   {submittedCount < allAssignments.length
-                    ? `${allAssignments.length - submittedCount} evaluator(s) have not yet submitted. Merging now will advance the evaluation using scores submitted so far.`
+                    ? `${allAssignments.length - submittedCount} evaluator(s) have not yet submitted. Merging now will use scores submitted so far.`
                     : 'All evaluators have submitted. This will advance the evaluation to the review phase.'}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleMerge}>Merge</AlertDialogAction>
+                <AlertDialogAction onClick={handleMerge}>Force Merge</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

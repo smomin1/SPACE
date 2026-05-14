@@ -222,13 +222,14 @@ export async function transitionEvaluation(
   evaluationId: string,
   newState: EvaluationState,
   actingUserId: string,
+  force = false,
 ): Promise<TransitionResult> {
   return prisma.$transaction(async tx => {
     const evaluation = await tx.evaluation.findUnique({
       where: { id: evaluationId },
       include: {
         assignments: { select: { userId: true, hasSubmitted: true, evaluatorType: true } },
-        conflictThreads: { select: { isClosed: true } },
+        conflictThreads: { select: { isClosed: true, requirementId: true } },
       },
     })
 
@@ -255,7 +256,7 @@ export async function transitionEvaluation(
     // ── IN_PROGRESS → MERGED ──────────────────────────────────────────────────
     if (evaluation.state === 'IN_PROGRESS' && newState === 'MERGED') {
       const unsubmitted = evaluation.assignments.filter(a => !a.hasSubmitted)
-      if (unsubmitted.length > 0) {
+      if (unsubmitted.length > 0 && !force) {
         return {
           ok: false,
           error: 'NOT_ALL_SUBMITTED' as const,

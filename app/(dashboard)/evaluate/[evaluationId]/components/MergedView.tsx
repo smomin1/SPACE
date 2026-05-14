@@ -33,6 +33,7 @@ type Requirement = {
   category: string | null
   weight: string
   isComplianceGate: boolean
+  evaluatorType: string
 }
 
 type ScoreRow = {
@@ -55,6 +56,7 @@ type Props = {
   openThreadCount: number
   currentUserId: string
   currentUserRole: Role
+  currentEvaluatorType: string | null
   isAdmin: boolean
 }
 
@@ -98,6 +100,7 @@ export function MergedView({
   openThreadCount: initialOpenCount,
   currentUserId,
   currentUserRole,
+  currentEvaluatorType,
   isAdmin,
 }: Props) {
   const router = useRouter()
@@ -107,6 +110,7 @@ export function MergedView({
     threadId: string
     requirementId: string
     requirementTitle: string
+    evaluatorType: string
     isClosed: boolean
   } | null>(null)
 
@@ -279,6 +283,7 @@ export function MergedView({
                                   threadId: thread.id,
                                   requirementId: req.id,
                                   requirementTitle: req.title,
+                                  evaluatorType: req.evaluatorType,
                                   isClosed: thread.isClosed,
                                 })
                               }
@@ -312,7 +317,8 @@ export function MergedView({
           requirementTitle={threadDialog.requirementTitle}
           isClosed={threadDialog.isClosed}
           currentUserId={currentUserId}
-          canClose={true}
+          // Admin can close any conflict; evaluators can only close their own team's conflicts
+          canClose={isAdmin || currentEvaluatorType === threadDialog.evaluatorType}
           open={true}
           onOpenChange={open => { if (!open) setThreadDialog(null) }}
           onClosed={handleThreadClosed}

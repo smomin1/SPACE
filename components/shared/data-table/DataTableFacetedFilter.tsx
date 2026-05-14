@@ -5,7 +5,6 @@ import { CheckIcon, PlusCircleIcon } from "lucide-react"
 import type { Column } from "@tanstack/react-table"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -37,46 +36,36 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <PlusCircleIcon className="mr-2 size-4" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 border-dashed border-stone-300 bg-transparent text-emerald-950/75 hover:border-emerald-900/30 hover:bg-stone-50 hover:text-emerald-950"
+        >
+          <PlusCircleIcon className="mr-1.5 size-3.5 text-emerald-800/70" />
           {title}
           {selectedValues?.size > 0 && (
             <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
+              <Separator orientation="vertical" className="mx-2 h-3.5 bg-stone-300" />
+              <span className="font-mono text-[10.5px] tracking-wider text-emerald-800 tabular-nums">
                 {selectedValues.size}
-              </Badge>
-              <div className="hidden space-x-1 lg:flex">
-                {selectedValues.size > 2 ? (
-                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
-                    {selectedValues.size} selected
-                  </Badge>
-                ) : (
-                  options
-                    .filter((option) => selectedValues.has(option.value))
-                    .map((option) => (
-                      <Badge
-                        variant="secondary"
-                        key={option.value}
-                        className="rounded-sm px-1 font-normal"
-                      >
-                        {option.label}
-                      </Badge>
-                    ))
-                )}
-              </div>
+              </span>
             </>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
-        <div className="p-1">
+      <PopoverContent className="w-[220px] p-1" align="start">
+        <div className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
+          Filter by {title}
+        </div>
+        <div className="p-0.5">
           {options.map((option) => {
             const isSelected = selectedValues.has(option.value)
             return (
               <div
                 key={option.value}
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                role="button"
+                tabIndex={0}
+                className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-[13px] text-emerald-950 outline-none hover:bg-emerald-900/[0.04]"
                 onClick={() => {
                   if (isSelected) {
                     selectedValues.delete(option.value)
@@ -89,20 +78,20 @@ export function DataTableFacetedFilter<TData, TValue>({
               >
                 <div
                   className={cn(
-                    "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
+                    "mr-2.5 flex size-4 items-center justify-center rounded border transition-colors",
                     isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "opacity-50 [&_svg]:invisible"
+                      ? "border-emerald-800 bg-emerald-700 text-white"
+                      : "border-stone-300 [&_svg]:invisible",
                   )}
                 >
-                  <CheckIcon className="size-4" />
+                  <CheckIcon className="size-3" strokeWidth={3} />
                 </div>
                 {option.icon && (
-                  <option.icon className="mr-2 size-4 text-muted-foreground" />
+                  <option.icon className="mr-2 size-4 text-stone-500" />
                 )}
-                <span>{option.label}</span>
-                {facets?.get(option.value) && (
-                  <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs">
+                <span className="flex-1">{option.label}</span>
+                {facets?.get(option.value) != null && (
+                  <span className="ml-auto font-mono text-[10.5px] text-stone-500 tabular-nums">
                     {facets.get(option.value)}
                   </span>
                 )}
@@ -112,14 +101,14 @@ export function DataTableFacetedFilter<TData, TValue>({
         </div>
         {selectedValues.size > 0 && (
           <>
-            <Separator />
-            <div className="p-1">
-              <div
-                className="flex cursor-pointer justify-center rounded-sm px-2 py-1.5 text-sm text-center hover:bg-accent hover:text-accent-foreground"
-                onClick={() => column?.setFilterValue(undefined)}
-              >
-                Clear filters
-              </div>
+            <Separator className="my-1 bg-stone-200" />
+            <div
+              role="button"
+              tabIndex={0}
+              className="flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-[12px] text-stone-500 hover:bg-stone-50 hover:text-emerald-900"
+              onClick={() => column?.setFilterValue(undefined)}
+            >
+              Clear filter
             </div>
           </>
         )}

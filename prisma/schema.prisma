@@ -144,6 +144,7 @@ model EvaluatorAssignment {
   evaluationId  String
   userId        String
   evaluatorType EvaluatorType
+  isLead        Boolean       @default(false)
   hasSubmitted  Boolean       @default(false)
   submittedAt   DateTime?
   createdAt     DateTime      @default(now())
@@ -276,6 +277,7 @@ model PlatformEvaluatorAssignment {
   platformId    String
   userId        String
   evaluatorType EvaluatorType
+  isLead        Boolean       @default(false)
   createdAt     DateTime      @default(now())
 
   platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)

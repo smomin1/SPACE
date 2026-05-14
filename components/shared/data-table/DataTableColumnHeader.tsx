@@ -25,8 +25,14 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return (
+      <div className={cn("text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55", className)}>
+        {title}
+      </div>
+    )
   }
+
+  const sorted = column.getIsSorted()
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
@@ -35,30 +41,33 @@ export function DataTableColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-2 h-7 data-[state=open]:bg-accent"
+            className={cn(
+              "-ml-1.5 h-6 px-1.5 text-[11px] font-medium uppercase tracking-[0.08em]",
+              sorted ? "text-emerald-900" : "text-emerald-950/55 hover:text-emerald-950",
+            )}
           >
             <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
-              <ArrowDownIcon className="ml-1 size-3.5" />
-            ) : column.getIsSorted() === "asc" ? (
-              <ArrowUpIcon className="ml-1 size-3.5" />
+            {sorted === "desc" ? (
+              <ArrowDownIcon className="ml-1 size-3 text-emerald-800" />
+            ) : sorted === "asc" ? (
+              <ArrowUpIcon className="ml-1 size-3 text-emerald-800" />
             ) : (
-              <ChevronsUpDownIcon className="ml-1 size-3.5" />
+              <ChevronsUpDownIcon className="ml-1 size-3 text-stone-400" />
             )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUpIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <ArrowUpIcon className="mr-2 size-3.5 text-emerald-800/70" />
             Asc
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDownIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <ArrowDownIcon className="mr-2 size-3.5 text-emerald-800/70" />
             Desc
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOffIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <EyeOffIcon className="mr-2 size-3.5 text-stone-500" />
             Hide
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -202,7 +202,7 @@ export function ScoringForm({
 
       {/* Lead: team submission status panel */}
       {teamAssignments.length > 0 && (
-        <div className="rounded-lg border bg-muted/40 px-4 py-3 space-y-2">
+        <div className="rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3 space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Team submissions
           </p>
@@ -210,13 +210,13 @@ export function ScoringForm({
             {teamAssignments.map(m => (
               <span
                 key={m.userId}
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                className={`inline-flex items-center gap-1.5 rounded-md ring-1 ring-inset px-2 h-[22px] text-[11.5px] font-medium tracking-tight ${
                   m.hasSubmitted
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
-                    : 'bg-muted text-muted-foreground'
+                    ? 'bg-stone-100/80 ring-stone-200 text-emerald-950'
+                    : 'bg-stone-50 ring-stone-200 text-stone-400'
                 }`}
               >
-                <span className={`size-1.5 rounded-full ${m.hasSubmitted ? 'bg-green-500' : 'bg-muted-foreground/50'}`} />
+                <span className={`size-1.5 rounded-full shrink-0 ${m.hasSubmitted ? 'bg-emerald-600' : 'bg-stone-300'}`} />
                 {m.name ?? 'Unknown'}
               </span>
             ))}
@@ -226,7 +226,7 @@ export function ScoringForm({
 
       {/* Admin: force merge override */}
       {isAdmin && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3">
           <span className="text-sm text-muted-foreground flex-1">
             {submittedCount} of {allAssignments.length} evaluator(s) submitted
           </span>
@@ -269,7 +269,7 @@ export function ScoringForm({
                 return (
                   <div
                     key={req.id}
-                    className={`rounded-lg border bg-card p-4 transition-opacity ${isSaving ? 'opacity-60' : ''}`}
+                    className={`rounded-xl border border-stone-200/80 bg-white p-4 transition-opacity ${isSaving ? 'opacity-60' : ''}`}
                   >
                     <div className="flex items-start gap-2 mb-3">
                       <div className="flex-1">
@@ -358,7 +358,7 @@ export function ScoringForm({
       })}
 
       {!assignment.hasSubmitted && (
-        <div className="sticky bottom-0 bg-background border-t py-4 flex justify-end">
+        <div className="sticky bottom-0 bg-[#f6f7f4] border-t border-stone-200/80 py-4 flex justify-end">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button disabled={!allScored || isPending}>

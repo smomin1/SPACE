@@ -11,6 +11,7 @@ import {
   TagsIcon,
   MonitorIcon,
   BarChart2Icon,
+  ClipboardCheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   LogOutIcon,
@@ -59,6 +60,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Platforms',
     icon: MonitorIcon,
     roles: ['ADMIN'],
+  },
+  {
+    href: '/evaluations',
+    label: 'Evaluations',
+    icon: ClipboardCheckIcon,
+    roles: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'],
   },
   {
     href: '/results',

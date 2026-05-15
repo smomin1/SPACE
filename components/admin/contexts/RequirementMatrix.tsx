@@ -7,6 +7,7 @@ import type { EvaluatorType, WeightLevel } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CheckIcon } from 'lucide-react'
+import { TypeBadge, WeightTier, ComplianceGateBadge } from '@/components/admin/_shared/badges'
 
 export type RequirementRow = {
   id: string
@@ -18,17 +19,6 @@ export type RequirementRow = {
   category: string | null
   order: number
   assigned: boolean
-}
-
-const TYPE_CLS: Record<string, string> = {
-  COMPLIANCE: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-  PEDAGOGY:   'bg-blue-100  text-blue-700  dark:bg-blue-900/50  dark:text-blue-300',
-  TECHNICAL:  'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
-}
-const WEIGHT_CLS: Record<string, string> = {
-  HIGH:   'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-  MEDIUM: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-  LOW:    'bg-gray-100   text-gray-600   dark:bg-gray-800      dark:text-gray-400',
 }
 
 interface RequirementMatrixProps {
@@ -64,7 +54,6 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
     }
   }
 
-  // Group by category
   const grouped = React.useMemo(() => {
     const map = new Map<string, RequirementRow[]>()
     for (const r of initialRequirements) {
@@ -88,38 +77,52 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">{assignedCount}</span> of{' '}
-          <span className="font-semibold text-foreground">{totalCount}</span> requirements assigned to{' '}
-          <strong>{contextName}</strong>
+        <p className="text-sm text-stone-500">
+          <span className="font-semibold text-emerald-950 tabular-nums">{assignedCount}</span> of{' '}
+          <span className="font-semibold text-emerald-950 tabular-nums">{totalCount}</span> requirements assigned to{' '}
+          <strong className="text-emerald-950">{contextName}</strong>
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={selectAll}>Select All</Button>
-          <Button variant="outline" size="sm" onClick={clearAll}>Clear All</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 border-stone-200 text-xs text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+            onClick={selectAll}
+          >
+            Select All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 border-stone-200 text-xs text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+            onClick={clearAll}
+          >
+            Clear All
+          </Button>
         </div>
       </div>
 
       {/* Table */}
       {initialRequirements.length === 0 ? (
-        <div className="rounded-lg border py-16 text-center text-muted-foreground">
+        <div className="rounded-xl border border-stone-200/80 py-16 text-center text-sm text-stone-400">
           No requirements found. Add requirements in the Requirements Master first.
         </div>
       ) : (
-        <div className="rounded-lg border overflow-hidden">
-          {/* Sticky column headers */}
-          <div className="sticky top-0 z-10 grid grid-cols-[2rem_1fr_7rem_6rem_5rem] gap-3 border-b bg-muted/80 px-4 py-2.5 backdrop-blur text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">
+          {/* Column headers */}
+          <div className="sticky top-0 z-10 grid grid-cols-[2rem_1fr_9rem_8rem_4rem] gap-3 border-b border-stone-200/80 bg-stone-50/80 px-4 py-2.5 backdrop-blur text-[10.5px] font-semibold uppercase tracking-wider text-stone-400">
             <span />
             <span>Requirement</span>
             <span>Type</span>
             <span>Weight</span>
-            <span className="text-center">Included</span>
+            <span className="text-center">Incl.</span>
           </div>
 
           {Array.from(grouped.entries()).map(([category, reqs]) => (
             <div key={category}>
               {/* Category sub-header */}
-              <div className="bg-muted/30 px-4 py-2 border-b border-dashed border-border/60">
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="bg-stone-50/40 px-4 py-2 border-b border-stone-200/40">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">
                   {category}
                 </span>
               </div>
@@ -141,59 +144,51 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                       }
                     }}
                     className={cn(
-                      'grid grid-cols-[2rem_1fr_7rem_6rem_5rem] gap-3 items-center px-4 py-3 border-b border-border/40 cursor-pointer transition-colors select-none',
+                      'grid grid-cols-[2rem_1fr_9rem_8rem_4rem] gap-3 items-center px-4 py-3 border-b border-stone-200/50 cursor-pointer transition-colors select-none',
                       isAssigned
-                        ? 'bg-primary/5 hover:bg-primary/10'
-                        : 'bg-background hover:bg-muted/40',
+                        ? 'bg-emerald-900/[0.03] hover:bg-emerald-900/[0.055]'
+                        : 'bg-white hover:bg-stone-50/60',
                       isSaving && 'opacity-50 cursor-wait'
                     )}
                   >
-                    {/* Checkbox column */}
+                    {/* Checkbox */}
                     <div className={cn(
-                      'flex size-5 shrink-0 items-center justify-center rounded border-2 transition-all',
+                      'flex size-4 shrink-0 items-center justify-center rounded border-2 transition-all',
                       isAssigned
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background'
+                        ? 'border-emerald-700 bg-emerald-700 text-white'
+                        : 'border-stone-300 bg-white'
                     )}>
-                      {isAssigned && <CheckIcon className="size-3" />}
+                      {isAssigned && <CheckIcon className="size-2.5" />}
                     </div>
 
                     {/* Title + description */}
                     <div className="min-w-0">
-                      <p className={cn('text-sm font-medium leading-snug', !isAssigned && 'text-muted-foreground')}>
+                      <p className={cn('text-[13px] font-medium leading-snug', isAssigned ? 'text-emerald-950' : 'text-stone-500')}>
                         {req.title}
                       </p>
                       {req.description && (
-                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        <p className="mt-0.5 text-xs text-stone-400 line-clamp-2 leading-relaxed">
                           {req.description}
                         </p>
                       )}
                     </div>
 
-                    {/* Type badge */}
-                    <div>
-                      <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', TYPE_CLS[req.evaluatorType])}>
-                        {req.evaluatorType.charAt(0) + req.evaluatorType.slice(1).toLowerCase()}
-                      </span>
-                      {req.isComplianceGate && (
-                        <span className="ml-1 inline-flex rounded-full bg-destructive/10 px-1.5 py-0.5 text-xs font-medium text-destructive">
-                          Gate
-                        </span>
-                      )}
+                    {/* Type + gate */}
+                    <div className="flex flex-wrap items-center gap-1">
+                      <TypeBadge value={req.evaluatorType} />
+                      {req.isComplianceGate && <ComplianceGateBadge />}
                     </div>
 
-                    {/* Weight badge */}
+                    {/* Weight */}
                     <div>
-                      <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', WEIGHT_CLS[req.weight])}>
-                        {req.weight.charAt(0) + req.weight.slice(1).toLowerCase()}
-                      </span>
+                      <WeightTier value={req.weight} />
                     </div>
 
                     {/* Included indicator */}
                     <div className="flex justify-center">
                       <span className={cn(
-                        'text-xs font-medium',
-                        isAssigned ? 'text-primary' : 'text-muted-foreground'
+                        'text-xs font-medium tabular-nums',
+                        isAssigned ? 'text-emerald-700' : 'text-stone-300'
                       )}>
                         {isAssigned ? 'Yes' : '—'}
                       </span>

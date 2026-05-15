@@ -849,7 +849,8 @@ describe('POST /api/evaluations/[id]/merge', () => {
     expect(res.status).toBe(200)
     expect(body.state).toBe('MERGED')
     expect(body.conflictCount).toBe(3)
-    expect(mockTransitionEvaluation).toHaveBeenCalledWith('eval-1', 'MERGED', 'u-admin')
+    // 4th arg = true: admin force-merge bypasses the all-submitted guard
+    expect(mockTransitionEvaluation).toHaveBeenCalledWith('eval-1', 'MERGED', 'u-admin', true)
   })
 
   it('returns conflictCount=0 when merge succeeds with no conflicts', async () => {

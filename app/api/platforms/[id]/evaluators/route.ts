@@ -40,6 +40,7 @@ export async function GET(
 const evaluatorActionSchema = z.object({
   userId: z.string().min(1),
   evaluatorType: z.nativeEnum(EvaluatorType),
+  isLead: z.boolean().optional().default(false),
   action: z.enum(['assign', 'remove']),
 })
 
@@ -72,7 +73,7 @@ export async function POST(
     )
   }
 
-  const { userId, evaluatorType, action } = parsed.data
+  const { userId, evaluatorType, isLead, action } = parsed.data
 
   try {
     if (action === 'assign') {
@@ -93,8 +94,8 @@ export async function POST(
 
       const assignment = await prisma.platformEvaluatorAssignment.upsert({
         where: { platformId_userId: { platformId, userId } },
-        create: { platformId, userId, evaluatorType },
-        update: { evaluatorType },
+        create: { platformId, userId, evaluatorType, isLead },
+        update: { evaluatorType, isLead },
         include: { user: { select: { id: true, name: true, email: true, role: true } } },
       })
       return Response.json({ assignment }, { status: 201 })

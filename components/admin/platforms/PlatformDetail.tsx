@@ -3,26 +3,15 @@ import type { EvaluationState, EvaluatorType, LicenceType, PlatformStatus } from
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { PencilIcon } from 'lucide-react'
-
-const EVAL_STATE_CLS: Record<EvaluationState, string> = {
-  IN_PROGRESS: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  MERGED:      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
-  FINALISED:   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-}
-
-const EVALUATOR_TYPE_CLS: Record<string, string> = {
-  PEDAGOGY:   'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  TECHNICAL:  'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-  COMPLIANCE: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-}
+import { PencilIcon, Star, ArrowRightIcon } from 'lucide-react'
+import { TypeBadge, EvalStateBadge, PlatformStatusDot } from '@/components/admin/_shared/badges'
 
 const LICENCE_LABELS: Partial<Record<LicenceType, string>> = {
-  PERPETUAL: 'Perpetual',
+  PERPETUAL:    'Perpetual',
   SUBSCRIPTION: 'Subscription',
-  PER_SEAT: 'Per Seat',
+  PER_SEAT:     'Per Seat',
   SITE_LICENCE: 'Site Licence',
-  OPEN_SOURCE: 'Open Source',
+  OPEN_SOURCE:  'Open Source',
 }
 
 type PlatformDetailData = {
@@ -35,6 +24,7 @@ type PlatformDetailData = {
   evaluatorAssignments: {
     id: string
     evaluatorType: EvaluatorType
+    isLead: boolean
     user: { id: string; name: string; email: string }
   }[]
   evaluations: { id: string; state: EvaluationState; createdAt: Date }[]
@@ -54,21 +44,17 @@ export function PlatformDetail({ platform }: PlatformDetailProps) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold tracking-tight">{platform.name}</h1>
-            <span
-              className={cn(
-                'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium',
-                platform.status === 'ACTIVE'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
-                  : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-              )}
-            >
-              {platform.status.charAt(0) + platform.status.slice(1).toLowerCase()}
-            </span>
+            <h1 className="text-2xl font-bold tracking-tight text-emerald-950">{platform.name}</h1>
+            <PlatformStatusDot value={platform.status} />
           </div>
-          <p className="text-muted-foreground">{platform.vendor}</p>
+          <p className="text-stone-500 text-sm">{platform.vendor}</p>
         </div>
-        <Button variant="outline" size="sm" asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-stone-200 text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+          asChild
+        >
           <Link href={`/admin/platforms/${platform.id}/edit`}>
             <PencilIcon className="mr-1.5 size-3.5" />
             Edit
@@ -76,56 +62,57 @@ export function PlatformDetail({ platform }: PlatformDetailProps) {
         </Button>
       </div>
 
-      <Separator />
+      <Separator className="bg-stone-200" />
 
       {/* Details grid */}
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Licence Type</p>
-          <p className="text-sm">
+          <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Licence Type</p>
+          <p className="text-sm text-emerald-950">
             {platform.licenceType ? LICENCE_LABELS[platform.licenceType] : '—'}
           </p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Trial Available</p>
-          <p className="text-sm">{platform.trialAvailable ? 'Yes' : 'No'}</p>
+          <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Trial Available</p>
+          <p className="text-sm text-emerald-950">{platform.trialAvailable ? 'Yes' : 'No'}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Evaluation Status</p>
-          {latestEval ? (
-            <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', EVAL_STATE_CLS[latestEval.state])}>
-              {latestEval.state.replace('_', ' ')}
-            </span>
-          ) : (
-            <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              None
-            </span>
-          )}
+          <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Evaluation Status</p>
+          <div className="flex items-center gap-2">
+            <EvalStateBadge value={latestEval?.state ?? null} />
+            {latestEval && (
+              <Link
+                href={`/evaluate/${latestEval.id}`}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:text-emerald-900 transition-colors"
+              >
+                Open
+                <ArrowRightIcon className="size-3" />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-stone-200" />
 
       {/* Evaluators */}
       <div>
-        <h2 className="text-base font-semibold mb-3">Evaluators</h2>
+        <h2 className="text-sm font-semibold text-emerald-950 mb-3">Evaluators</h2>
         {platform.evaluatorAssignments.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No evaluators assigned.</p>
+          <p className="text-sm text-stone-400">No evaluators assigned.</p>
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y divide-stone-200/60 rounded-xl border border-stone-200/80 bg-white overflow-hidden">
             {platform.evaluatorAssignments.map((a) => (
-              <div key={a.id} className="flex items-center gap-3 px-4 py-3">
-                <span
-                  className={cn(
-                    'inline-flex rounded-full px-2 py-0.5 text-xs font-medium shrink-0',
-                    EVALUATOR_TYPE_CLS[a.evaluatorType]
-                  )}
-                >
-                  {a.evaluatorType.charAt(0) + a.evaluatorType.slice(1).toLowerCase()}
-                </span>
-                <div>
-                  <p className="text-sm font-medium">{a.user.name}</p>
-                  <p className="text-xs text-muted-foreground">{a.user.email}</p>
+              <div key={a.id} className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50/60 transition-colors">
+                <TypeBadge value={a.evaluatorType} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-emerald-950">{a.user.name}</p>
+                    {a.isLead && (
+                      <Star className="size-3 fill-amber-400 text-amber-500 shrink-0" aria-label="Team lead" />
+                    )}
+                  </div>
+                  <p className="text-xs text-stone-400 font-mono">{a.user.email}</p>
                 </div>
               </div>
             ))}

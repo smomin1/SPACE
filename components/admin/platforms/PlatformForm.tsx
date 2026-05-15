@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { XIcon } from 'lucide-react'
+import { XIcon, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const LICENCE_LABELS: Record<LicenceType, string> = {
   PERPETUAL: 'Perpetual',
@@ -30,7 +31,103 @@ export type EvaluatorAssignment = {
   name: string
   email: string
   evaluatorType: EvaluatorType
+  isLead: boolean
 }
+
+// ── Evaluator section sub-component ─────────────────────────────────────────
+
+function EvaluatorSection({
+  label,
+  type,
+  evaluators,
+  available,
+  open,
+  onOpenChange,
+  onAdd,
+  onRemove,
+  onToggleLead,
+}: {
+  label: string
+  type: EvaluatorType
+  evaluators: EvaluatorAssignment[]
+  available: UserOption[]
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  onAdd: (u: UserOption) => void
+  onRemove: (userId: string) => void
+  onToggleLead: (userId: string) => void
+}) {
+  const members = evaluators.filter((e) => e.evaluatorType === type)
+  const showLeadToggle = members.length > 1
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
+      <div className="flex flex-wrap gap-2">
+        {members.map((e) => (
+          <span
+            key={e.userId}
+            className="inline-flex items-center gap-1.5 rounded-md bg-stone-100/80 ring-1 ring-inset ring-stone-200 px-2 h-[26px] text-[11.5px] font-medium tracking-tight text-emerald-950"
+          >
+            {showLeadToggle && (
+              <button
+                type="button"
+                title={e.isLead ? 'Team lead' : 'Set as lead'}
+                onClick={() => onToggleLead(e.userId)}
+                className="shrink-0 transition-colors"
+              >
+                <Star
+                  className={cn(
+                    'size-3',
+                    e.isLead
+                      ? 'fill-amber-400 text-amber-500'
+                      : 'text-stone-300 hover:text-amber-400'
+                  )}
+                />
+              </button>
+            )}
+            {e.isLead && !showLeadToggle && (
+              <Star className="size-3 fill-amber-400 text-amber-500 shrink-0" />
+            )}
+            {e.name}
+            <button
+              type="button"
+              onClick={() => onRemove(e.userId)}
+              className="text-stone-400 hover:text-stone-600 transition-colors"
+            >
+              <XIcon className="size-3" />
+            </button>
+          </span>
+        ))}
+        <Popover open={open} onOpenChange={onOpenChange}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-[26px] text-xs border-stone-200">
+              + Add
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="w-64 p-1">
+            {available.length > 0 ? (
+              available.map((u) => (
+                <div
+                  key={u.id}
+                  className="flex cursor-pointer flex-col rounded-sm px-2 py-1.5 hover:bg-stone-50"
+                  onClick={() => onAdd(u)}
+                >
+                  <span className="text-sm font-medium text-emerald-950">{u.name}</span>
+                  <span className="text-xs text-stone-400 font-mono">{u.email}</span>
+                </div>
+              ))
+            ) : (
+              <p className="p-2 text-sm text-stone-400">No available users.</p>
+            )}
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  )
+}
+
+// ── Main form ─────────────────────────────────────────────────────────────────
 
 interface PlatformFormProps {
   defaultValues?: Partial<PlatformFormValues>
@@ -69,15 +166,38 @@ export function PlatformForm({
 
   function addEvaluator(user: UserOption, type: EvaluatorType) {
     if (evaluators.some((e) => e.userId === user.id)) return
+    // First of this type becomes lead automatically
+    const isFirstOfType = !evaluators.some((e) => e.evaluatorType === type)
     setEvaluators((prev) => [
       ...prev,
-      { userId: user.id, name: user.name, email: user.email, evaluatorType: type },
+      { userId: user.id, name: user.name, email: user.email, evaluatorType: type, isLead: isFirstOfType },
     ])
     setEvalError(null)
   }
 
   function removeEvaluator(userId: string) {
-    setEvaluators((prev) => prev.filter((e) => e.userId !== userId))
+    setEvaluators((prev) => {
+      const next = prev.filter((e) => e.userId !== userId)
+      const removed = prev.find((e) => e.userId === userId)
+      // If we removed the lead, promote the first remaining member of that team
+      if (removed?.isLead) {
+        const firstOfType = next.find((e) => e.evaluatorType === removed.evaluatorType)
+        if (firstOfType) firstOfType.isLead = true
+      }
+      return [...next]
+    })
+  }
+
+  function toggleLead(userId: string) {
+    setEvaluators((prev) => {
+      const target = prev.find((e) => e.userId === userId)
+      if (!target || target.isLead) return prev // already lead, no-op
+      return prev.map((e) =>
+        e.evaluatorType === target.evaluatorType
+          ? { ...e, isLead: e.userId === userId }
+          : e
+      )
+    })
   }
 
   function validateEvaluators(): boolean {
@@ -132,7 +252,7 @@ export function PlatformForm({
       await fetch(`/api/platforms/${pid}/evaluators`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: e.userId, evaluatorType: e.evaluatorType, action: 'assign' }),
+        body: JSON.stringify({ userId: e.userId, evaluatorType: e.evaluatorType, isLead: e.isLead, action: 'assign' }),
       })
     }
 
@@ -200,88 +320,30 @@ export function PlatformForm({
         </p>
 
         {/* Pedagogy */}
-        <div className="space-y-2">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Pedagogy</Label>
-          <div className="flex flex-wrap gap-2">
-            {evaluators
-              .filter((e) => e.evaluatorType === EvaluatorType.PEDAGOGY)
-              .map((e) => (
-                <span
-                  key={e.userId}
-                  className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                >
-                  {e.name}
-                  <button type="button" onClick={() => removeEvaluator(e.userId)}>
-                    <XIcon className="size-3" />
-                  </button>
-                </span>
-              ))}
-            <Popover open={pedagogyOpen} onOpenChange={setPedagogyOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs">+ Add</Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 p-1">
-                {pedagogyUsers
-                  .filter((u) => !assignedUserIds.has(u.id))
-                  .map((u) => (
-                    <div
-                      key={u.id}
-                      className="flex cursor-pointer flex-col rounded-sm px-2 py-1.5 hover:bg-accent"
-                      onClick={() => { addEvaluator(u, EvaluatorType.PEDAGOGY); setPedagogyOpen(false) }}
-                    >
-                      <span className="text-sm font-medium">{u.name}</span>
-                      <span className="text-xs text-muted-foreground">{u.email}</span>
-                    </div>
-                  ))}
-                {pedagogyUsers.filter((u) => !assignedUserIds.has(u.id)).length === 0 && (
-                  <p className="p-2 text-sm text-muted-foreground">No available users.</p>
-                )}
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+        <EvaluatorSection
+          label="Pedagogy"
+          type={EvaluatorType.PEDAGOGY}
+          evaluators={evaluators}
+          available={pedagogyUsers.filter((u) => !assignedUserIds.has(u.id))}
+          open={pedagogyOpen}
+          onOpenChange={setPedagogyOpen}
+          onAdd={(u) => { addEvaluator(u, EvaluatorType.PEDAGOGY); setPedagogyOpen(false) }}
+          onRemove={removeEvaluator}
+          onToggleLead={toggleLead}
+        />
 
         {/* Technical */}
-        <div className="space-y-2">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Technical</Label>
-          <div className="flex flex-wrap gap-2">
-            {evaluators
-              .filter((e) => e.evaluatorType === EvaluatorType.TECHNICAL)
-              .map((e) => (
-                <span
-                  key={e.userId}
-                  className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"
-                >
-                  {e.name}
-                  <button type="button" onClick={() => removeEvaluator(e.userId)}>
-                    <XIcon className="size-3" />
-                  </button>
-                </span>
-              ))}
-            <Popover open={technicalOpen} onOpenChange={setTechnicalOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs">+ Add</Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 p-1">
-                {technicalUsers
-                  .filter((u) => !assignedUserIds.has(u.id))
-                  .map((u) => (
-                    <div
-                      key={u.id}
-                      className="flex cursor-pointer flex-col rounded-sm px-2 py-1.5 hover:bg-accent"
-                      onClick={() => { addEvaluator(u, EvaluatorType.TECHNICAL); setTechnicalOpen(false) }}
-                    >
-                      <span className="text-sm font-medium">{u.name}</span>
-                      <span className="text-xs text-muted-foreground">{u.email}</span>
-                    </div>
-                  ))}
-                {technicalUsers.filter((u) => !assignedUserIds.has(u.id)).length === 0 && (
-                  <p className="p-2 text-sm text-muted-foreground">No available users.</p>
-                )}
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+        <EvaluatorSection
+          label="Technical"
+          type={EvaluatorType.TECHNICAL}
+          evaluators={evaluators}
+          available={technicalUsers.filter((u) => !assignedUserIds.has(u.id))}
+          open={technicalOpen}
+          onOpenChange={setTechnicalOpen}
+          onAdd={(u) => { addEvaluator(u, EvaluatorType.TECHNICAL); setTechnicalOpen(false) }}
+          onRemove={removeEvaluator}
+          onToggleLead={toggleLead}
+        />
 
         {evalError && <p className="text-sm text-destructive">{evalError}</p>}
       </div>

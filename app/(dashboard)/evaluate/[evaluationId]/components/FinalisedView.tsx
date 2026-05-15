@@ -4,6 +4,7 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ComplianceGateBadge, WeightTier } from '@/components/admin/_shared/badges'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -137,9 +138,9 @@ export function FinalisedView({
   return (
     <div className="space-y-6">
       {/* Locked banner */}
-      <div className="flex items-center gap-3 rounded-lg border bg-green-50 dark:bg-green-950/20 px-4 py-3">
+      <div className="flex items-center gap-3 rounded-xl border border-emerald-200/60 bg-emerald-50/60 px-4 py-3">
         <svg
-          className="size-4 text-green-600 shrink-0"
+          className="size-4 text-emerald-700 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -152,10 +153,10 @@ export function FinalisedView({
           />
         </svg>
         <div className="flex-1">
-          <p className="text-sm font-medium text-green-800 dark:text-green-200">
+          <p className="text-sm font-medium text-emerald-900">
             Finalised — scores are locked
           </p>
-          <p className="text-xs text-green-700 dark:text-green-300">
+          <p className="text-xs text-emerald-700/70">
             Locked on {new Date(lockedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
           </p>
         </div>
@@ -178,7 +179,7 @@ export function FinalisedView({
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleReopen}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="bg-amber-700 text-amber-50 hover:bg-amber-800"
                 >
                   Reopen
                 </AlertDialogAction>
@@ -201,19 +202,19 @@ export function FinalisedView({
 
       {/* Grand total */}
       {!isDisqualified && (
-        <div className="rounded-lg border bg-card px-4 py-4 flex items-center gap-4">
+        <div className="rounded-xl border border-stone-200/80 bg-white px-5 py-4 flex items-center gap-4">
           <div className="flex-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+            <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-1">
               Weighted Score
             </p>
-            <p className="text-3xl font-bold tabular-nums">
+            <p className="text-3xl font-bold tabular-nums text-emerald-950">
               {grandTotal !== null ? (grandTotal / 3 * 100).toFixed(1) : '—'}
               {grandTotal !== null && (
-                <span className="text-sm font-normal text-muted-foreground ml-1">/ 100</span>
+                <span className="text-sm font-normal text-stone-400 ml-1">/ 100</span>
               )}
             </p>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-stone-400">
             Raw avg: {fmt(grandTotal)} / 3 · Weights: HIGH×3, MEDIUM×2, LOW×1
           </p>
         </div>
@@ -248,15 +249,15 @@ export function FinalisedView({
               )}
             </div>
 
-            <div className="rounded-lg border overflow-hidden">
+            <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40%]">Requirement</TableHead>
-                    <TableHead>Weight</TableHead>
-                    <TableHead>Pedagogy avg</TableHead>
-                    <TableHead>Technical avg</TableHead>
-                    <TableHead>Combined</TableHead>
+                  <TableRow className="border-b border-stone-200/80 bg-stone-50/60 hover:bg-stone-50/60">
+                    <TableHead className="w-[40%] text-xs font-medium text-stone-500">Requirement</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Weight</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Pedagogy avg</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Technical avg</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Combined</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -266,19 +267,15 @@ export function FinalisedView({
                     const tAvg = avg(entry.technical)
                     const combined = combinedAvg(req.id)
                     return (
-                      <TableRow key={req.id}>
+                      <TableRow key={req.id} className="border-b border-stone-200/60 hover:bg-emerald-900/[0.025]">
                         <TableCell>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-sm font-medium">{req.title}</span>
-                            {req.isComplianceGate && (
-                              <span className="inline-flex items-center rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive ring-1 ring-inset ring-destructive/30">
-                                Gate
-                              </span>
-                            )}
+                            <span className="text-[13px] font-medium text-emerald-950">{req.title}</span>
+                            {req.isComplianceGate && <ComplianceGateBadge />}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-xs text-muted-foreground">{req.weight}</span>
+                          <WeightTier value={req.weight as 'HIGH' | 'MEDIUM' | 'LOW'} />
                         </TableCell>
                         <TableCell>
                           <span className="tabular-nums text-sm">{fmt(pAvg)}</span>

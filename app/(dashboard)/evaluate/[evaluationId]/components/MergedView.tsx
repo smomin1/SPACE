@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ConflictThread } from './ConflictThread'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { ComplianceGateBadge, WeightTier } from '@/components/admin/_shared/badges'
 import {
   Table,
   TableBody,
@@ -73,17 +73,17 @@ function ScorePill({
 }) {
   if (value === null) {
     return (
-      <span className="inline-block rounded px-1.5 py-0.5 text-xs bg-muted text-muted-foreground">
+      <span className="inline-block rounded-md px-1.5 py-0.5 text-[11px] bg-stone-100 text-stone-400 ring-1 ring-inset ring-stone-200">
         {userName ?? '?'}: N/A
       </span>
     )
   }
   return (
     <span
-      className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
+      className={`inline-block rounded-md px-1.5 py-0.5 text-[11px] font-medium ring-1 ring-inset ${
         value === 0
-          ? 'bg-destructive/15 text-destructive ring-1 ring-inset ring-destructive/30'
-          : 'bg-primary/10 text-primary'
+          ? 'bg-amber-50 text-amber-800 ring-amber-300/60'
+          : 'bg-emerald-50 text-emerald-800 ring-emerald-200/60'
       }`}
     >
       {userName ?? '?'}: {SCORE_LABELS[value]}
@@ -162,7 +162,7 @@ export function MergedView({
     <div className="space-y-6">
       {/* Admin toolbar */}
       {isAdmin && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3">
           <div className="flex-1 text-sm text-muted-foreground">
             {openThreadCount > 0 ? (
               <span className="text-amber-600 font-medium">
@@ -223,13 +223,13 @@ export function MergedView({
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               {category}
             </h2>
-            <div className="rounded-lg border overflow-hidden">
+            <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40%]">Requirement</TableHead>
-                    <TableHead>Evaluator Scores</TableHead>
-                    <TableHead className="w-[110px] text-right">Conflict</TableHead>
+                  <TableRow className="border-b border-stone-200/80 bg-stone-50/60 hover:bg-stone-50/60">
+                    <TableHead className="w-[40%] text-xs font-medium text-stone-500">Requirement</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Evaluator Scores</TableHead>
+                    <TableHead className="w-[110px] text-right text-xs font-medium text-stone-500">Conflict</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -242,17 +242,12 @@ export function MergedView({
                     return (
                       <TableRow
                         key={req.id}
-                        className={conflictOpen ? 'bg-amber-50/60 dark:bg-amber-950/20' : undefined}
+                        className={conflictOpen ? 'bg-amber-50/50 border-b border-stone-200/60' : 'border-b border-stone-200/60 hover:bg-emerald-900/[0.025]'}
                       >
                         <TableCell>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-medium text-sm">{req.title}</span>
-                            {req.isComplianceGate && (
-                              <span className="inline-flex items-center rounded-full bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive ring-1 ring-inset ring-destructive/30">
-                                Gate
-                              </span>
-                            )}
-                            <span className="text-xs text-muted-foreground">{req.weight}</span>
+                            <span className="text-[13px] font-medium text-emerald-950">{req.title}</span>
+                            {req.isComplianceGate && <ComplianceGateBadge />}
                           </div>
                         </TableCell>
 
@@ -287,17 +282,16 @@ export function MergedView({
                                   isClosed: thread.isClosed,
                                 })
                               }
-                              className="focus:outline-none"
+                              className={`inline-flex items-center gap-1 rounded-md px-2 h-[22px] text-[11px] font-medium ring-1 ring-inset transition-opacity hover:opacity-75 ${
+                                thread.isClosed
+                                  ? 'bg-emerald-50 text-emerald-800 ring-emerald-200/60'
+                                  : 'bg-amber-50 text-amber-800 ring-amber-300/60'
+                              }`}
                             >
-                              <Badge
-                                variant={thread.isClosed ? 'secondary' : 'destructive'}
-                                className="cursor-pointer hover:opacity-80 transition-opacity"
-                              >
-                                {thread.isClosed ? 'Resolved' : 'Conflict'}
-                              </Badge>
+                              {thread.isClosed ? 'Resolved' : 'Conflict'}
                             </button>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-stone-300">—</span>
                           )}
                         </TableCell>
                       </TableRow>

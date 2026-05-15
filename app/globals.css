@@ -37,37 +37,6 @@
   --radius-xl:           calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background:          #0b1410;
-    --foreground:          #f7f7f4;
-
-    --card:                #0f1b17;
-    --card-foreground:     #f7f7f4;
-
-    --popover:             #0f1b17;
-    --popover-foreground:  #f7f7f4;
-
-    --primary:             #10b981;
-    --primary-foreground:  #022c22;
-
-    --secondary:           #182420;
-    --secondary-foreground:#f7f7f4;
-
-    --muted:               #182320;
-    --muted-foreground:    #aaa89e;
-
-    --accent:              #182420;
-    --accent-foreground:   #f7f7f4;
-
-    --destructive:         #d0894d;
-    --destructive-foreground: #022c22;
-
-    --border:              #1c2a26;
-    --input:               #1c2a26;
-    --ring:                #10b981;
-  }
-}
 
 /* ── Tailwind v4 theme mapping ───────────────────────────────────────────── */
 @theme inline {
@@ -107,6 +76,10 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+}
+
+html {
+  color-scheme: light;
 }
 
 body {

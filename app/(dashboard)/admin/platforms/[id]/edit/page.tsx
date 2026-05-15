@@ -52,6 +52,7 @@ export default async function EditPlatformPage({ params }: Props) {
           name: a.user.name,
           email: a.user.email,
           evaluatorType: a.evaluatorType,
+          isLead: a.isLead,
         }))}
         users={users}
       />

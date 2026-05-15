@@ -30,13 +30,13 @@ import {
   ChevronsUpDownIcon,
   CheckIcon,
   PlusCircleIcon,
+  SearchIcon,
 } from 'lucide-react'
 import type { Requirement } from '@prisma/client'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -69,12 +69,16 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { ComplianceGateBadge } from './ComplianceGateBadge'
+import {
+  TypeBadge,
+  WeightTier,
+  ComplianceGateBadge,
+} from '@/components/admin/_shared/badges'
 import { BulkImportDialog } from '@/components/admin/requirements/BulkImportDialog'
 
 const PAGE_SIZE = 25
 
-// ── Inline column header with sort ──────────────────────────────────────────
+// ── Column header with sort ──────────────────────────────────────────────────
 
 function ColHeader<T, V>({
   column,
@@ -87,18 +91,18 @@ function ColHeader<T, V>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="-ml-2 h-7">
+        <Button variant="ghost" size="sm" className="-ml-2 h-7 text-xs font-medium text-stone-500 hover:text-emerald-950">
           {title}
           {column.getIsSorted() === 'desc' ? (
-            <ArrowDownIcon className="ml-1 size-3.5" />
+            <ArrowDownIcon className="ml-1 size-3" />
           ) : column.getIsSorted() === 'asc' ? (
-            <ArrowUpIcon className="ml-1 size-3.5" />
+            <ArrowUpIcon className="ml-1 size-3" />
           ) : (
-            <ChevronsUpDownIcon className="ml-1 size-3.5 opacity-50" />
+            <ChevronsUpDownIcon className="ml-1 size-3 opacity-40" />
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="start" className="w-32">
         <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
           <ArrowUpIcon className="mr-2 size-3.5" /> Asc
         </DropdownMenuItem>
@@ -114,7 +118,7 @@ function ColHeader<T, V>({
   )
 }
 
-// ── Inline faceted filter ────────────────────────────────────────────────────
+// ── Faceted filter ───────────────────────────────────────────────────────────
 
 function FacetFilter<T, V>({
   column,
@@ -131,13 +135,17 @@ function FacetFilter<T, V>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <PlusCircleIcon className="mr-1.5 size-3.5" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 border-stone-200 text-xs font-medium text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+        >
+          <PlusCircleIcon className="mr-1.5 size-3.5 text-stone-400" />
           {title}
           {selected.size > 0 && (
             <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
-              <span className="font-mono text-xs">{selected.size}</span>
+              <Separator orientation="vertical" className="mx-2 h-3.5" />
+              <span className="font-mono text-[11px] text-emerald-700">{selected.size}</span>
             </>
           )}
         </Button>
@@ -148,7 +156,7 @@ function FacetFilter<T, V>({
           return (
             <div
               key={opt.value}
-              className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+              className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm hover:bg-stone-50"
               onClick={() => {
                 if (active) selected.delete(opt.value)
                 else selected.add(opt.value)
@@ -158,15 +166,17 @@ function FacetFilter<T, V>({
             >
               <div
                 className={cn(
-                  'mr-2 flex size-4 items-center justify-center rounded-sm border border-primary',
-                  active ? 'bg-primary text-primary-foreground' : 'opacity-40'
+                  'mr-2 flex size-4 items-center justify-center rounded-sm border',
+                  active
+                    ? 'border-emerald-700 bg-emerald-700 text-white'
+                    : 'border-stone-300 opacity-60'
                 )}
               >
-                <CheckIcon className="size-3" />
+                {active && <CheckIcon className="size-3" />}
               </div>
-              <span className="flex-1">{opt.label}</span>
+              <span className="flex-1 text-emerald-950">{opt.label}</span>
               {facets.get(opt.value) != null && (
-                <span className="ml-auto text-xs text-muted-foreground">
+                <span className="ml-auto font-mono text-[11px] text-stone-400">
                   {facets.get(opt.value)}
                 </span>
               )}
@@ -177,7 +187,7 @@ function FacetFilter<T, V>({
           <>
             <Separator className="my-1" />
             <div
-              className="cursor-pointer rounded-sm px-2 py-1.5 text-center text-xs text-muted-foreground hover:bg-accent"
+              className="cursor-pointer rounded-sm px-2 py-1.5 text-center text-xs text-stone-500 hover:bg-stone-50"
               onClick={() => column.setFilterValue(undefined)}
             >
               Clear filter
@@ -189,28 +199,7 @@ function FacetFilter<T, V>({
   )
 }
 
-// ── Type / weight badge styles ───────────────────────────────────────────────
-
-const TYPE_CLS: Record<string, string> = {
-  COMPLIANCE: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-  PEDAGOGY:   'bg-blue-100  text-blue-700  dark:bg-blue-900/50  dark:text-blue-300',
-  TECHNICAL:  'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
-}
-const WEIGHT_CLS: Record<string, string> = {
-  HIGH:   'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-  MEDIUM: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-  LOW:    'bg-gray-100   text-gray-600   dark:bg-gray-800      dark:text-gray-400',
-}
-
-function Chip({ value, map }: { value: string; map: Record<string, string> }) {
-  return (
-    <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', map[value])}>
-      {value.charAt(0) + value.slice(1).toLowerCase()}
-    </span>
-  )
-}
-
-// ── Delete row action ────────────────────────────────────────────────────────
+// ── Delete action ────────────────────────────────────────────────────────────
 
 function DeleteAction({ req }: { req: Requirement }) {
   const router = useRouter()
@@ -237,7 +226,7 @@ function DeleteAction({ req }: { req: Requirement }) {
         <Button
           variant="ghost"
           size="sm"
-          className="size-7 p-0 text-muted-foreground hover:text-destructive"
+          className="size-7 p-0 text-stone-400 hover:text-amber-700"
         >
           <Trash2Icon className="size-3.5" />
           <span className="sr-only">Delete</span>
@@ -248,13 +237,13 @@ function DeleteAction({ req }: { req: Requirement }) {
           <AlertDialogTitle>Delete requirement?</AlertDialogTitle>
           <AlertDialogDescription>
             <strong>&ldquo;{req.title}&rdquo;</strong> will be permanently removed.
-            {err && <span className="mt-1 block font-medium text-destructive">{err}</span>}
+            {err && <span className="mt-1 block font-medium text-amber-800">{err}</span>}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-amber-700 text-amber-50 hover:bg-amber-800"
             onClick={handleDelete}
           >
             Delete
@@ -274,12 +263,17 @@ function buildColumns(): ColumnDef<Requirement>[] {
       header: '#',
       size: 48,
       enableColumnFilter: false,
+      cell: ({ row }) => (
+        <span className="font-mono text-[11px] text-stone-400 tabular-nums">
+          {row.original.order}
+        </span>
+      ),
     },
     {
       accessorKey: 'title',
       header: ({ column }) => <ColHeader column={column} title="Requirement" />,
       cell: ({ row }) => (
-        <span className={row.original.isComplianceGate ? 'font-medium' : undefined}>
+        <span className={cn('text-[13px] text-emerald-950', row.original.isComplianceGate && 'font-medium')}>
           {row.original.title}
         </span>
       ),
@@ -288,21 +282,23 @@ function buildColumns(): ColumnDef<Requirement>[] {
       accessorKey: 'category',
       header: ({ column }) => <ColHeader column={column} title="Category" />,
       cell: ({ row }) =>
-        row.original.category ?? (
-          <span className="text-muted-foreground">—</span>
+        row.original.category ? (
+          <span className="text-[13px] text-emerald-950/70">{row.original.category}</span>
+        ) : (
+          <span className="text-stone-400">—</span>
         ),
       filterFn: 'includesString',
     },
     {
       accessorKey: 'evaluatorType',
       header: 'Type',
-      cell: ({ row }) => <Chip value={row.original.evaluatorType} map={TYPE_CLS} />,
+      cell: ({ row }) => <TypeBadge value={row.original.evaluatorType} />,
       filterFn: (row, id, value: string[]) => value.includes(row.getValue(id)),
     },
     {
       accessorKey: 'weight',
       header: 'Weight',
-      cell: ({ row }) => <Chip value={row.original.weight} map={WEIGHT_CLS} />,
+      cell: ({ row }) => <WeightTier value={row.original.weight} />,
       filterFn: (row, id, value: string[]) => value.includes(row.getValue(id)),
     },
     {
@@ -318,7 +314,7 @@ function buildColumns(): ColumnDef<Requirement>[] {
       enableColumnFilter: false,
       cell: ({ row }) => (
         <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="sm" className="size-7 p-0" asChild>
+          <Button variant="ghost" size="sm" className="size-7 p-0 text-stone-400 hover:text-emerald-800" asChild>
             <Link href={`/admin/requirements/${row.original.id}/edit`}>
               <PencilIcon className="size-3.5" />
               <span className="sr-only">Edit</span>
@@ -378,12 +374,15 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2">
-        <Input
-          placeholder="Search requirements…"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="h-8 w-60"
-        />
+        <div className="relative">
+          <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-stone-400 pointer-events-none" />
+          <Input
+            placeholder="Search requirements…"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="h-8 w-72 pl-8 text-sm border-stone-200 placeholder:text-stone-400"
+          />
+        </div>
 
         <FacetFilter
           column={table.getColumn('evaluatorType')!}
@@ -399,7 +398,7 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
           column={table.getColumn('weight')!}
           title="Weight"
           options={[
-            { label: 'High (3×)',   value: 'HIGH' },
+            { label: 'High (3×)',    value: 'HIGH' },
             { label: 'Medium (2×)', value: 'MEDIUM' },
             { label: 'Low (1×)',    value: 'LOW' },
           ]}
@@ -408,17 +407,23 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
         <Button
           variant={gatesOnly ? 'default' : 'outline'}
           size="sm"
-          className="h-8"
+          className={cn(
+            'h-8 gap-1.5 text-xs',
+            gatesOnly
+              ? 'bg-amber-700 text-amber-50 hover:bg-amber-800 border-transparent'
+              : 'border-stone-200 text-stone-600 hover:border-stone-300 hover:bg-stone-50'
+          )}
           onClick={() => setGatesOnly((v) => !v)}
         >
-          Gates only
+          <ComplianceGateBadge />
+          only
         </Button>
 
         {isFiltered && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 px-2 text-muted-foreground"
+            className="h-8 px-2 text-xs text-stone-500 hover:text-emerald-950"
             onClick={() => {
               table.resetColumnFilters()
               setGlobalFilter('')
@@ -432,9 +437,9 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
 
         <div className="ml-auto flex items-center gap-2">
           <BulkImportDialog onSuccess={() => router.refresh()} />
-          <Button size="sm" asChild>
+          <Button size="sm" className="h-8 bg-emerald-800 hover:bg-emerald-900 text-white" asChild>
             <Link href="/admin/requirements/new">
-              <PlusIcon className="mr-1.5 size-4" />
+              <PlusIcon className="mr-1.5 size-3.5" />
               New Requirement
             </Link>
           </Button>
@@ -442,13 +447,13 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border">
+      <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
+              <TableRow key={hg.id} className="border-b border-stone-200/80 bg-stone-50/60 hover:bg-stone-50/60">
                 {hg.headers.map((h) => (
-                  <TableHead key={h.id}>
+                  <TableHead key={h.id} className="text-xs font-medium text-stone-500 h-9">
                     {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
                   </TableHead>
                 ))}
@@ -461,12 +466,14 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
                 <TableRow
                   key={row.id}
                   className={cn(
-                    row.original.isComplianceGate &&
-                      'bg-destructive/5 hover:bg-destructive/10'
+                    'border-b border-stone-200/60 transition-colors',
+                    row.original.isComplianceGate
+                      ? 'bg-amber-50/30 hover:bg-amber-50/50'
+                      : 'hover:bg-emerald-900/[0.025]'
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-2.5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -476,7 +483,7 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
+                  className="h-24 text-center text-sm text-stone-400"
                 >
                   No requirements found.
                 </TableCell>
@@ -487,7 +494,7 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex items-center justify-between text-xs text-stone-500 tabular-nums">
         <span>
           {totalRows === 0
             ? 'No results'
@@ -497,41 +504,41 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
           <Button
             variant="outline"
             size="sm"
-            className="size-8 p-0"
+            className="size-7 p-0 border-stone-200"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <ChevronsLeftIcon className="size-4" />
+            <ChevronsLeftIcon className="size-3.5" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="size-8 p-0"
+            className="size-7 p-0 border-stone-200"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <ChevronLeftIcon className="size-4" />
+            <ChevronLeftIcon className="size-3.5" />
           </Button>
-          <span className="px-2 tabular-nums">
+          <span className="px-2">
             Page {pageIndex + 1} / {Math.max(table.getPageCount(), 1)}
           </span>
           <Button
             variant="outline"
             size="sm"
-            className="size-8 p-0"
+            className="size-7 p-0 border-stone-200"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <ChevronRightIcon className="size-4" />
+            <ChevronRightIcon className="size-3.5" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="size-8 p-0"
+            className="size-7 p-0 border-stone-200"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
-            <ChevronsRightIcon className="size-4" />
+            <ChevronsRightIcon className="size-3.5" />
           </Button>
         </div>
       </div>

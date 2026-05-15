@@ -88,7 +88,8 @@ export default async function EvaluationWorkspacePage({
         <header className="mb-6">
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-semibold">{evaluation.platform.name}</h1>
-            <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 ring-1 ring-inset ring-blue-700/20">
+            <span className="inline-flex items-center rounded-md bg-stone-100/80 ring-1 ring-inset ring-stone-200 px-2 h-[22px] text-[11.5px] font-medium tracking-tight text-emerald-950">
+              <span className="size-1.5 rounded-full bg-emerald-600 mr-1.5" />
               In Progress
             </span>
           </div>

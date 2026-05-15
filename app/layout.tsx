@@ -10,7 +10,6 @@ const inter = Inter({
 const sourceSerif4 = Source_Serif_4({
   variable: "--font-serif",
   subsets: ["latin"],
-  axes: ["opsz"],
   weight: ["400", "500", "600"],
 });
 

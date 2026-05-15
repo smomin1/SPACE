@@ -80,6 +80,19 @@ export function canTransitionTo(
 
 // ─── Async query helpers ──────────────────────────────────────────────────────
 
+/**
+ * Attempt to finalise the evaluation if it is in MERGED state and all conflict
+ * threads are resolved. Safe to call speculatively — returns false instead of
+ * throwing when the evaluation isn't ready yet.
+ */
+export async function autoFinaliseIfReady(
+  evaluationId: string,
+  actingUserId: string,
+): Promise<boolean> {
+  const result = await transitionEvaluation(evaluationId, 'FINALISED', actingUserId)
+  return result.ok
+}
+
 export async function checkAllTeamsSubmitted(evaluationId: string): Promise<boolean> {
   const unsubmitted = await prisma.evaluatorAssignment.count({
     where: { evaluationId, hasSubmitted: false },
@@ -141,9 +154,6 @@ function computeConflicts(
   for (const [requirementId, reqScores] of byRequirement) {
     const title = reqScores[0]?.title ?? ''
 
-    // Requirements are exclusively owned by one evaluatorType.
-    // Conflicts arise when multiple evaluators on the same team disagree by more than 1
-    // (intra-team disagreement = personal bias to resolve).
     const nonNull = reqScores.filter(s => s.value !== null && typeByUser.has(s.userId))
     if (nonNull.length < 2) continue  // need ≥2 evaluators to have a disagreement
 
@@ -151,7 +161,7 @@ function computeConflicts(
     const values = nonNull.map(s => s.value as number)
     const maxDiff = Math.max(...values) - Math.min(...values)
 
-    if (maxDiff > 1) {
+    if (maxDiff > 0) {
       conflicts.push({ requirementId, requirementTitle: title, evaluatorType, scores: values, maxDiff })
     }
   }

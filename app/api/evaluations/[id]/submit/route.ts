@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
-import { checkAllTeamsSubmitted, transitionEvaluation } from '@/lib/evaluation-state'
+import { checkAllTeamsSubmitted, transitionEvaluation, autoFinaliseIfReady } from '@/lib/evaluation-state'
 
 export async function POST(
   _request: Request,
@@ -97,6 +97,11 @@ export async function POST(
     const transition = await transitionEvaluation(evaluationId, 'MERGED', session.user.id)
     if (transition.ok) {
       evaluationState = 'MERGED'
+      // If there are no conflicts at all, immediately finalise
+      if ((transition.conflictCount ?? 0) === 0) {
+        const finalised = await autoFinaliseIfReady(evaluationId, session.user.id)
+        if (finalised) evaluationState = 'FINALISED'
+      }
     }
   }
 

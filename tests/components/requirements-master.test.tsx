@@ -226,6 +226,7 @@ vi.mock('lucide-react', async () => {
     LayoutDashboardIcon: Icon,
     ClipboardListIcon: Icon,
     BarChart2Icon: Icon,
+    SearchIcon: Icon,
   }
 })
 
@@ -361,8 +362,13 @@ describe('RequirementsTable — compliance gate row', () => {
       '@/app/(dashboard)/admin/requirements/components/RequirementsTable'
     )
     const gateReq = makeReq({ isComplianceGate: true, title: 'GDPR Compliance' })
-    render(<RequirementsTable initialData={[gateReq]} />)
-    expect(screen.getByText('Compliance Gate')).toBeInTheDocument()
+    const { container } = render(<RequirementsTable initialData={[gateReq]} />)
+    // Badge appears in toolbar (always) AND in the gate row cell → at least 2 occurrences
+    const gateBadges = screen.getAllByText('Gate')
+    expect(gateBadges.length).toBeGreaterThanOrEqual(2)
+    // Also verify the badge is inside a tbody row
+    const tbody = container.querySelector('tbody')
+    expect(tbody?.textContent).toContain('Gate')
   })
 
   it('does NOT render ComplianceGateBadge for a non-gate requirement', async () => {
@@ -370,11 +376,13 @@ describe('RequirementsTable — compliance gate row', () => {
       '@/app/(dashboard)/admin/requirements/components/RequirementsTable'
     )
     const nonGateReq = makeReq({ isComplianceGate: false, title: 'Curriculum Alignment' })
-    render(<RequirementsTable initialData={[nonGateReq]} />)
-    expect(screen.queryByText('Compliance Gate')).not.toBeInTheDocument()
+    const { container } = render(<RequirementsTable initialData={[nonGateReq]} />)
+    // Toolbar always renders the badge, but the table cell should NOT
+    const tbody = container.querySelector('tbody')
+    expect(tbody?.textContent).not.toContain('Gate')
   })
 
-  it('applies a red background tint to gate rows', async () => {
+  it('applies an amber background tint to gate rows', async () => {
     const { RequirementsTable } = await import(
       '@/app/(dashboard)/admin/requirements/components/RequirementsTable'
     )
@@ -382,7 +390,7 @@ describe('RequirementsTable — compliance gate row', () => {
     const { container } = render(<RequirementsTable initialData={[gateReq]} />)
     const rows = container.querySelectorAll('tbody tr')
     const gateRow = rows[0] as HTMLElement
-    expect(gateRow.className).toMatch(/destructive/)
+    expect(gateRow.className).toMatch(/amber/)
   })
 })
 

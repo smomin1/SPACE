@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { updateScore } from '@/lib/score-service'
-import { checkAllTeamsSubmitted, transitionEvaluation } from '@/lib/evaluation-state'
+import { checkAllTeamsSubmitted, transitionEvaluation, autoFinaliseIfReady } from '@/lib/evaluation-state'
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -112,6 +112,7 @@ export async function POST(
     select: { id: true },
   })
 
+  let threadAutoClosedForReq = false
   let score
   if (existing) {
     // updateScore is transactional: it updates the score and writes a ScoreAuditLog row atomically
@@ -152,7 +153,26 @@ export async function POST(
     })
   }
 
-  // AUTO-TRANSITION — if all assigned evaluators have submitted, advance to MERGED
+  // Auto-close conflict thread if scores converged during MERGED review
+  if (evaluation.state === 'MERGED') {
+    const reqScores = await prisma.score.findMany({
+      where: { evaluationId, requirementId },
+      select: { value: true },
+    })
+    const numericScores = reqScores.filter(s => s.value !== null).map(s => s.value as number)
+    if (numericScores.length >= 2) {
+      const maxDiff = Math.max(...numericScores) - Math.min(...numericScores)
+      if (maxDiff === 0) {
+        await prisma.conflictThread.updateMany({
+          where: { evaluationId, requirementId, isClosed: false },
+          data: { isClosed: true, closedAt: new Date(), closedById: session.user.id },
+        })
+        threadAutoClosedForReq = true
+      }
+    }
+  }
+
+  // AUTO-TRANSITION — advance state as work completes
   let evaluationState = evaluation.state
   if (evaluation.state === 'IN_PROGRESS') {
     const allSubmitted = await checkAllTeamsSubmitted(evaluationId)
@@ -160,12 +180,20 @@ export async function POST(
       const transition = await transitionEvaluation(evaluationId, 'MERGED', session.user.id)
       if (transition.ok) {
         evaluationState = 'MERGED'
+        if ((transition.conflictCount ?? 0) === 0) {
+          const finalised = await autoFinaliseIfReady(evaluationId, session.user.id)
+          if (finalised) evaluationState = 'FINALISED'
+        }
       }
     }
+  } else if (evaluation.state === 'MERGED' && threadAutoClosedForReq) {
+    // Score convergence may have closed the last open thread — try to finalise
+    const finalised = await autoFinaliseIfReady(evaluationId, session.user.id)
+    if (finalised) evaluationState = 'FINALISED'
   }
 
   return Response.json(
-    { score, evaluationState },
+    { score, evaluationState, threadAutoClosed: threadAutoClosedForReq },
     { status: existing ? 200 : 201 },
   )
 }

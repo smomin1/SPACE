@@ -256,7 +256,23 @@ export function PlatformForm({
       })
     }
 
-    router.push('/admin/platforms')
+    // On create, auto-create an Evaluation with all assigned evaluators
+    if (!isEdit) {
+      await fetch('/api/evaluations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platformId: pid,
+          evaluators: evaluators.map(e => ({
+            userId: e.userId,
+            evaluatorType: e.evaluatorType,
+            isLead: e.isLead,
+          })),
+        }),
+      })
+    }
+
+    router.push(isEdit ? '/admin/platforms' : '/evaluations')
     router.refresh()
   }
 

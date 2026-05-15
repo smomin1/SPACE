@@ -52,9 +52,11 @@ type Assignment = {
   isLead?: boolean
 }
 
-type TeamMember = {
+type Member = {
   userId: string
   name: string | null
+  evaluatorType: EvaluatorType
+  isLead: boolean
   hasSubmitted: boolean
 }
 
@@ -64,8 +66,7 @@ type Props = {
   ownScores: Score[]
   assignment: Assignment
   isAdmin: boolean
-  teamAssignments: TeamMember[]
-  allAssignments: Assignment[]
+  allMembers: Member[]
 }
 
 const EVIDENCE_LABELS: Record<string, string> = {
@@ -88,9 +89,8 @@ export function ScoringForm({
   requirements,
   ownScores,
   assignment,
-  isAdmin,
-  teamAssignments,
-  allAssignments,
+  isAdmin: _isAdmin,
+  allMembers,
 }: Props) {
   const router = useRouter()
   const [scores, setScores] = useState<Map<string, Score>>(
@@ -177,21 +177,6 @@ export function ScoringForm({
     })
   }
 
-  async function handleMerge() {
-    startTransition(async () => {
-      const res = await fetch(`/api/evaluations/${evaluationId}/merge`, { method: 'POST' })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        toast.error(data.error ?? 'Failed to merge')
-        return
-      }
-      toast.success('Scores merged')
-      router.refresh()
-    })
-  }
-
-  const submittedCount = allAssignments.filter(a => a.hasSubmitted).length
-
   return (
     <div className="space-y-6">
       <ProgressBar
@@ -200,59 +185,51 @@ export function ScoringForm({
         hasSubmitted={assignment.hasSubmitted}
       />
 
-      {/* Lead: team submission status panel */}
-      {teamAssignments.length > 0 && (
-        <div className="rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3 space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Team submissions
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {teamAssignments.map(m => (
-              <span
-                key={m.userId}
-                className={`inline-flex items-center gap-1.5 rounded-md ring-1 ring-inset px-2 h-[22px] text-[11.5px] font-medium tracking-tight ${
-                  m.hasSubmitted
-                    ? 'bg-stone-100/80 ring-stone-200 text-emerald-950'
-                    : 'bg-stone-50 ring-stone-200 text-stone-400'
-                }`}
-              >
-                <span className={`size-1.5 rounded-full shrink-0 ${m.hasSubmitted ? 'bg-emerald-600' : 'bg-stone-300'}`} />
-                {m.name ?? 'Unknown'}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Admin: force merge override */}
-      {isAdmin && (
-        <div className="flex items-center gap-3 rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3">
-          <span className="text-sm text-muted-foreground flex-1">
-            {submittedCount} of {allAssignments.length} evaluator(s) submitted
-          </span>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="sm" variant="outline" disabled={isPending}>
-                Force Merge
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Force merge scores?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {submittedCount < allAssignments.length
-                    ? `${allAssignments.length - submittedCount} evaluator(s) have not yet submitted. Merging now will use scores submitted so far.`
-                    : 'All evaluators have submitted. This will advance the evaluation to the review phase.'}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleMerge}>Force Merge</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )}
+      {/* All evaluators panel - shown always */}
+      <div className="rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Team submissions
+        </p>
+        {(['PEDAGOGY', 'TECHNICAL'] as const).map(type => {
+          const members = allMembers.filter(m => m.evaluatorType === type)
+          if (members.length === 0) return null
+          return (
+            <div key={type}>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400 mb-1.5">
+                {type === 'PEDAGOGY' ? 'Pedagogy' : 'Technical'}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {members.map(m => (
+                  <span
+                    key={m.userId}
+                    className={`inline-flex items-center gap-1.5 rounded-md ring-1 ring-inset px-2 h-[22px] text-[11.5px] font-medium tracking-tight ${
+                      m.hasSubmitted
+                        ? 'bg-stone-100/80 ring-stone-200 text-emerald-950'
+                        : 'bg-stone-50 ring-stone-200 text-stone-400'
+                    }`}
+                  >
+                    <span className={`size-1.5 rounded-full shrink-0 ${m.hasSubmitted ? 'bg-emerald-600' : 'bg-stone-300'}`} />
+                    {m.isLead && <span className="text-amber-500">★</span>}
+                    {m.name ?? 'Unknown'}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+        {(() => {
+          const submittedCount = allMembers.filter(m => m.hasSubmitted).length
+          const totalCount = allMembers.length
+          const allSubmitted = submittedCount === totalCount && totalCount > 0
+          return (
+            <p className="text-xs text-muted-foreground pt-1 border-t border-stone-200/60">
+              {allSubmitted
+                ? 'All evaluators submitted — merging automatically…'
+                : `${submittedCount} of ${totalCount} evaluators submitted`}
+            </p>
+          )
+        })()}
+      </div>
 
       {categories.map(category => {
         const catReqs = requirements.filter(r => (r.category ?? 'General') === category)

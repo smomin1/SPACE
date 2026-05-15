@@ -228,7 +228,7 @@ describe('detectConflicts()', () => {
     expect(await detectConflicts('eval-1')).toEqual([])
   })
 
-  it('returns empty array when diff is exactly 1 (boundary — acceptable spread)', async () => {
+  it('detects a conflict when diff is exactly 1', async () => {
     mockPrisma.score.findMany.mockResolvedValue([
       makeScore('req-1', 'u-ped-1', 3),
       makeScore('req-1', 'u-ped-2', 2),
@@ -237,7 +237,9 @@ describe('detectConflicts()', () => {
       makeAssignment('u-ped-1', 'PEDAGOGY'),
       makeAssignment('u-ped-2', 'PEDAGOGY'),
     ])
-    expect(await detectConflicts('eval-1')).toEqual([])
+    const conflicts = await detectConflicts('eval-1')
+    expect(conflicts).toHaveLength(1)
+    expect(conflicts[0].maxDiff).toBe(1)
   })
 
   it('detects an intra-team conflict when two PEDAGOGY evaluators differ by 2', async () => {
@@ -288,12 +290,14 @@ describe('detectConflicts()', () => {
     expect(await detectConflicts('eval-1')).toEqual([])
   })
 
-  it('handles multiple requirements and only returns conflicting ones', async () => {
+  it('handles multiple requirements and returns all with any score difference', async () => {
     mockPrisma.score.findMany.mockResolvedValue([
       makeScore('req-1', 'u-ped-1', 3, 'A'), // diff 2 → conflict
       makeScore('req-1', 'u-ped-2', 1, 'A'),
-      makeScore('req-2', 'u-tech-1', 2, 'B'), // diff 1 → no conflict
+      makeScore('req-2', 'u-tech-1', 2, 'B'), // diff 1 → conflict
       makeScore('req-2', 'u-tech-2', 1, 'B'),
+      makeScore('req-3', 'u-ped-1', 2, 'A'), // diff 0 → no conflict
+      makeScore('req-3', 'u-ped-2', 2, 'A'),
     ])
     mockPrisma.evaluatorAssignment.findMany.mockResolvedValue([
       makeAssignment('u-ped-1', 'PEDAGOGY'),
@@ -302,8 +306,8 @@ describe('detectConflicts()', () => {
       makeAssignment('u-tech-2', 'TECHNICAL'),
     ])
     const conflicts = await detectConflicts('eval-1')
-    expect(conflicts).toHaveLength(1)
-    expect(conflicts[0].requirementId).toBe('req-1')
+    expect(conflicts).toHaveLength(2)
+    expect(conflicts.map(c => c.requirementId)).toEqual(expect.arrayContaining(['req-1', 'req-2']))
   })
 
   it('takes the worst-case diff across three evaluators on the same team', async () => {

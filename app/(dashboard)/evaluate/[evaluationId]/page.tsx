@@ -64,7 +64,44 @@ export default async function EvaluationWorkspacePage({
 
   // ── IN_PROGRESS ──────────────────────────────────────────────────────────────
   if (evaluation.state === 'IN_PROGRESS') {
-    if (!isEvaluator || !myAssignment) redirect('/dashboard')
+    // Admin without assignment: show read-only monitoring view
+    if (isAdmin && !myAssignment) {
+      return (
+        <main className="container mx-auto py-8 max-w-5xl">
+          <header className="mb-6">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-semibold">{evaluation.platform.name}</h1>
+              <span className="inline-flex items-center rounded-md bg-stone-100/80 ring-1 ring-inset ring-stone-200 px-2 h-[22px] text-[11.5px] font-medium tracking-tight text-emerald-950">
+                <span className="size-1.5 rounded-full bg-emerald-600 mr-1.5" />
+                In Progress
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">{evaluation.platform.vendor}</p>
+          </header>
+          <div className="rounded-xl border border-stone-200/80 bg-white divide-y divide-stone-100">
+            <div className="px-5 py-3.5">
+              <p className="text-xs font-medium uppercase tracking-wider text-stone-400 mb-3">Evaluator Status</p>
+              <div className="space-y-2">
+                {evaluation.assignments.map(a => (
+                  <div key={a.userId} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-emerald-950">{a.user.name}</span>
+                      <span className="text-xs text-stone-400 capitalize">{a.evaluatorType.toLowerCase()}</span>
+                      {a.isLead && <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Lead</span>}
+                    </div>
+                    <span className={`text-xs font-medium ${a.hasSubmitted ? 'text-emerald-700' : 'text-stone-400'}`}>
+                      {a.hasSubmitted ? 'Submitted' : 'Not submitted'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      )
+    }
+
+    if (!isEvaluator || !myAssignment) redirect('/evaluations')
 
     const [requirements, ownScores] = await Promise.all([
       prisma.requirement.findMany({
@@ -78,10 +115,13 @@ export default async function EvaluationWorkspacePage({
       }),
     ])
 
-    // Team assignments: leads see their own team's submission status
-    const teamAssignments = evaluation.assignments
-      .filter(a => a.evaluatorType === myAssignment.evaluatorType)
-      .map(a => ({ userId: a.userId, name: a.user.name, hasSubmitted: a.hasSubmitted }))
+    const allMembers = evaluation.assignments.map(a => ({
+      userId: a.userId,
+      name: a.user.name,
+      evaluatorType: a.evaluatorType,
+      isLead: a.isLead,
+      hasSubmitted: a.hasSubmitted,
+    }))
 
     return (
       <main className="container mx-auto py-8 max-w-5xl">
@@ -102,8 +142,7 @@ export default async function EvaluationWorkspacePage({
           ownScores={ownScores}
           assignment={{ userId: myAssignment.userId, evaluatorType: myAssignment.evaluatorType, hasSubmitted: myAssignment.hasSubmitted, isLead: myAssignment.isLead }}
           isAdmin={isAdmin}
-          teamAssignments={myAssignment.isLead ? teamAssignments : []}
-          allAssignments={evaluation.assignments.map(a => ({ userId: a.userId, evaluatorType: a.evaluatorType, hasSubmitted: a.hasSubmitted }))}
+          allMembers={allMembers}
         />
       </main>
     )
@@ -114,7 +153,7 @@ export default async function EvaluationWorkspacePage({
   if (evaluation.state === 'MERGED') {
     if (!isEvaluator) redirect('/dashboard')
 
-    const [requirements, allScores, threads] = await Promise.all([
+    const [requirements, allScores, threads, submissionEvents, auditEvents] = await Promise.all([
       prisma.requirement.findMany({
         select: REQUIREMENT_SELECT,
         orderBy: [{ category: 'asc' }, { order: 'asc' }],
@@ -128,6 +167,7 @@ export default async function EvaluationWorkspacePage({
           evidenceType: true,
           comment: true,
           userId: true,
+          updatedAt: true,
           user: { select: { id: true, name: true, role: true } },
         },
       }),
@@ -135,7 +175,57 @@ export default async function EvaluationWorkspacePage({
         where: { evaluationId },
         select: { id: true, requirementId: true, isClosed: true },
       }),
+      prisma.evaluatorAssignment.findMany({
+        where: { evaluationId, hasSubmitted: true },
+        select: {
+          submittedAt: true,
+          evaluatorType: true,
+          isLead: true,
+          user: { select: { name: true } },
+        },
+        orderBy: { submittedAt: 'asc' },
+      }),
+      prisma.scoreAuditLog.findMany({
+        where: {
+          score: { evaluationId },
+          NOT: { previousValue: null, newValue: null },
+        },
+        select: {
+          id: true,
+          changedAt: true,
+          previousValue: true,
+          newValue: true,
+          changedBy: { select: { name: true } },
+          score: { select: { requirement: { select: { title: true } } } },
+        },
+        orderBy: { changedAt: 'asc' },
+        take: 50,
+      }),
     ])
+
+    type ActivityEntry = {
+      id: string
+      timestamp: string
+      label: string
+      type: 'submit' | 'score_update'
+    }
+
+    const activityLog: ActivityEntry[] = [
+      ...submissionEvents.map((e, i) => ({
+        id: `sub-${i}`,
+        timestamp: e.submittedAt?.toISOString() ?? new Date(0).toISOString(),
+        label: `${e.user.name ?? 'Unknown'}${e.isLead ? ' (Lead)' : ''} submitted ${e.evaluatorType === 'PEDAGOGY' ? 'Pedagogy' : 'Technical'} scores`,
+        type: 'submit' as const,
+      })),
+      ...auditEvents
+        .filter(e => e.previousValue !== e.newValue)
+        .map(e => ({
+          id: `audit-${e.id}`,
+          timestamp: e.changedAt.toISOString(),
+          label: `${e.changedBy.name ?? 'Unknown'} updated ${e.score.requirement.title}: ${e.previousValue ?? 'N/A'} → ${e.newValue ?? 'N/A'}`,
+          type: 'score_update' as const,
+        })),
+    ].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
 
     // Each team resolves their own conflicts independently
     const myEvaluatorType = myAssignment?.evaluatorType ?? null
@@ -162,7 +252,9 @@ export default async function EvaluationWorkspacePage({
           currentUserId={userId}
           currentUserRole={role}
           currentEvaluatorType={myEvaluatorType}
+          isLead={myAssignment?.isLead ?? false}
           isAdmin={isAdmin}
+          activityLog={activityLog}
         />
       </main>
     )

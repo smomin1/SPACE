@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { autoFinaliseIfReady } from '@/lib/evaluation-state'
 
 const patchSchema = z.object({
   action: z.literal('close'),
@@ -67,5 +68,8 @@ export async function PATCH(
     select: { id: true, isClosed: true, closedAt: true },
   })
 
-  return Response.json({ thread: updated })
+  // Auto-finalise if this was the last open thread
+  const autoFinalised = await autoFinaliseIfReady(evaluationId, session.user.id)
+
+  return Response.json({ thread: updated, autoFinalised })
 }

@@ -10,13 +10,15 @@ export async function POST(
   if (!session?.user) {
     return Response.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
   }
-  if (!canDo(session.user.role, 'lock:evaluation')) {
+  const isAdmin = canDo(session.user.role, 'lock:evaluation')
+  const isEvaluator = canDo(session.user.role, 'access:evaluate')
+  if (!isAdmin && !isEvaluator) {
     return Response.json({ error: 'Forbidden', code: 'FORBIDDEN' }, { status: 403 })
   }
 
   const { id: evaluationId } = await params
-  // Admin force-merge bypasses the all-submitted guard
-  const result = await transitionEvaluation(evaluationId, 'MERGED', session.user.id, true)
+  // Admin force-merge bypasses the all-submitted guard; evaluators must wait for all to submit
+  const result = await transitionEvaluation(evaluationId, 'MERGED', session.user.id, isAdmin)
 
   if (!result.ok) {
     return Response.json({ error: result.message, code: result.error }, { status: 422 })

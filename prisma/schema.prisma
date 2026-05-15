@@ -95,6 +95,7 @@ model User {
   name         String
   passwordHash String
   role         Role
+  isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -104,6 +105,7 @@ model User {
   conflictMessages         ConflictMessage[]
   closedThreads            ConflictThread[]
   platformAssignments      PlatformEvaluatorAssignment[]
+  teamMerges               EvaluationTeamMerge[]
 }
 
 model Platform {
@@ -135,6 +137,7 @@ model Evaluation {
   assignments     EvaluatorAssignment[]
   scores          Score[]
   conflictThreads ConflictThread[]
+  teamMerges      EvaluationTeamMerge[]
 }
 
 // Links a User to an Evaluation with an explicit team role.
@@ -296,4 +299,20 @@ model ConflictMessage {
 
   thread ConflictThread @relation(fields: [threadId], references: [id])
   author User           @relation(fields: [authorId], references: [id])
+}
+
+// Records when a team lead merges their team's scores.
+// One record per (evaluation, evaluatorType). Both teams must have a record
+// before the evaluation can advance to MERGED.
+model EvaluationTeamMerge {
+  id            String        @id @default(cuid())
+  evaluationId  String
+  evaluatorType EvaluatorType
+  mergedAt      DateTime      @default(now())
+  mergedById    String
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+  mergedBy   User       @relation(fields: [mergedById], references: [id])
+
+  @@unique([evaluationId, evaluatorType])
 }

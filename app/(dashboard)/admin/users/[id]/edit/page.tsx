@@ -1,0 +1,36 @@
+import { redirect, notFound } from 'next/navigation'
+import { auth } from '@/lib/auth'
+import { canDo } from '@/lib/permissions'
+import { prisma } from '@/lib/prisma'
+import { UserForm } from '@/components/admin/users/UserForm'
+
+export default async function EditUserPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const session = await auth()
+  if (!session?.user) redirect('/login')
+  if (!canDo(session.user.role, 'manage:users')) redirect('/dashboard')
+
+  const { id } = await params
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, name: true, role: true, isActive: true },
+  })
+  if (!user) notFound()
+
+  const isSelf = session.user.id === user.id
+
+  return (
+    <div className="container mx-auto max-w-2xl py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Edit User</h1>
+        <p className="text-muted-foreground">
+          Update profile details, role, or set a new password.
+        </p>
+      </div>
+      <UserForm mode="edit" user={user} isSelf={isSelf} />
+    </div>
+  )
+}

@@ -12,6 +12,7 @@ import {
   MonitorIcon,
   BarChart2Icon,
   ClipboardCheckIcon,
+  UsersIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   LogOutIcon,
@@ -59,6 +60,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/platforms',
     label: 'Platforms',
     icon: MonitorIcon,
+    roles: ['ADMIN'],
+  },
+  {
+    href: '/admin/users',
+    label: 'Users',
+    icon: UsersIcon,
     roles: ['ADMIN'],
   },
   {

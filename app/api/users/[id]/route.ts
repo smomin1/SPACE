@@ -1,0 +1,110 @@
+import { z } from 'zod'
+import bcrypt from 'bcryptjs'
+import { auth } from '@/lib/auth'
+import { canDo } from '@/lib/permissions'
+import { prisma } from '@/lib/prisma'
+
+const updateSchema = z.object({
+  email:    z.string().email().max(200).optional(),
+  name:     z.string().min(1).max(120).optional(),
+  role:     z.enum(['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']).optional(),
+  isActive: z.boolean().optional(),
+  password: z.string().min(8).max(200).optional(),
+})
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth()
+  if (!session?.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!canDo(session.user.role, 'manage:users')) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id } = await params
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+  })
+  if (!user) return Response.json({ error: 'Not found' }, { status: 404 })
+  return Response.json({ user })
+}
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth()
+  if (!session?.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!canDo(session.user.role, 'manage:users')) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id } = await params
+  const body = await req.json().catch(() => null)
+  const parsed = updateSchema.safeParse(body)
+  if (!parsed.success) {
+    return Response.json({ error: 'Invalid input', issues: parsed.error.flatten() }, { status: 400 })
+  }
+
+  const target = await prisma.user.findUnique({ where: { id } })
+  if (!target) return Response.json({ error: 'Not found' }, { status: 404 })
+
+  const { email, name, role, isActive, password } = parsed.data
+
+  // Email uniqueness check
+  if (email && email !== target.email) {
+    const clash = await prisma.user.findUnique({ where: { email } })
+    if (clash) return Response.json({ error: 'A user with this email already exists', code: 'EMAIL_TAKEN' }, { status: 409 })
+  }
+
+  // Self-protection: prevent locking yourself out of admin
+  if (session.user.id === id) {
+    if (role && role !== 'ADMIN') {
+      return Response.json({ error: 'You cannot change your own role away from ADMIN', code: 'SELF_DEMOTE' }, { status: 400 })
+    }
+    if (isActive === false) {
+      return Response.json({ error: 'You cannot deactivate your own account', code: 'SELF_DEACTIVATE' }, { status: 400 })
+    }
+  }
+
+  const data: Record<string, unknown> = {}
+  if (email    !== undefined) data.email    = email
+  if (name     !== undefined) data.name     = name
+  if (role     !== undefined) data.role     = role
+  if (isActive !== undefined) data.isActive = isActive
+  if (password !== undefined) data.passwordHash = await bcrypt.hash(password, 10)
+
+  const user = await prisma.user.update({
+    where: { id },
+    data,
+    select: { id: true, email: true, name: true, role: true, isActive: true },
+  })
+
+  return Response.json({ user })
+}
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth()
+  if (!session?.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!canDo(session.user.role, 'manage:users')) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id } = await params
+  if (session.user.id === id) {
+    return Response.json({ error: 'You cannot delete your own account', code: 'SELF_DELETE' }, { status: 400 })
+  }
+
+  // Check for foreign references that would block delete
+  const [scoreCount, assignmentCount, platformAssignmentCount] = await Promise.all([
+    prisma.score.count({ where: { userId: id } }),
+    prisma.evaluatorAssignment.count({ where: { userId: id } }),
+    prisma.platformEvaluatorAssignment.count({ where: { userId: id } }),
+  ])
+
+  if (scoreCount > 0 || assignmentCount > 0 || platformAssignmentCount > 0) {
+    return Response.json(
+      { error: 'This user has activity history and cannot be deleted. Deactivate them instead.', code: 'HAS_ACTIVITY' },
+      { status: 409 },
+    )
+  }
+
+  await prisma.user.delete({ where: { id } })
+  return new Response(null, { status: 204 })
+}

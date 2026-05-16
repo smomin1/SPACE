@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     return Response.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
   }
   // Any authenticated user can read requirements (evaluators need the list to score against).
-  // No role gate here — just authentication.
+  // No role gate here - just authentication.
 
   const { searchParams } = new URL(request.url)
   const category = searchParams.get('category')

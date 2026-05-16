@@ -163,7 +163,7 @@ export async function AdminDashboard() {
           icon={ClipboardCheckIcon}
         />
         <StatCard
-          label="Merged — Pending Review"
+          label="Merged - Pending Review"
           value={mergedCount}
           tone={mergedCount > 0 ? 'amber' : 'default'}
           icon={AlertTriangleIcon}
@@ -267,7 +267,7 @@ export async function AdminDashboard() {
                               {row.openConflicts}
                             </span>
                           ) : (
-                            <span className="text-stone-300">—</span>
+                            <span className="text-stone-300">-</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right text-stone-400 tabular-nums">

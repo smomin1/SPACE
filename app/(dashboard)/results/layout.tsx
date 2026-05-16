@@ -37,7 +37,7 @@ export default async function ResultsLayout({
 
   return (
     <div className="flex flex-col">
-      {/* Sticky header — title + tab nav + filter bar */}
+      {/* Sticky header - title + tab nav + filter bar */}
       <div className="sticky top-0 z-20 bg-white border-b border-stone-200/80 shadow-sm">
         <div className="container mx-auto max-w-7xl px-6">
           {/* Title row */}
@@ -55,7 +55,7 @@ export default async function ResultsLayout({
           <ResultsNav />
         </div>
 
-        {/* Filter bar — full-width strip below tabs */}
+        {/* Filter bar - full-width strip below tabs */}
         <div className="border-t border-stone-100 bg-stone-50/70">
           <div className="container mx-auto max-w-7xl px-6 py-2.5">
             <Suspense fallback={<FilterBarSkeleton />}>

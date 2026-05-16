@@ -70,7 +70,7 @@ function avg(nums: number[]): number | null {
 }
 
 function fmt(n: number | null): string {
-  if (n === null) return '—'
+  if (n === null) return '-'
   return n.toFixed(2)
 }
 
@@ -154,7 +154,7 @@ export function FinalisedView({
         </svg>
         <div className="flex-1">
           <p className="text-sm font-medium text-emerald-900">
-            Finalised — scores are locked
+            Finalised - scores are locked
           </p>
           <p className="text-xs text-emerald-700/70">
             Locked on {new Date(lockedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
@@ -208,14 +208,14 @@ export function FinalisedView({
               Weighted Score
             </p>
             <p className="text-3xl font-bold tabular-nums text-emerald-950">
-              {grandTotal !== null ? (grandTotal / 3 * 100).toFixed(1) : '—'}
+              {grandTotal !== null ? (grandTotal / 4 * 100).toFixed(1) : '-'}
               {grandTotal !== null && (
                 <span className="text-sm font-normal text-stone-400 ml-1">/ 100</span>
               )}
             </p>
           </div>
           <p className="text-xs text-stone-400">
-            Raw avg: {fmt(grandTotal)} / 3 · Weights: HIGH×3, MEDIUM×2, LOW×1
+            Raw avg: {fmt(grandTotal)} / 4 · Weights: HIGH×3, MEDIUM×2, LOW×1
           </p>
         </div>
       )}
@@ -244,7 +244,7 @@ export function FinalisedView({
               </h2>
               {catTotal !== null && (
                 <span className="text-xs text-muted-foreground">
-                  avg {fmt(catTotal)} / 3
+                  avg {fmt(catTotal)} / 4
                 </span>
               )}
             </div>
@@ -255,8 +255,8 @@ export function FinalisedView({
                   <TableRow className="border-b border-stone-200/80 bg-stone-50/60 hover:bg-stone-50/60">
                     <TableHead className="w-[40%] text-xs font-medium text-stone-500">Requirement</TableHead>
                     <TableHead className="text-xs font-medium text-stone-500">Weight</TableHead>
-                    <TableHead className="text-xs font-medium text-stone-500">Pedagogy avg</TableHead>
-                    <TableHead className="text-xs font-medium text-stone-500">Technical avg</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Pedagogy</TableHead>
+                    <TableHead className="text-xs font-medium text-stone-500">Technical</TableHead>
                     <TableHead className="text-xs font-medium text-stone-500">Combined</TableHead>
                   </TableRow>
                 </TableHeader>

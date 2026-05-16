@@ -20,8 +20,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eval — Platform Evaluation",
-  description: "Educational platform evaluation workspace",
+  title: "PET - Platform Evaluation Tool",
+  description: "PET: Platform Evaluation Tool workspace",
 };
 
 export default function RootLayout({

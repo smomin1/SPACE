@@ -82,6 +82,7 @@ const SCORE_BUTTONS = [
   { label: '1', value: 1 },
   { label: '2', value: 2 },
   { label: '3', value: 3 },
+  { label: '4', value: 4 },
 ]
 
 export function ScoringForm({
@@ -224,7 +225,7 @@ export function ScoringForm({
           return (
             <p className="text-xs text-muted-foreground pt-1 border-t border-stone-200/60">
               {allSubmitted
-                ? 'All evaluators submitted — merging automatically…'
+                ? 'All evaluators submitted - merging automatically…'
                 : `${submittedCount} of ${totalCount} evaluators submitted`}
             </p>
           )

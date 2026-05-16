@@ -76,11 +76,11 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
     onChange: (v: boolean) => void
   ) {
     if (!currentValue) {
-      // User is trying to ENABLE it — show warning dialog first
+      // User is trying to ENABLE it - show warning dialog first
       confirmGateRef.current = () => onChange(true)
       setShowGateDialog(true)
     } else {
-      // User is disabling — no confirmation needed
+      // User is disabling - no confirmation needed
       onChange(false)
     }
   }
@@ -108,7 +108,7 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
 
   return (
     <>
-      {/* Compliance gate confirmation dialog — shown before the toggle is enabled */}
+      {/* Compliance gate confirmation dialog - shown before the toggle is enabled */}
       <AlertDialog open={showGateDialog} onOpenChange={setShowGateDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -125,7 +125,7 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
                 from evaluation and halt all further scoring.
               </span>
               <span className="block">
-                This setting is intended only for hard pass/fail blockers — legal,
+                This setting is intended only for hard pass/fail blockers - legal,
                 accessibility, or safety requirements where failure is absolute.
               </span>
               <span className="block font-medium">
@@ -300,7 +300,7 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
                     Compliance Gate
                     {watchIsComplianceGate && (
                       <span className="ml-2 text-xs font-normal text-destructive">
-                        (active — FAIL disqualifies platform)
+                        (active - FAIL disqualifies platform)
                       </span>
                     )}
                   </FormLabel>

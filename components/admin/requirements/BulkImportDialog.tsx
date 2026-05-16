@@ -90,7 +90,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
         setFailures([])
       }
     } catch {
-      setGlobalError("Network error — please try again")
+      setGlobalError("Network error - please try again")
       setFailures([])
     }
 

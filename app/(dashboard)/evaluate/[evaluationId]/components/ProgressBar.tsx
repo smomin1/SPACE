@@ -32,7 +32,7 @@ export function ProgressBar({ total, scored, hasSubmitted }: ProgressBarProps) {
 
       {!hasSubmitted && allDone && (
         <p className="mt-2 text-xs text-muted-foreground">
-          All requirements scored — you can now submit.
+          All requirements scored - you can now submit.
         </p>
       )}
       {hasSubmitted && (

@@ -190,7 +190,7 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                         'text-xs font-medium tabular-nums',
                         isAssigned ? 'text-emerald-700' : 'text-stone-300'
                       )}>
-                        {isAssigned ? 'Yes' : '—'}
+                        {isAssigned ? 'Yes' : '-'}
                       </span>
                     </div>
                   </div>

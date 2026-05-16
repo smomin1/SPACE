@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { calculateWeightedPercentage } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
 import type { PlatformStatus } from '@prisma/client'
+import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -24,12 +25,10 @@ const THRESHOLD = 70  // min score to be considered "covered"
 // ─── Cell state ───────────────────────────────────────────────────────────────
 
 type CellState =
-  | { kind: 'not-in-context' }
   | { kind: 'no-eval' }
   | { kind: 'scored'; pct: number }
 
 function cellClasses(cell: CellState): string {
-  if (cell.kind === 'not-in-context') return 'bg-stone-50 text-stone-300'
   if (cell.kind === 'no-eval')        return 'bg-stone-100 text-stone-400'
   const { pct } = cell
   if (pct >= 85) return 'bg-emerald-100 text-emerald-800'
@@ -49,10 +48,12 @@ export default async function CoveragePage({
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'view:results')) redirect('/dashboard')
 
-  const sp         = await searchParams
-  const platformId = typeof sp.platform === 'string' ? sp.platform : null
+  const sp          = await searchParams
+  const platformIds = (typeof sp.platform === 'string' ? sp.platform : '').split(',').filter(Boolean)
+  const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
+  const showDq      = sp.showDq === '1'
 
-  // ── Fetch — always show full matrix, ignore context filter ─────────────────
+  // ── Fetch - always show full matrix, ignore context filter ─────────────────
 
   const [allContexts, allPlatforms, allRequirements, evaluations] = await Promise.all([
     prisma.context.findMany({
@@ -60,12 +61,14 @@ export default async function CoveragePage({
       select: {
         id: true, name: true,
         requirements: { select: { requirementId: true } },
-        platforms:    { select: { platformId: true } },
       },
     }),
 
     prisma.platform.findMany({
-      where: platformId ? { id: platformId } : undefined,
+      where: {
+        ...(platformIds.length > 0 && { id: { in: platformIds } }),
+        ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
+      },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, status: true },
     }),
@@ -76,7 +79,7 @@ export default async function CoveragePage({
     }),
 
     prisma.evaluation.findMany({
-      where: { state: { in: ['FINALISED', 'MERGED'] } },
+      where: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } },
       select: {
         id: true, platformId: true, state: true, lockedAt: true,
         scores: { select: { requirementId: true, value: true, evidenceType: true } },
@@ -103,17 +106,12 @@ export default async function CoveragePage({
   }
 
   const matrix: MatrixRow[] = allContexts.map(ctx => {
-    const ctxReqIds  = new Set(ctx.requirements.map(r => r.requirementId))
-    const ctxPlatIds = new Set(ctx.platforms.map(p => p.platformId))
-    const ctxReqs    = allRequirements.filter(r => ctxReqIds.has(r.id)).map(toScoringReq)
+    const ctxReqIds = new Set(ctx.requirements.map(r => r.requirementId))
+    const ctxReqs   = allRequirements.filter(r => ctxReqIds.has(r.id)).map(toScoringReq)
 
     let hasCoverage = false
 
     const cells = allPlatforms.map(p => {
-      if (!ctxPlatIds.has(p.id)) {
-        return { platformId: p.id, state: { kind: 'not-in-context' } as CellState }
-      }
-
       const ev = evalByPlatform.get(p.id)
       if (!ev) {
         return { platformId: p.id, state: { kind: 'no-eval' } as CellState }
@@ -133,7 +131,7 @@ export default async function CoveragePage({
   if (allPlatforms.length === 0 || allContexts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-3 text-3xl text-stone-300">—</div>
+        <div className="mb-3 text-3xl text-stone-300">-</div>
         <p className="text-sm font-medium text-stone-500">No platforms or contexts to display</p>
       </div>
     )
@@ -142,6 +140,7 @@ export default async function CoveragePage({
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <FullscreenWrapper title="Coverage Matrix">
     <div className="space-y-5">
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 text-[11.5px]">
@@ -214,7 +213,6 @@ export default async function CoveragePage({
                 {row.cells.map(({ platformId: pid, state }) => (
                   <td key={pid} className="py-2 px-3 text-center">
                     <div className={`mx-auto inline-flex items-center justify-center rounded-lg px-3 py-1.5 min-w-[72px] text-[12.5px] font-medium tabular-nums ${cellClasses(state)}`}>
-                      {state.kind === 'not-in-context' && '—'}
                       {state.kind === 'no-eval' && (
                         <span className="text-[11px]">No eval</span>
                       )}
@@ -229,8 +227,9 @@ export default async function CoveragePage({
       </div>
 
       <p className="text-[11px] text-stone-400">
-        Scores computed using requirements assigned to each context. Platforms not assigned to a context show —.
+        Scores computed using requirements assigned to each context. Platforms not assigned to a context show -.
       </p>
     </div>
+    </FullscreenWrapper>
   )
 }

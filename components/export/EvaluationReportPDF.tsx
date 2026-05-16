@@ -166,12 +166,12 @@ type Props = {
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
 function pct(n: number | null): string {
-  if (n === null) return '—'
+  if (n === null) return '-'
   return `${n.toFixed(1)}%`
 }
 
 function compliance(v: boolean | null): string {
-  if (v === null) return '—'
+  if (v === null) return '-'
   return v ? 'Pass' : 'Fail'
 }
 
@@ -243,7 +243,7 @@ export function EvaluationReportPDF({ generatedAt, comparison, bestFit }: Props)
                     </Text>
                   </View>
                 ) : (
-                  <Text style={s.tdLight}>—</Text>
+                  <Text style={s.tdLight}>-</Text>
                 )}
               </View>
             </View>

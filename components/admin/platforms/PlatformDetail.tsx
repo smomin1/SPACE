@@ -69,7 +69,7 @@ export function PlatformDetail({ platform }: PlatformDetailProps) {
         <div>
           <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Licence Type</p>
           <p className="text-sm text-emerald-950">
-            {platform.licenceType ? LICENCE_LABELS[platform.licenceType] : '—'}
+            {platform.licenceType ? LICENCE_LABELS[platform.licenceType] : '-'}
           </p>
         </div>
         <div>

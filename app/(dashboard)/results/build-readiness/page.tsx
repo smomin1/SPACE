@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { calculateWeightedPercentage } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
 import type { PlatformStatus } from '@prisma/client'
+import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Build-readiness keyword groups ───────────────────────────────────────────
 
@@ -79,17 +80,19 @@ export default async function BuildReadinessPage({
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'view:results')) redirect('/dashboard')
 
-  const sp         = await searchParams
-  const contextId  = typeof sp.context  === 'string' ? sp.context  : null
-  const platformId = typeof sp.platform === 'string' ? sp.platform : null
+  const sp          = await searchParams
+  const contextIds  = (typeof sp.context  === 'string' ? sp.context  : '').split(',').filter(Boolean)
+  const platformIds = (typeof sp.platform === 'string' ? sp.platform : '').split(',').filter(Boolean)
+  const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
+  const showDq      = sp.showDq === '1'
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const [rawPlatforms, allRequirements, evaluations] = await Promise.all([
     prisma.platform.findMany({
       where: {
-        ...(platformId && { id: platformId }),
-        ...(contextId  && { contexts: { some: { contextId } } }),
+        ...(platformIds.length > 0 && { id: { in: platformIds } }),
+        ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
       },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, vendor: true, status: true },
@@ -99,13 +102,13 @@ export default async function BuildReadinessPage({
     prisma.requirement.findMany({
       where: {
         evaluatorType: 'TECHNICAL',
-        ...(contextId && { contexts: { some: { contextId } } }),
+        ...(contextIds.length > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
       },
       select: { id: true, weight: true, category: true, isComplianceGate: true },
     }),
 
     prisma.evaluation.findMany({
-      where: { state: { in: ['FINALISED', 'MERGED'] } },
+      where: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } },
       select: {
         id: true, platformId: true, state: true, lockedAt: true,
         scores: { select: { requirementId: true, value: true, evidenceType: true } },
@@ -184,7 +187,7 @@ export default async function BuildReadinessPage({
   if (readiness.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-3 text-3xl text-stone-300">—</div>
+        <div className="mb-3 text-3xl text-stone-300">-</div>
         <p className="text-sm font-medium text-stone-500">No platforms match the current filters</p>
       </div>
     )
@@ -195,12 +198,13 @@ export default async function BuildReadinessPage({
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <FullscreenWrapper title="Build Readiness">
     <div className="space-y-5">
       {/* Key */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-stone-700">
-            Build Readiness — Technical Integration Score
+            Build Readiness - Technical Integration Score
           </p>
           <p className="text-xs text-stone-400 mt-0.5">
             {hasAnyBuildReqs
@@ -228,6 +232,7 @@ export default async function BuildReadinessPage({
         ))}
       </div>
     </div>
+    </FullscreenWrapper>
   )
 }
 
@@ -274,7 +279,7 @@ function ReadinessCard({ item, rank }: { item: PlatformReadiness; rank: number }
           ) : (
             <>
               <p className={`text-2xl font-bold tabular-nums ${pctTextColor(overallPct)}`}>
-                {overallPct !== null ? `${overallPct.toFixed(1)}%` : '—'}
+                {overallPct !== null ? `${overallPct.toFixed(1)}%` : '-'}
               </p>
               <p className="text-[11px] text-stone-400 mt-0.5">Overall readiness</p>
             </>
@@ -306,7 +311,7 @@ function ReadinessCard({ item, rank }: { item: PlatformReadiness; rank: number }
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11.5px] text-stone-600 font-medium">{group.label}</span>
                   <span className={`text-[11.5px] tabular-nums font-semibold ${pctTextColor(pct)}`}>
-                    {pct !== null ? `${pct.toFixed(0)}%` : '—'}
+                    {pct !== null ? `${pct.toFixed(0)}%` : '-'}
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">

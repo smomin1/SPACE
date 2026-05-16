@@ -9,166 +9,213 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Badge } from '@/components/ui/badge'
-import { XIcon } from 'lucide-react'
+import { XIcon, ChevronDownIcon, CheckIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { PlatformStatus } from '@prisma/client'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-type ContextOption = { id: string; name: string }
+type ContextOption  = { id: string; name: string }
 type PlatformOption = { id: string; name: string; status: PlatformStatus }
 
-interface FilterBarProps {
-  contexts: ContextOption[]
-  platforms: PlatformOption[]
+export interface FilterBarProps {
+  contexts:   ContextOption[]
+  platforms:  PlatformOption[]
   categories: string[]
 }
 
-// ─── Static option sets ────────────────────────────────────────────────────────
+// ─── Constants ─────────────────────────────────────────────────────────────────
 
-const EVALUATOR_TYPES = [
-  { value: 'COMPLIANCE', label: 'Compliance' },
-  { value: 'PEDAGOGY',   label: 'Pedagogy' },
-  { value: 'TECHNICAL',  label: 'Technical' },
+const STATUS_OPTIONS = [
+  { value: 'FINALISED',   label: 'Finalised' },
+  { value: 'MERGED',      label: 'Merged' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
 ] as const
 
-const EVIDENCE_QUALITY_OPTIONS = [
+const EVIDENCE_OPTIONS = [
   { value: 'high', label: 'High confidence' },
   { value: 'low',  label: 'Low confidence' },
 ] as const
 
-const EVALUATION_STATUS_OPTIONS = [
-  { value: 'IN_PROGRESS', label: 'In Progress' },
-  { value: 'MERGED',      label: 'Merged' },
-  { value: 'FINALISED',   label: 'Finalised' },
+const EVALUATOR_TYPE_OPTIONS = [
+  { value: 'PEDAGOGY',  label: 'Pedagogy' },
+  { value: 'TECHNICAL', label: 'Technical' },
 ] as const
 
-// URL param keys
-const PARAM_KEYS = [
-  'context',
-  'platform',
-  'category',
-  'evaluatorType',
-  'evidenceQuality',
-  'status',
-] as const
-type ParamKey = (typeof PARAM_KEYS)[number]
+// Default status when no param is present
+const DEFAULT_STATUSES = ['FINALISED']
 
-// ─── Component ─────────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+
+function parseMultiParam(params: URLSearchParams, key: string, fallback: string[] = []): string[] {
+  const raw = params.get(key)
+  return raw ? raw.split(',').filter(Boolean) : fallback
+}
+
+function isDefaultStatuses(vals: string[]): boolean {
+  return vals.length === DEFAULT_STATUSES.length && vals.every(v => DEFAULT_STATUSES.includes(v))
+}
+
+// ─── Main component ─────────────────────────────────────────────────────────────
 
 export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
   const router   = useRouter()
   const pathname = usePathname()
   const params   = useSearchParams()
 
-  const get = (key: ParamKey) => params.get(key) ?? ''
+  // Multi-select state (parsed from URL)
+  const selectedContexts   = parseMultiParam(params, 'context')
+  const selectedPlatforms  = parseMultiParam(params, 'platform')
+  const selectedCategories = parseMultiParam(params, 'category')
+  const selectedStatuses   = parseMultiParam(params, 'status', DEFAULT_STATUSES)
 
-  const activeCount = PARAM_KEYS.filter((k) => params.has(k)).length
+  // Single-select state
+  const evalTypeValue  = params.get('evaluatorType') ?? ''
+  const evidenceValue  = params.get('evidenceQuality') ?? ''
+  const showDq         = params.has('showDq')
 
-  const update = useCallback(
-    (key: ParamKey, value: string | null) => {
-      const next = new URLSearchParams(params.toString())
-      if (!value) {
-        next.delete(key)
-      } else {
-        next.set(key, value)
-      }
+  // ── Update helpers ──────────────────────────────────────────────────────────
+
+  const push = useCallback(
+    (next: URLSearchParams) => {
       const qs = next.toString()
       router.replace(pathname + (qs ? `?${qs}` : ''), { scroll: false })
     },
-    [params, pathname, router],
+    [pathname, router],
   )
+
+  const setMulti = useCallback(
+    (key: string, values: string[], suppressDefault?: string[]) => {
+      const next = new URLSearchParams(params.toString())
+      const isDefault = suppressDefault &&
+        values.length === suppressDefault.length &&
+        values.every(v => suppressDefault.includes(v))
+      if (values.length === 0 || isDefault) next.delete(key)
+      else next.set(key, values.join(','))
+      push(next)
+    },
+    [params, push],
+  )
+
+  const setSingle = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(params.toString())
+      if (!value) next.delete(key)
+      else next.set(key, value)
+      push(next)
+    },
+    [params, push],
+  )
+
+  const toggleShowDq = useCallback(() => {
+    const next = new URLSearchParams(params.toString())
+    if (showDq) next.delete('showDq')
+    else next.set('showDq', '1')
+    push(next)
+  }, [params, push, showDq])
 
   const clearAll = useCallback(() => {
     router.replace(pathname, { scroll: false })
   }, [pathname, router])
 
+  // ── Active count (non-default filters) ─────────────────────────────────────
+
+  const activeCount = [
+    selectedContexts.length > 0,
+    selectedPlatforms.length > 0,
+    selectedCategories.length > 0,
+    !isDefaultStatuses(selectedStatuses),
+    !!params.get('evaluatorType'),
+    !!params.get('evidenceQuality'),
+    showDq,
+  ].filter(Boolean).length
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Context */}
-      <FilterSelect
+
+      {/* Context — multi-select */}
+      <MultiSelect
         placeholder="All contexts"
-        value={get('context')}
-        onChange={(v) => update('context', v)}
-      >
-        {contexts.map((c) => (
-          <SelectItem key={c.id} value={c.id}>
-            {c.name}
-          </SelectItem>
-        ))}
-      </FilterSelect>
+        selected={selectedContexts}
+        options={contexts.map(c => ({ value: c.id, label: c.name }))}
+        onChange={vals => setMulti('context', vals)}
+      />
 
-      {/* Platform */}
-      <FilterSelect
+      {/* Platform — multi-select */}
+      <MultiSelect
         placeholder="All platforms"
-        value={get('platform')}
-        onChange={(v) => update('platform', v)}
-      >
-        {platforms.map((p) => (
-          <SelectItem key={p.id} value={p.id}>
-            <span className={p.status === 'DISQUALIFIED' ? 'line-through text-stone-400' : undefined}>
-              {p.name}
-            </span>
-            {p.status === 'DISQUALIFIED' && (
-              <span className="ml-1.5 text-[10px] text-destructive font-medium">DQ</span>
-            )}
-          </SelectItem>
-        ))}
-      </FilterSelect>
+        selected={selectedPlatforms}
+        options={platforms.map(p => ({
+          value: p.id,
+          label: p.name,
+          dim: p.status === 'DISQUALIFIED',
+          suffix: p.status === 'DISQUALIFIED' ? 'DQ' : undefined,
+        }))}
+        onChange={vals => setMulti('platform', vals)}
+      />
 
-      {/* Category */}
-      <FilterSelect
+      {/* Category — multi-select */}
+      <MultiSelect
         placeholder="All categories"
-        value={get('category')}
-        onChange={(v) => update('category', v)}
-      >
-        {categories.map((cat) => (
-          <SelectItem key={cat} value={cat}>
-            {cat}
-          </SelectItem>
-        ))}
-      </FilterSelect>
+        selected={selectedCategories}
+        options={categories.map(c => ({ value: c, label: c }))}
+        onChange={vals => setMulti('category', vals)}
+      />
 
-      {/* Evaluator type */}
+      {/* Evaluator type — single-select */}
       <FilterSelect
         placeholder="All types"
-        value={get('evaluatorType')}
-        onChange={(v) => update('evaluatorType', v)}
+        value={evalTypeValue}
+        onChange={v => setSingle('evaluatorType', v)}
       >
-        {EVALUATOR_TYPES.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>
-            {label}
-          </SelectItem>
+        {EVALUATOR_TYPE_OPTIONS.map(({ value, label }) => (
+          <SelectItem key={value} value={value}>{label}</SelectItem>
         ))}
       </FilterSelect>
 
-      {/* Evidence quality */}
+      {/* Evidence quality — single-select */}
       <FilterSelect
         placeholder="Any evidence"
-        value={get('evidenceQuality')}
-        onChange={(v) => update('evidenceQuality', v)}
+        value={evidenceValue}
+        onChange={v => setSingle('evidenceQuality', v)}
       >
-        {EVIDENCE_QUALITY_OPTIONS.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>
-            {label}
-          </SelectItem>
+        {EVIDENCE_OPTIONS.map(({ value, label }) => (
+          <SelectItem key={value} value={value}>{label}</SelectItem>
         ))}
       </FilterSelect>
 
-      {/* Evaluation status */}
-      <FilterSelect
-        placeholder="Any status"
-        value={get('status')}
-        onChange={(v) => update('status', v)}
-      >
-        {EVALUATION_STATUS_OPTIONS.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>
-            {label}
-          </SelectItem>
-        ))}
-      </FilterSelect>
+      {/* Status — multi-select, default = Finalised */}
+      <MultiSelect
+        placeholder="All statuses"
+        selected={selectedStatuses}
+        options={STATUS_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
+        onChange={vals => setMulti('status', vals.length > 0 ? vals : DEFAULT_STATUSES, DEFAULT_STATUSES)}
+        defaultSelected={DEFAULT_STATUSES}
+      />
 
-      {/* Active filter count + clear */}
+      {/* Show disqualified toggle */}
+      <button
+        onClick={toggleShowDq}
+        className={cn(
+          'h-8 inline-flex items-center gap-1.5 rounded-md border px-2.5 text-[12.5px] transition-colors select-none',
+          showDq
+            ? 'border-destructive/30 bg-destructive/5 text-destructive'
+            : 'border-stone-200 bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700',
+        )}
+      >
+        <Checkbox checked={showDq} variant="destructive" />
+        Show disqualified
+      </button>
+
+      {/* Clear all */}
       {activeCount > 0 && (
         <button
           onClick={clearAll}
@@ -176,10 +223,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         >
           <XIcon className="size-3" />
           Clear
-          <Badge
-            variant="secondary"
-            className="h-4 min-w-4 px-1 text-[10px] font-semibold"
-          >
+          <Badge variant="secondary" className="h-4 min-w-4 px-1 text-[10px] font-semibold">
             {activeCount}
           </Badge>
         </button>
@@ -188,7 +232,129 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
   )
 }
 
-// ─── Shared select wrapper ─────────────────────────────────────────────────────
+// ─── MultiSelect ───────────────────────────────────────────────────────────────
+
+type MultiSelectOption = {
+  value: string
+  label: string
+  dim?: boolean
+  suffix?: string
+}
+
+function MultiSelect({
+  placeholder,
+  selected,
+  options,
+  onChange,
+  defaultSelected,
+}: {
+  placeholder: string
+  selected: string[]
+  options: MultiSelectOption[]
+  onChange: (vals: string[]) => void
+  defaultSelected?: string[]
+}) {
+  const isDefault =
+    !!defaultSelected &&
+    selected.length === defaultSelected.length &&
+    selected.every(v => defaultSelected.includes(v))
+
+  const isActive = selected.length > 0 && !isDefault
+
+  const triggerLabel =
+    isDefault && defaultSelected
+      ? options.filter(o => defaultSelected.includes(o.value)).map(o => o.label).join(', ')
+      : selected.length === 0
+      ? placeholder
+      : selected.length === 1
+      ? (options.find(o => o.value === selected[0])?.label ?? selected[0])
+      : `${selected.length} selected`
+
+  const allSelected = options.every(o => selected.includes(o.value))
+
+  const toggle = (value: string) => {
+    const next = selected.includes(value)
+      ? selected.filter(v => v !== value)
+      : [...selected, value]
+    onChange(next)
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            'h-8 inline-flex items-center gap-1.5 rounded-md border px-2.5 text-[12.5px] transition-colors',
+            isActive
+              ? 'border-emerald-300 bg-emerald-50/60 text-emerald-800'
+              : 'border-stone-200 bg-white text-stone-600 hover:bg-stone-50',
+          )}
+        >
+          <span className="flex-1 text-left truncate max-w-[130px]">{triggerLabel}</span>
+          {isActive && selected.length > 1 && (
+            <Badge className="h-4 min-w-4 px-1 text-[10px] bg-emerald-700 text-white shrink-0">
+              {selected.length}
+            </Badge>
+          )}
+          <ChevronDownIcon className="size-3.5 shrink-0 text-stone-400" />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent align="start" className="w-56 p-1.5 max-h-72 overflow-y-auto">
+        {/* Select all / Clear all */}
+        <button
+          onClick={() => onChange(allSelected ? [] : options.map(o => o.value))}
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[12px] text-stone-500 hover:bg-stone-100 italic"
+        >
+          {allSelected ? 'Clear all' : 'Select all'}
+        </button>
+        <div className="my-1 border-t border-stone-100" />
+
+        {options.map(opt => {
+          const checked = selected.includes(opt.value)
+          return (
+            <button
+              key={opt.value}
+              onClick={() => toggle(opt.value)}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[12.5px] text-stone-700 hover:bg-stone-100 transition-colors"
+            >
+              <Checkbox checked={checked} />
+              <span className={cn('flex-1 text-left truncate', opt.dim && 'line-through text-stone-400')}>
+                {opt.label}
+              </span>
+              {opt.suffix && (
+                <span className="text-[10px] font-semibold text-destructive">{opt.suffix}</span>
+              )}
+            </button>
+          )
+        })}
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ─── Shared primitives ──────────────────────────────────────────────────────────
+
+function Checkbox({
+  checked,
+  variant = 'default',
+}: {
+  checked: boolean
+  variant?: 'default' | 'destructive'
+}) {
+  return (
+    <span
+      className={cn(
+        'flex size-3.5 shrink-0 items-center justify-center rounded-sm border',
+        checked && variant === 'default' && 'bg-emerald-700 border-emerald-700',
+        checked && variant === 'destructive' && 'bg-destructive border-destructive',
+        !checked && 'border-stone-300',
+      )}
+    >
+      {checked && <CheckIcon className="size-2.5 text-white stroke-[3]" />}
+    </span>
+  )
+}
 
 function FilterSelect({
   placeholder,
@@ -204,7 +370,7 @@ function FilterSelect({
   return (
     <Select
       value={value || '__all__'}
-      onValueChange={(v) => onChange(v === '__all__' ? null : v)}
+      onValueChange={v => onChange(v === '__all__' ? null : v)}
     >
       <SelectTrigger
         size="sm"

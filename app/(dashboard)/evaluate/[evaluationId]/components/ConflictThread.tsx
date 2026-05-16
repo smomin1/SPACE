@@ -52,6 +52,7 @@ const SCORE_BUTTONS = [
   { label: '1', value: 1 },
   { label: '2', value: 2 },
   { label: '3', value: 3 },
+  { label: '4', value: 4 },
 ]
 
 function formatTime(iso: string) {
@@ -312,7 +313,7 @@ export function ConflictThread({
               </span>
               {' submitted score '}
               <span className="font-medium">{s.value ?? 'N/A'}</span>
-              {' — '}
+              {' - '}
               {formatTime(s.updatedAt)}
             </p>
           ))}

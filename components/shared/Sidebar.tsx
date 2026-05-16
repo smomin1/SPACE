@@ -102,12 +102,15 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
           collapsed ? 'justify-center px-2' : 'px-5',
         )}
       >
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-emerald-50/8 ring-1 ring-emerald-50/15">
+        <div
+          title="Platform Evaluation Tool"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-emerald-50/8 ring-1 ring-emerald-50/15"
+        >
           <MonitorIcon className="size-4 text-emerald-200" />
         </div>
         {!collapsed && (
-          <div className="flex min-w-0 flex-col -space-y-0.5">
-            <span className="font-serif text-[16px] tracking-tight text-emerald-50">Eval</span>
+          <div title="Platform Evaluation Tool" className="flex min-w-0 flex-col -space-y-0.5">
+            <span className="font-serif text-[16px] tracking-tight text-emerald-50">PET</span>
             <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-emerald-200/60">
               Platform Evaluation
             </span>

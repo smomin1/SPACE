@@ -9,7 +9,7 @@ import { checkAllTeamsSubmitted, transitionEvaluation, autoFinaliseIfReady } fro
 
 const submitScoreSchema = z.object({
   requirementId: z.string().min(1),
-  value: z.number().int().min(0).max(3).nullable(),
+  value: z.number().int().min(0).max(4).nullable(),
   evidenceType: z
     .enum(['TRIAL', 'DEMO', 'DOCUMENTATION', 'VENDOR_CLAIM'])
     .nullable()
@@ -17,7 +17,7 @@ const submitScoreSchema = z.object({
   comment: z.string().max(2000).nullable().optional(),
 })
 
-// ─── POST — submit / update a single score ────────────────────────────────────
+// ─── POST - submit / update a single score ────────────────────────────────────
 
 export async function POST(
   request: Request,
@@ -50,7 +50,7 @@ export async function POST(
 
   const { requirementId, value, evidenceType = null, comment = null } = parsed.data
 
-  // GUARD 1 — evaluation exists and is not locked (FINALISED)
+  // GUARD 1 - evaluation exists and is not locked (FINALISED)
   const evaluation = await prisma.evaluation.findUnique({
     where: { id: evaluationId },
     select: { id: true, state: true, lockedAt: true, platformId: true },
@@ -67,7 +67,7 @@ export async function POST(
     )
   }
 
-  // GUARD 2 — submitting user has an assignment for this evaluation
+  // GUARD 2 - submitting user has an assignment for this evaluation
   const assignment = await prisma.evaluatorAssignment.findUnique({
     where: { evaluationId_userId: { evaluationId, userId: session.user.id } },
     select: { evaluatorType: true, hasSubmitted: true },
@@ -80,7 +80,7 @@ export async function POST(
     )
   }
 
-  // GUARD 3 — requirement exists and its evaluatorType matches the user's assignment
+  // GUARD 3 - requirement exists and its evaluatorType matches the user's assignment
   const requirement = await prisma.requirement.findUnique({
     where: { id: requirementId },
     select: { id: true, evaluatorType: true, isComplianceGate: true },
@@ -100,7 +100,7 @@ export async function POST(
     )
   }
 
-  // UPSERT — create first score or update existing one; always produce an audit log row
+  // UPSERT - create first score or update existing one; always produce an audit log row
   const existing = await prisma.score.findUnique({
     where: {
       evaluationId_requirementId_userId: {
@@ -145,7 +145,7 @@ export async function POST(
     })
   }
 
-  // COMPLIANCE GATE — a FAIL on a gate requirement immediately disqualifies the platform
+  // COMPLIANCE GATE - a FAIL on a gate requirement immediately disqualifies the platform
   if (value === 0 && requirement.isComplianceGate) {
     await prisma.platform.update({
       where: { id: evaluation.platformId },
@@ -172,7 +172,7 @@ export async function POST(
     }
   }
 
-  // AUTO-TRANSITION — advance state as work completes
+  // AUTO-TRANSITION - advance state as work completes
   let evaluationState = evaluation.state
   if (evaluation.state === 'IN_PROGRESS') {
     const allSubmitted = await checkAllTeamsSubmitted(evaluationId)
@@ -187,7 +187,7 @@ export async function POST(
       }
     }
   } else if (evaluation.state === 'MERGED' && threadAutoClosedForReq) {
-    // Score convergence may have closed the last open thread — try to finalise
+    // Score convergence may have closed the last open thread - try to finalise
     const finalised = await autoFinaliseIfReady(evaluationId, session.user.id)
     if (finalised) evaluationState = 'FINALISED'
   }
@@ -198,7 +198,7 @@ export async function POST(
   )
 }
 
-// ─── GET — fetch scores, with isolation enforced at the query level ────────────
+// ─── GET - fetch scores, with isolation enforced at the query level ────────────
 
 export async function GET(
   _request: Request,
@@ -223,10 +223,10 @@ export async function GET(
   const role = session.user.role
   const seeAllScores = canDo(role, 'view:all_scores') // ADMIN + VIEWER
 
-  // ── Branch A: IN_PROGRESS for a regular evaluator — own scores only ──────────
+  // ── Branch A: IN_PROGRESS for a regular evaluator - own scores only ──────────
   //
   // The WHERE clause `userId: session.user.id` is the isolation mechanism.
-  // The server never fetches cross-team rows and filters in memory — they
+  // The server never fetches cross-team rows and filters in memory - they
   // simply are not queried.
   if (evaluation.state === 'IN_PROGRESS' && !seeAllScores) {
     if (!canDo(role, 'access:evaluate')) {
@@ -245,7 +245,7 @@ export async function GET(
       )
     }
 
-    // Requirements are scoped to this evaluator's type — DB-level filter
+    // Requirements are scoped to this evaluator's type - DB-level filter
     const [requirements, ownScores] = await Promise.all([
       prisma.requirement.findMany({
         where: { evaluatorType: assignment.evaluatorType }, // ← DB-level filter
@@ -254,7 +254,7 @@ export async function GET(
       prisma.score.findMany({
         where: {
           evaluationId,
-          userId: session.user.id, // ← DB-level isolation — no cross-team rows fetched
+          userId: session.user.id, // ← DB-level isolation - no cross-team rows fetched
         },
         select: { id: true, requirementId: true, value: true, evidenceType: true, comment: true },
       }),
@@ -270,7 +270,7 @@ export async function GET(
 
   // ── Branch B: MERGED / FINALISED, or a role with view:all_scores ─────────────
   //
-  // No userId filter — all scores are returned so the UI can show them side by side.
+  // No userId filter - all scores are returned so the UI can show them side by side.
   // VIEWERs may only observe FINALISED evaluations; they are excluded from the active MERGED phase.
   if (evaluation.state === 'MERGED' && !canDo(role, 'access:evaluate')) {
     return Response.json({ error: 'Forbidden', code: 'FORBIDDEN' }, { status: 403 })
@@ -284,7 +284,7 @@ export async function GET(
       orderBy: [{ category: 'asc' }, { order: 'asc' }],
     }),
     prisma.score.findMany({
-      where: { evaluationId }, // ← no userId clause — full cross-team visibility
+      where: { evaluationId }, // ← no userId clause - full cross-team visibility
       select: {
         id: true,
         requirementId: true,

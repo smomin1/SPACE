@@ -67,7 +67,7 @@ export function calculateWeightedScore(scores: Score[], requirements: Requiremen
 
 /**
  * Returns the weighted percentage (0–100).
- * Formula: sum(combinedAvg × multiplier) / sum(3 × multiplier) × 100
+ * Formula: sum(combinedAvg × multiplier) / sum(4 × multiplier) × 100
  * Only requirements with ≥1 scored value contribute to the denominator.
  * Returns 0 when no requirement has any non-N/A score.
  */
@@ -81,7 +81,7 @@ export function calculateWeightedPercentage(scores: Score[], requirements: Requi
     if (a === null) continue
     const m = WEIGHT_MULTIPLIER[req.weight]
     numerator += a * m
-    denominator += 3 * m
+    denominator += 4 * m
   }
   if (denominator === 0) return 0
   return (numerator / denominator) * 100

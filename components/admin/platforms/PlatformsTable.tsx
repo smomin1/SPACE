@@ -70,6 +70,7 @@ import {
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { EvalStateBadge } from '@/components/admin/_shared/badges'
+import { toast } from 'sonner'
 
 type PlatformRow = {
   id: string
@@ -233,18 +234,17 @@ function FacetFilter<T, V>({
 
 function DeleteAction({ platform }: { platform: PlatformRow }) {
   const router = useRouter()
-  const [err, setErr] = React.useState<string | null>(null)
 
   async function handleDelete() {
-    setErr(null)
     const res = await fetch(`/api/platforms/${platform.id}`, { method: 'DELETE' })
     if (res.status === 204) {
+      toast.success(`"${platform.name}" deleted`)
       router.refresh()
     } else {
       const data = await res.json().catch(() => ({}))
-      setErr(
+      toast.error(
         data.code === 'HAS_EVALUATIONS'
-          ? 'Cannot delete — this platform has existing evaluations.'
+          ? 'Cannot delete - this platform has existing evaluations.'
           : (data.error ?? 'Delete failed.'),
       )
     }
@@ -267,7 +267,6 @@ function DeleteAction({ platform }: { platform: PlatformRow }) {
           <AlertDialogTitle>Delete platform?</AlertDialogTitle>
           <AlertDialogDescription>
             <strong>&ldquo;{platform.name}&rdquo;</strong> and all its assignments will be permanently removed.
-            {err && <span className="mt-1 block font-medium text-amber-800">{err}</span>}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -314,7 +313,7 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
         row.original.licenceType ? (
           <span className="text-emerald-950/85">{LICENCE_LABELS[row.original.licenceType]}</span>
         ) : (
-          <span className="text-stone-400">—</span>
+          <span className="text-stone-400">-</span>
         ),
       filterFn: (row, id, value: string[]) => {
         const v = row.getValue(id)
@@ -336,7 +335,7 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
             Available
           </span>
         ) : (
-          <span className="text-[12px] text-stone-400">—</span>
+          <span className="text-[12px] text-stone-400">-</span>
         ),
     },
     {

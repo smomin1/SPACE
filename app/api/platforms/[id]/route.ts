@@ -93,18 +93,52 @@ export async function DELETE(
   const { id } = await params
 
   try {
-    const evalCount = await prisma.evaluation.count({ where: { platformId: id } })
-    if (evalCount > 0) {
-      return Response.json(
-        { error: 'Platform has existing evaluations and cannot be deleted', code: 'HAS_EVALUATIONS' },
-        { status: 409 }
-      )
+    const platform = await prisma.platform.findUnique({
+      where: { id },
+      select: { id: true, evaluations: { select: { id: true } } },
+    })
+    if (!platform) {
+      return Response.json({ error: 'Not Found', code: 'NOT_FOUND' }, { status: 404 })
     }
 
-    await prisma.$transaction([
-      prisma.platformEvaluatorAssignment.deleteMany({ where: { platformId: id } }),
-      prisma.platform.delete({ where: { id } }),
-    ])
+    const evaluationIds = platform.evaluations.map(e => e.id)
+
+    await prisma.$transaction(async tx => {
+      if (evaluationIds.length > 0) {
+        // Delete conflict messages and threads
+        const threadIds = (
+          await tx.conflictThread.findMany({
+            where: { evaluationId: { in: evaluationIds } },
+            select: { id: true },
+          })
+        ).map(t => t.id)
+        if (threadIds.length > 0) {
+          await tx.conflictMessage.deleteMany({ where: { threadId: { in: threadIds } } })
+          await tx.conflictThread.deleteMany({ where: { id: { in: threadIds } } })
+        }
+
+        // Delete score audit logs and scores
+        const scoreIds = (
+          await tx.score.findMany({
+            where: { evaluationId: { in: evaluationIds } },
+            select: { id: true },
+          })
+        ).map(s => s.id)
+        if (scoreIds.length > 0) {
+          await tx.scoreAuditLog.deleteMany({ where: { scoreId: { in: scoreIds } } })
+          await tx.score.deleteMany({ where: { id: { in: scoreIds } } })
+        }
+
+        await tx.evaluatorAssignment.deleteMany({ where: { evaluationId: { in: evaluationIds } } })
+        await tx.evaluationTeamMerge.deleteMany({ where: { evaluationId: { in: evaluationIds } } })
+        await tx.evaluation.deleteMany({ where: { id: { in: evaluationIds } } })
+      }
+
+      await tx.platformContext.deleteMany({ where: { platformId: id } })
+      await tx.platformEvaluatorAssignment.deleteMany({ where: { platformId: id } })
+      await tx.platform.delete({ where: { id } })
+    })
+
     return new Response(null, { status: 204 })
   } catch (err: unknown) {
     const e = err as { code?: string }

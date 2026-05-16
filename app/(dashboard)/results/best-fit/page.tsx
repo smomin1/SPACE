@@ -9,6 +9,7 @@ import {
 } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
 import type { PlatformStatus } from '@prisma/client'
+import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Helpers (shared pattern) ─────────────────────────────────────────────────
 
@@ -61,18 +62,20 @@ export default async function BestFitPage({
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'view:results')) redirect('/dashboard')
 
-  const sp             = await searchParams
-  const contextId      = typeof sp.context         === 'string' ? sp.context         : null
-  const platformId     = typeof sp.platform        === 'string' ? sp.platform        : null
-  const categoryFilter = typeof sp.category        === 'string' ? sp.category        : null
-  const evalTypeFilter = typeof sp.evaluatorType   === 'string' ? sp.evaluatorType   : null
-  const evidenceFilter = typeof sp.evidenceQuality === 'string' ? sp.evidenceQuality : null
+  const sp              = await searchParams
+  const contextIds      = (typeof sp.context         === 'string' ? sp.context         : '').split(',').filter(Boolean)
+  const platformIds     = (typeof sp.platform        === 'string' ? sp.platform        : '').split(',').filter(Boolean)
+  const categoryFilters = (typeof sp.category        === 'string' ? sp.category        : '').split(',').filter(Boolean)
+  const evalTypeFilter  = typeof sp.evaluatorType   === 'string' ? sp.evaluatorType   : null
+  const evidenceFilter  = typeof sp.evidenceQuality === 'string' ? sp.evidenceQuality : null
+  const statuses        = (typeof sp.status === 'string' ? sp.status : 'FINALISED').split(',').filter(Boolean)
+  const showDq          = sp.showDq === '1'
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const [contexts, allPlatforms, allRequirements, evaluations] = await Promise.all([
     prisma.context.findMany({
-      where: contextId ? { id: contextId } : undefined,
+      where: contextIds.length > 0 ? { id: { in: contextIds } } : undefined,
       orderBy: { name: 'asc' },
       select: {
         id: true, name: true, description: true,
@@ -82,7 +85,10 @@ export default async function BestFitPage({
     }),
 
     prisma.platform.findMany({
-      where: platformId ? { id: platformId } : undefined,
+      where: {
+        ...(platformIds.length > 0 && { id: { in: platformIds } }),
+        ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
+      },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, vendor: true, status: true },
     }),
@@ -90,14 +96,14 @@ export default async function BestFitPage({
     prisma.requirement.findMany({
       where: {
         evaluatorType: { not: 'COMPLIANCE' },
-        ...(categoryFilter && { category: categoryFilter }),
-        ...(evalTypeFilter && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
+        ...(categoryFilters.length > 0 && { category: { in: categoryFilters } }),
+        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
       },
       select: { id: true, weight: true, category: true, isComplianceGate: true },
     }),
 
     prisma.evaluation.findMany({
-      where: { state: { in: ['FINALISED', 'MERGED'] } },
+      where: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } },
       select: {
         id: true, platformId: true, state: true, lockedAt: true,
         scores: { select: { requirementId: true, value: true, evidenceType: true } },
@@ -195,9 +201,11 @@ export default async function BestFitPage({
   }
 
   return (
+    <FullscreenWrapper title="Best Fit">
     <div className="space-y-8">
       {cards.map(card => <ContextCard key={card.contextId} card={card} />)}
     </div>
+    </FullscreenWrapper>
   )
 }
 
@@ -217,7 +225,7 @@ function ContextCard({ card }: { card: ContextCard }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Winner — full-width left column */}
+        {/* Winner - full-width left column */}
         {winner ? (
           <div className="lg:col-span-2 rounded-xl border border-emerald-200/70 bg-emerald-50/40 p-5 space-y-4">
             {/* Header */}
@@ -233,7 +241,7 @@ function ContextCard({ card }: { card: ContextCard }) {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-3xl font-bold tabular-nums text-emerald-800">
-                  {winner.pct !== null ? `${winner.pct.toFixed(1)}%` : '—'}
+                  {winner.pct !== null ? `${winner.pct.toFixed(1)}%` : '-'}
                 </p>
                 {winner.pct !== null && (
                   <p className="text-xs text-stone-400 mt-0.5">
@@ -341,7 +349,7 @@ function RunnerCard({
           (p.pct ?? 0) >= 70 ? 'text-emerald-700' :
           (p.pct ?? 0) >= 50 ? 'text-amber-600' : 'text-red-600'
         }`}>
-          {p.pct !== null ? `${p.pct.toFixed(1)}%` : '—'}
+          {p.pct !== null ? `${p.pct.toFixed(1)}%` : '-'}
         </span>
       </div>
       {p.pct !== null && (
@@ -389,7 +397,7 @@ function EvidenceBar({ evidence }: { evidence: ReturnType<typeof calculateEviden
 function EmptyState({ message, hint }: { message: string; hint: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="mb-3 text-3xl text-stone-300">—</div>
+      <div className="mb-3 text-3xl text-stone-300">-</div>
       <p className="text-sm font-medium text-stone-500">{message}</p>
       <p className="text-xs text-stone-400 mt-1">{hint}</p>
     </div>

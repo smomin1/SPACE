@@ -238,10 +238,10 @@ export function MergedView({
             <div className="flex-1 text-sm text-muted-foreground">
               {openThreadCount > 0 ? (
                 <span className="text-amber-600 font-medium">
-                  {openThreadCount} open conflict{openThreadCount !== 1 ? 's' : ''} — resolve before finalising
+                  {openThreadCount} open conflict{openThreadCount !== 1 ? 's' : ''} - resolve before finalising
                 </span>
               ) : (
-                <span>All conflicts resolved — ready to finalise</span>
+                <span>All conflicts resolved - ready to finalise</span>
               )}
             </div>
             <AlertDialog>
@@ -348,7 +348,7 @@ export function MergedView({
             {(allConflictsResolved) && (
               <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/60 px-4 py-3">
                 <p className="text-sm font-medium text-emerald-800">
-                  All conflicts resolved — scores are ready to finalise.
+                  All conflicts resolved - scores are ready to finalise.
                 </p>
               </div>
             )}
@@ -552,7 +552,7 @@ export function MergedView({
         </div>
       </div>
 
-      {/* Conflict thread Sheet — slides in from the right */}
+      {/* Conflict thread Sheet - slides in from the right */}
       <Sheet open={!!sheetState} onOpenChange={open => { if (!open) setSheetState(null) }}>
         <SheetContent
           side="right"

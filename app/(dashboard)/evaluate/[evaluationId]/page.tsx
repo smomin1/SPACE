@@ -237,7 +237,7 @@ export default async function EvaluationWorkspacePage({
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-semibold">{evaluation.platform.name}</h1>
             <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-700/20">
-              Merged — Review
+              Merged - Review
             </span>
           </div>
           <p className="text-sm text-muted-foreground">{evaluation.platform.vendor}</p>

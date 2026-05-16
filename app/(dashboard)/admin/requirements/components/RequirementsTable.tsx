@@ -214,7 +214,7 @@ function DeleteAction({ req }: { req: Requirement }) {
       const data = await res.json().catch(() => ({}))
       setErr(
         data.code === 'HAS_SCORES'
-          ? 'Cannot delete — this requirement has recorded scores.'
+          ? 'Cannot delete - this requirement has recorded scores.'
           : (data.error ?? 'Delete failed.')
       )
     }
@@ -285,7 +285,7 @@ function buildColumns(): ColumnDef<Requirement>[] {
         row.original.category ? (
           <span className="text-[13px] text-emerald-950/70">{row.original.category}</span>
         ) : (
-          <span className="text-stone-400">—</span>
+          <span className="text-stone-400">-</span>
         ),
       filterFn: 'includesString',
     },

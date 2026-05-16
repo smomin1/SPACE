@@ -158,7 +158,7 @@ const columns: ColumnDef<Requirement>[] = [
       row.original.category ? (
         <span className="text-stone-600">{row.original.category}</span>
       ) : (
-        <span className="text-stone-400">—</span>
+        <span className="text-stone-400">-</span>
       ),
     filterFn: "includesString",
   },
@@ -193,7 +193,7 @@ const columns: ColumnDef<Requirement>[] = [
       row.original.isComplianceGate ? (
         <ComplianceGateBadge />
       ) : (
-        <span className="text-stone-400 text-[12px]">—</span>
+        <span className="text-stone-400 text-[12px]">-</span>
       ),
     filterFn: (row, id, value: boolean) => {
       if (!value) return true

@@ -320,7 +320,7 @@ function buildColumns(): ColumnDef<ContextRow>[] {
       enableSorting: false,
       cell: ({ row }) => {
         const levels = row.original.learningLevels as string[]
-        if (!levels.length) return <span className="text-stone-400">—</span>
+        if (!levels.length) return <span className="text-stone-400">-</span>
         return (
           <div className="flex flex-wrap gap-1">
             {levels.map((l) => (
@@ -345,7 +345,7 @@ function buildColumns(): ColumnDef<ContextRow>[] {
       enableSorting: false,
       cell: ({ row }) => {
         const { cefrMin, cefrMax } = row.original
-        if (!cefrMin && !cefrMax) return <span className="text-stone-400">—</span>
+        if (!cefrMin && !cefrMax) return <span className="text-stone-400">-</span>
         if (cefrMin && cefrMax)
           return (
             <span className="font-mono text-[12.5px] tabular-nums text-emerald-950">
@@ -371,7 +371,7 @@ function buildColumns(): ColumnDef<ContextRow>[] {
         return m ? (
           <span className="text-stone-700">{DEPLOYMENT_LABELS[m]}</span>
         ) : (
-          <span className="text-stone-400">—</span>
+          <span className="text-stone-400">-</span>
         )
       },
       filterFn: (row, id, value: string[]) => {

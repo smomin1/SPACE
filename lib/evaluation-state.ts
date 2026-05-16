@@ -318,7 +318,7 @@ export async function transitionEvaluation(
       return { ok: true }
     }
 
-    // ── FINALISED → IN_PROGRESS (admin reopen) ────────────────────────────────
+    // ── MERGED / FINALISED → IN_PROGRESS (admin reopen) ──────────────────────
     if (newState === 'IN_PROGRESS') {
       // Create an audit entry per score so the reopen event is permanently recorded
       const existingScores = await tx.score.findMany({
@@ -340,6 +340,21 @@ export async function transitionEvaluation(
             reason: 'EVALUATION_REOPENED',
           })),
         })
+      }
+
+      // Reset submission status so evaluators must re-submit; scores are preserved
+      await tx.evaluatorAssignment.updateMany({
+        where: { evaluationId },
+        data: { hasSubmitted: false, submittedAt: null },
+      })
+
+      // Delete stale conflict threads (messages first due to FK constraint)
+      const staleThreadIds = (
+        await tx.conflictThread.findMany({ where: { evaluationId }, select: { id: true } })
+      ).map(t => t.id)
+      if (staleThreadIds.length > 0) {
+        await tx.conflictMessage.deleteMany({ where: { threadId: { in: staleThreadIds } } })
+        await tx.conflictThread.deleteMany({ where: { evaluationId } })
       }
 
       await tx.evaluation.update({

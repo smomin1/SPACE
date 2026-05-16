@@ -38,7 +38,7 @@ function str(raw: unknown): string | null {
   return s === '' || s === 'undefined' || s === 'null' ? null : s
 }
 
-// Hardcoded column map — keys are the exact header strings from the Excel file
+// Hardcoded column map - keys are the exact header strings from the Excel file
 // Secondary keys handle future uploads that include evaluatorType / isComplianceGate
 function mapRow(raw: Record<string, unknown>, index: number): {
   title: string | null
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       { status: 422 }
     )
 
-  // Map every row — skip rows where title is blank (e.g. section header rows)
+  // Map every row - skip rows where title is blank (e.g. section header rows)
   const failures: { row: number; errors: string[] }[] = []
   const validRows: ReturnType<typeof mapRow>[] = []
 

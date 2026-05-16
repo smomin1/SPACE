@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import type { PlatformStatus } from '@prisma/client'
+import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Evidence quality cell ────────────────────────────────────────────────────
 
@@ -34,20 +35,22 @@ export default async function EvidencePage({
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'view:results')) redirect('/dashboard')
 
-  const sp             = await searchParams
-  const contextId      = typeof sp.context       === 'string' ? sp.context       : null
-  const platformId     = typeof sp.platform      === 'string' ? sp.platform      : null
-  const categoryFilter = typeof sp.category      === 'string' ? sp.category      : null
-  const evalTypeFilter = typeof sp.evaluatorType === 'string' ? sp.evaluatorType : null
+  const sp              = await searchParams
+  const contextIds      = (typeof sp.context         === 'string' ? sp.context         : '').split(',').filter(Boolean)
+  const platformIds     = (typeof sp.platform        === 'string' ? sp.platform        : '').split(',').filter(Boolean)
+  const categoryFilters = (typeof sp.category        === 'string' ? sp.category        : '').split(',').filter(Boolean)
+  const evalTypeFilter  = typeof sp.evaluatorType   === 'string' ? sp.evaluatorType   : null
+  const statuses        = (typeof sp.status === 'string' ? sp.status : 'FINALISED').split(',').filter(Boolean)
+  const showDq          = sp.showDq === '1'
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const [rawRequirements, rawPlatforms, evaluations] = await Promise.all([
     prisma.requirement.findMany({
       where: {
-        ...(contextId      && { contexts: { some: { contextId } } }),
-        ...(categoryFilter && { category: categoryFilter }),
-        ...(evalTypeFilter && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
+        ...(contextIds.length      > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
+        ...(categoryFilters.length > 0 && { category: { in: categoryFilters } }),
+        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
       },
       select: { id: true, category: true },
       orderBy: { category: 'asc' },
@@ -55,15 +58,15 @@ export default async function EvidencePage({
 
     prisma.platform.findMany({
       where: {
-        ...(platformId && { id: platformId }),
-        ...(contextId  && { contexts: { some: { contextId } } }),
+        ...(platformIds.length > 0 && { id: { in: platformIds } }),
+        ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
       },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, vendor: true, status: true },
     }),
 
     prisma.evaluation.findMany({
-      where: { state: { in: ['FINALISED', 'MERGED'] } },
+      where: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } },
       select: {
         id: true, platformId: true, state: true,
         scores: {
@@ -115,7 +118,7 @@ export default async function EvidencePage({
       let highCount = 0, totalCount = 0
       for (const s of ev!.scores) {
         if (!reqIds.has(s.requirementId)) continue
-        if (s.value === null) continue       // N/A — skip
+        if (s.value === null) continue       // N/A - skip
         if (!s.evidenceType) continue        // no evidence type recorded
         totalCount++
         if (HIGH_EVIDENCE.has(s.evidenceType)) highCount++
@@ -137,7 +140,7 @@ export default async function EvidencePage({
   if (rows.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-3 text-3xl text-stone-300">—</div>
+        <div className="mb-3 text-3xl text-stone-300">-</div>
         <p className="text-sm font-medium text-stone-500">No platforms match the current filters</p>
       </div>
     )
@@ -146,6 +149,7 @@ export default async function EvidencePage({
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <FullscreenWrapper title="Evidence Quality">
     <div className="space-y-5">
       {/* Colour scale legend */}
       <div className="flex flex-wrap items-center gap-4 text-[11.5px]">
@@ -223,7 +227,7 @@ export default async function EvidencePage({
                 {/* Overall cell */}
                 <td className="py-2 px-3 text-center">
                   {!row.hasEval ? (
-                    <span className="text-stone-300 text-sm">—</span>
+                    <span className="text-stone-300 text-sm">-</span>
                   ) : (
                     <HeatCell cell={row.overall} />
                   )}
@@ -233,7 +237,7 @@ export default async function EvidencePage({
                 {row.cells.map((cell, i) => (
                   <td key={i} className="py-2 px-3 text-center">
                     {!row.hasEval ? (
-                      <span className="text-stone-300 text-sm">—</span>
+                      <span className="text-stone-300 text-sm">-</span>
                     ) : (
                       <HeatCell cell={cell} />
                     )}
@@ -250,6 +254,7 @@ export default async function EvidencePage({
         Scores with no evidence type recorded are excluded.
       </p>
     </div>
+    </FullscreenWrapper>
   )
 }
 
@@ -259,7 +264,7 @@ function HeatCell({ cell }: { cell: EvidenceCell }) {
   if (cell.pct === null) {
     return (
       <div className="mx-auto inline-flex items-center justify-center rounded-lg px-2 py-1.5 min-w-[72px] bg-stone-50 text-stone-300 text-[12px]">
-        —
+        -
       </div>
     )
   }

@@ -106,15 +106,15 @@ export function filterByContext(
 
 /**
  * Maps a weighted percentage to a procurement recommendation tier.
- * Compliance failures must be caught separately (by checking platform.status = DISQUALIFIED).
+ * Disqualification is a platform status (compliance gate failure) — never a score outcome.
  */
 export function getRecommendedAction(
   percentage: number,
-): 'TOP_PICK' | 'RECOMMENDED' | 'CONSIDER' | 'DISQUALIFIED' {
+): 'TOP_PICK' | 'RECOMMENDED' | 'CONSIDER' | 'NOT_RECOMMENDED' {
   if (percentage >= 85) return 'TOP_PICK'
   if (percentage >= 70) return 'RECOMMENDED'
   if (percentage >= 50) return 'CONSIDER'
-  return 'DISQUALIFIED'
+  return 'NOT_RECOMMENDED'
 }
 
 /**

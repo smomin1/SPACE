@@ -298,10 +298,11 @@ function RecommendationBadge({
   action: NonNullable<PlatformRow['recommendation']>
 }) {
   const cfg = {
-    TOP_PICK:     { label: 'Top Pick',     cls: 'bg-emerald-600 text-white' },
-    RECOMMENDED:  { label: 'Recommended',  cls: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300/60' },
-    CONSIDER:     { label: 'Consider',     cls: 'bg-amber-100 text-amber-800 ring-1 ring-amber-300/60' },
-    DISQUALIFIED: { label: 'Disqualified', cls: 'bg-destructive/10 text-destructive ring-1 ring-destructive/20' },
+    TOP_PICK:        { label: 'Top Pick',        cls: 'bg-emerald-600 text-white' },
+    RECOMMENDED:     { label: 'Recommended',     cls: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300/60' },
+    CONSIDER:        { label: 'Consider',        cls: 'bg-amber-100 text-amber-800 ring-1 ring-amber-300/60' },
+    NOT_RECOMMENDED: { label: 'Not Recommended', cls: 'bg-stone-100 text-stone-600 ring-1 ring-stone-300/60' },
+    DISQUALIFIED:    { label: 'Disqualified',    cls: 'bg-destructive/10 text-destructive ring-1 ring-destructive/20' },
   } as const
   const { label, cls } = cfg[action]
   return (

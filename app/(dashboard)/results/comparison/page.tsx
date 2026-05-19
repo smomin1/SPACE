@@ -21,7 +21,7 @@ export type PlatformRow = {
   compliancePass: boolean | null
   categoryScores: Record<string, number | null>
   overallPct: number | null
-  recommendation: ReturnType<typeof getRecommendedAction> | null
+  recommendation: ReturnType<typeof getRecommendedAction> | 'DISQUALIFIED' | null
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────

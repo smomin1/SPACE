@@ -5,11 +5,9 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const TABS = [
-  { href: '/results/comparison',     label: 'Comparison' },
+  { href: '/results/comparison',      label: 'Comparison' },
   { href: '/results/breakdown',       label: 'Categories' },
-  { href: '/results/best-fit',       label: 'Best Fit' },
-  { href: '/results/coverage',       label: 'Coverage Gap' },
-  { href: '/results/evidence',       label: 'Evidence Quality' },
+  { href: '/results/best-fit',        label: 'Best Fit' },
   { href: '/results/build-readiness', label: 'Build Readiness' },
 ]
 

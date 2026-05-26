@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { Sidebar } from '@/components/shared/Sidebar'
+import { Footer } from '@/components/shared/Footer'
 
 function getInitials(name: string | null | undefined): string {
   if (!name) return '?'
@@ -8,6 +9,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: 'Super Admin',
   ADMIN: 'Administrator',
   PEDAGOGY_EVALUATOR: 'Pedagogy',
   TECHNICAL_EVALUATOR: 'Technical',
@@ -33,7 +35,8 @@ export default async function DashboardLayout({
         roleLabel={ROLE_LABELS[role]}
       />
       <main className="flex-1 overflow-y-auto">
-        {children}
+        <div className="min-h-[520px]">{children}</div>
+        <Footer />
       </main>
     </div>
   )

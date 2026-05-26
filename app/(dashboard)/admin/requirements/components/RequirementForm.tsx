@@ -7,11 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ShieldAlertIcon } from 'lucide-react'
 import { z } from 'zod'
 
+import { cn } from '@/lib/utils'
 import { requirementBaseSchema } from '@/lib/requirement-schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -280,27 +280,39 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
             name="isComplianceGate"
             render={({ field }) => (
               <FormItem
-                className={`flex flex-row items-center gap-3 rounded-lg border p-4 transition-colors ${
+                onClick={() => handleComplianceGateChange(field.value, field.onChange)}
+                className={cn(
+                  'flex flex-row items-center gap-3 rounded-lg border p-4 transition-colors cursor-pointer select-none',
                   watchIsComplianceGate
-                    ? 'border-destructive/50 bg-destructive/5'
-                    : ''
-                }`}
+                    ? 'border-amber-500 bg-amber-100/80'
+                    : 'border-stone-200/80 hover:bg-stone-50/50',
+                )}
               >
                 <FormControl>
-                  <Switch
+                  <input
+                    type="checkbox"
+                    className="sr-only"
                     checked={field.value}
-                    onCheckedChange={(checked) =>
-                      handleComplianceGateChange(field.value, field.onChange)
-                    }
+                    onChange={(e) => field.onChange(e.target.checked)}
                     aria-label="Compliance gate"
                   />
                 </FormControl>
-                <div className="space-y-0.5">
-                  <FormLabel className="cursor-pointer text-base">
+                <div className={cn(
+                  'size-5 shrink-0 rounded-full border-2 transition-all flex items-center justify-center',
+                  watchIsComplianceGate
+                    ? 'border-amber-700 bg-amber-700'
+                    : 'border-stone-300 bg-white',
+                )}>
+                  {watchIsComplianceGate && (
+                    <div className="size-2 rounded-full bg-white" />
+                  )}
+                </div>
+                <div className="space-y-0.5 flex-1">
+                  <FormLabel className={cn('cursor-pointer text-base', watchIsComplianceGate && 'text-amber-900')}>
                     Compliance Gate
                     {watchIsComplianceGate && (
-                      <span className="ml-2 text-xs font-normal text-destructive">
-                        (active - FAIL disqualifies platform)
+                      <span className="ml-2 text-xs font-normal text-amber-700">
+                        (active: FAIL disqualifies platform)
                       </span>
                     )}
                   </FormLabel>
@@ -313,8 +325,8 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
           />
 
           {watchIsComplianceGate && watchEvaluatorType !== 'COMPLIANCE' && (
-            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
-              Note: Compliance gate is enabled for a non-COMPLIANCE evaluator type. The
+            <p className="rounded-md border border-amber-200 bg-amber-50/80 px-3 py-2 text-sm text-amber-800">
+              Note: Compliance gate is enabled for a non-Compliance evaluator type. The
               platform disqualification rule still applies.
             </p>
           )}

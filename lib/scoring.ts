@@ -106,7 +106,7 @@ export function filterByContext(
 
 /**
  * Maps a weighted percentage to a procurement recommendation tier.
- * Disqualification is a platform status (compliance gate failure) — never a score outcome.
+ * Disqualification is a platform status (compliance gate failure), never a score outcome.
  */
 export function getRecommendedAction(
   percentage: number,

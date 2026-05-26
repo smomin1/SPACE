@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ─── Mocks must be declared before imports ────────────────────────────────────
 
-// Transaction mock tx — used by scores POST (first-time creation path)
+// Transaction mock tx: used by scores POST (first-time creation path)
 const mockTx = {
   score: { create: vi.fn() },
   scoreAuditLog: { create: vi.fn() },
@@ -239,7 +239,7 @@ beforeEach(() => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/evaluations/[id]/scores — Score isolation
+// GET /api/evaluations/[id]/scores: Score isolation
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('GET /api/evaluations/[id]/scores', () => {
@@ -331,7 +331,7 @@ describe('GET /api/evaluations/[id]/scores', () => {
       await scoresGET(makeRequest(), makeParams('eval-1'))
 
       const scoreCall = db.score.findMany.mock.calls[0][0]
-      // Must contain userId: current user only — no wildcard
+      // Must contain userId: current user only, no wildcard
       expect(scoreCall.where.userId).toBe('u-ped-1')
       // Must NOT omit userId (which would expose all rows)
       expect(Object.keys(scoreCall.where)).toContain('userId')
@@ -462,7 +462,7 @@ describe('GET /api/evaluations/[id]/scores', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/evaluations/[id]/scores — Score submission
+// POST /api/evaluations/[id]/scores: Score submission
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('POST /api/evaluations/[id]/scores', () => {
@@ -805,7 +805,7 @@ describe('POST /api/evaluations/[id]/submit', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/evaluations/[id]/merge — Admin only
+// POST /api/evaluations/[id]/merge: Admin only
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('POST /api/evaluations/[id]/merge', () => {
@@ -890,7 +890,7 @@ describe('POST /api/evaluations/[id]/merge', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/evaluations/[id]/finalise — Admin only
+// POST /api/evaluations/[id]/finalise: Admin only
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('POST /api/evaluations/[id]/finalise', () => {

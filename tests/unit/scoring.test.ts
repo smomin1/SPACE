@@ -132,10 +132,10 @@ describe('calculateWeightedPercentage()', () => {
     expect(calculateWeightedPercentage(scores, reqs)).toBe(50)
   })
 
-  it('does not penalise N/A requirements — they are excluded from denominator', () => {
+  it('does not penalise N/A requirements; they are excluded from denominator', () => {
     const reqs = [
       req({ id: 'r1', weight: 'HIGH' }),
-      req({ id: 'r2', weight: 'HIGH' }),  // all N/A — should not drag score down
+      req({ id: 'r2', weight: 'HIGH' }),  // all N/A; should not drag score down
     ]
     const scores = [
       score({ requirementId: 'r1', value: 3 }),

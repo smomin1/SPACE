@@ -336,7 +336,7 @@ export function ScoringForm({
       })}
 
       {!assignment.hasSubmitted && (
-        <div className="sticky bottom-0 bg-[#f6f7f4] border-t border-stone-200/80 py-4 flex justify-end">
+        <div className="sticky bottom-0 bg-[var(--color-neutral)] border-t border-stone-200/80 py-4 flex justify-end">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button disabled={!allScored || isPending}>

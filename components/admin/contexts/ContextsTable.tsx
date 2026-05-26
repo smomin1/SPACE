@@ -496,7 +496,7 @@ export function ContextsTable({ initialData }: ContextsTableProps) {
           <span className="hidden text-[12px] text-stone-500 md:inline">
             <span className="font-mono tabular-nums text-emerald-950">{initialData.length}</span> contexts
           </span>
-          <Button size="sm" asChild>
+          <Button size="sm" className="bg-emerald-800 hover:bg-emerald-900 text-white" asChild>
             <Link href="/admin/contexts/new">
               <PlusIcon className="mr-1.5 size-3.5" />
               New Context

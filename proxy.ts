@@ -11,6 +11,11 @@ export const proxy = auth((request) => {
     return NextResponse.next()
   }
 
+  // Allow the first-run setup page and its API endpoint without auth
+  if (pathname === '/setup' || pathname.startsWith('/api/setup')) {
+    return NextResponse.next()
+  }
+
   // Redirect authenticated users away from the login page
   if (pathname.startsWith('/login')) {
     if (session) {

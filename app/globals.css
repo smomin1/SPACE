@@ -1,34 +1,44 @@
 @import "tailwindcss";
 
-/* ── CSS variable tokens — Forest Green theme ────────────────────────────── */
+/* ── Brand variables ─────────────────────────────────────────────────────── */
 :root {
-  --background:          #f6f7f4;  /* warm sage canvas */
-  --foreground:          #022c22;  /* emerald-950 */
+  --color-primary:   #1A4731;
+  --color-secondary: #C9973A;
+  --color-neutral:   #F7F4EF;
+  --color-text:      #2B2B2B;
+  --color-accent:    #3A5A72;
+
+  /* Gold alias — used for CTA buttons, left-border accents, dividers */
+  --gold: #C9973A;
+
+  /* ── shadcn semantic tokens ──────────────────────────────────────────── */
+  --background:          #F7F4EF;
+  --foreground:          #2B2B2B;
 
   --card:                #ffffff;
-  --card-foreground:     #022c22;
+  --card-foreground:     #2B2B2B;
 
   --popover:             #ffffff;
-  --popover-foreground:  #022c22;
+  --popover-foreground:  #2B2B2B;
 
-  --primary:             #065f46;  /* emerald-800 */
-  --primary-foreground:  #fafaf5;
+  --primary:             #1A4731;
+  --primary-foreground:  #ffffff;
 
   --secondary:           #f4f4ee;
-  --secondary-foreground:#042d1e;
+  --secondary-foreground:#2B2B2B;
 
   --muted:               #f2f2ec;
-  --muted-foreground:    #78716c;  /* stone-500 */
+  --muted-foreground:    #78716c;
 
-  --accent:              #dceee5;
-  --accent-foreground:   #042d1e;
+  --accent:              #3A5A72;
+  --accent-foreground:   #ffffff;
 
-  --destructive:         #92400e;  /* amber-800 — dignified ochre, not red */
+  --destructive:         #92400e;
   --destructive-foreground: #fef3c7;
 
-  --border:              #e7e5e4;  /* stone-200 */
+  --border:              #e7e5e4;
   --input:               #e7e5e4;
-  --ring:                #065f46;
+  --ring:                #1A4731;
 
   --radius:              0.625rem;
   --radius-sm:           calc(var(--radius) - 2px);
@@ -72,6 +82,9 @@
   --color-input:                var(--input);
   --color-ring:                 var(--ring);
 
+  /* Gold utility — bg-gold, text-gold, border-gold */
+  --color-gold:                 var(--gold);
+
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -90,3 +103,31 @@ body {
 }
 
 table, .tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: var(--color-text);
+}
+
+body, p, li, span, input, button, label, a {
+  font-family: var(--font-sans);
+}
+
+/* ── Dividers ────────────────────────────────────────────────────────────── */
+hr {
+  border: none;
+  border-top: 1px solid var(--gold);
+  opacity: 0.45;
+  margin: 2.5rem 0;
+}
+
+/* ── Layout helpers ──────────────────────────────────────────────────────── */
+.page-section {
+  padding: 4rem 2rem;
+}
+
+.content-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}

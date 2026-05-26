@@ -79,7 +79,7 @@ describe('Login', () => {
     const result = await authorizeCredentials('nobody@eval.com', 'any-password')
 
     expect(result).toBeNull()
-    // bcrypt.compare must NOT be called — avoids timing oracle
+    // bcrypt.compare must NOT be called; avoids timing oracle
     expect(mockBcrypt.compare).not.toHaveBeenCalled()
   })
 })

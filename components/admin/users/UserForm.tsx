@@ -11,12 +11,14 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-const ROLE_OPTIONS: { value: Role; label: string; description: string }[] = [
-  { value: 'ADMIN',               label: 'Admin',               description: 'Full access, manages users, platforms, requirements, and finalises evaluations.' },
-  { value: 'PEDAGOGY_EVALUATOR',  label: 'Pedagogy Evaluator',  description: 'Scores pedagogy requirements.' },
-  { value: 'TECHNICAL_EVALUATOR', label: 'Technical Evaluator', description: 'Scores technical requirements.' },
-  { value: 'VIEWER',              label: 'Viewer',              description: 'Read-only access to results and dashboards.' },
+const ALL_ROLE_OPTIONS: { value: Role; label: string; description: string }[] = [
+  { value: 'SUPER_ADMIN',          label: 'Super Admin',          description: 'Full access including user account creation and management.' },
+  { value: 'ADMIN',                label: 'Admin',                description: 'Full access to platforms, requirements, contexts, and evaluations. Cannot create accounts.' },
+  { value: 'PEDAGOGY_EVALUATOR',   label: 'Pedagogy Evaluator',   description: 'Scores pedagogy requirements.' },
+  { value: 'TECHNICAL_EVALUATOR',  label: 'Technical Evaluator',  description: 'Scores technical requirements.' },
+  { value: 'VIEWER',               label: 'Viewer',               description: 'Read-only access to results and dashboards.' },
 ]
 
 type UserData = {
@@ -31,9 +33,10 @@ interface UserFormProps {
   mode: 'create' | 'edit'
   user?: UserData
   isSelf?: boolean
+  currentUserRole: Role
 }
 
-export function UserForm({ mode, user, isSelf = false }: UserFormProps) {
+export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFormProps) {
   const router = useRouter()
   const [name,     setName]     = React.useState(user?.name  ?? '')
   const [email,    setEmail]    = React.useState(user?.email ?? '')
@@ -42,6 +45,11 @@ export function UserForm({ mode, user, isSelf = false }: UserFormProps) {
   const [password, setPassword] = React.useState('')
   const [showPwd,  setShowPwd]  = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
+
+  // ADMIN cannot assign or see the SUPER_ADMIN option
+  const roleOptions = currentUserRole === 'SUPER_ADMIN'
+    ? ALL_ROLE_OPTIONS
+    : ALL_ROLE_OPTIONS.filter(o => o.value !== 'SUPER_ADMIN')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -125,7 +133,7 @@ export function UserForm({ mode, user, isSelf = false }: UserFormProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ROLE_OPTIONS.map((opt) => (
+            {roleOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{opt.label}</span>
@@ -167,9 +175,19 @@ export function UserForm({ mode, user, isSelf = false }: UserFormProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between rounded-md border border-stone-200/80 bg-stone-50/40 px-4 py-3">
+      <div className={cn(
+        'flex items-center justify-between rounded-md border px-4 py-3 transition-colors',
+        isActive
+          ? 'border-emerald-200 bg-emerald-50/60'
+          : 'border-stone-200/80 bg-stone-100/60',
+      )}>
         <div className="space-y-0.5">
-          <Label htmlFor="isActive" className="text-sm">Active</Label>
+          <Label
+            htmlFor="isActive"
+            className={cn('text-sm font-medium', isActive ? 'text-emerald-800' : 'text-stone-500')}
+          >
+            {isActive ? 'Active' : 'Inactive'}
+          </Label>
           <p className="text-[11px] text-stone-500">
             {isActive ? 'User can sign in and access the platform.' : 'Sign-in disabled. Account is preserved.'}
           </p>

@@ -1,5 +1,5 @@
 /**
- * Results Dashboard — behavioural tests
+ * Results Dashboard: behavioural tests
  *
  * Each group tests one observable guarantee of the dashboard. Expected values
  * are hand-computed from the formulas in CLAUDE.md so the tests serve as a
@@ -92,7 +92,7 @@ describe('Context switching recalculates all weighted scores', () => {
     const reqsB  = requirements.filter(r => r.contextIds.includes('ctx-b'))
     const pctA   = calculateWeightedPercentage(filtA, reqsA)
     const pctB   = calculateWeightedPercentage(filtB, reqsB)
-    expect(pctA).toBeGreaterThan(pctB + 30) // 86.67 vs 46.67 — 40-point gap
+    expect(pctA).toBeGreaterThan(pctB + 30) // 86.67 vs 46.67, 40-point gap
   })
 
   it('null context returns all scores unchanged', () => {
@@ -273,7 +273,7 @@ describe('N/A scores are excluded from weighted percentage calculations', () => 
     const withNa   = [score({ requirementId: 'r1', value: null })]  // 0 % (no denom)
     const withZero = [score({ requirementId: 'r1', value: 0    })]  // 0 % (scored 0)
 
-    // Both return 0, but for different reasons — N/A keeps the denom clean
+    // Both return 0, but for different reasons; N/A keeps the denom clean
     expect(calculateWeightedPercentage(withNa,   reqs)).toBe(0)
     expect(calculateWeightedPercentage(withZero, reqs)).toBe(0)
 
@@ -366,7 +366,7 @@ describe('Evidence quality correctly ranks TRIAL > DEMO > DOCUMENTATION > VENDOR
       score({ requirementId: 'r2', evidenceType: null }),   // no evidence recorded
       score({ requirementId: 'r3', evidenceType: null }),
     ])
-    // Only r1 counts — high=1, low=0, total=1 → 100 %
+    // Only r1 counts: high=1, low=0, total=1 -> 100 %
     expect(result.high).toBe(1)
     expect(result.low).toBe(0)
     expect(result.percentage).toBe(100)
@@ -374,7 +374,7 @@ describe('Evidence quality correctly ranks TRIAL > DEMO > DOCUMENTATION > VENDOR
 
   it('TRIAL evidence produces a higher percentage than DEMO when replacing a low-conf item', () => {
     // Not about per-type scoring (both TRIAL and DEMO are "high"), but confirms
-    // they are treated identically in the high bucket — no secondary ranking needed
+    // they are treated identically in the high bucket; no secondary ranking needed
     const trialResult = calculateEvidenceQuality([
       score({ requirementId: 'r1', evidenceType: 'TRIAL' }),
       score({ requirementId: 'r2', evidenceType: 'VENDOR_CLAIM' }),
@@ -383,7 +383,7 @@ describe('Evidence quality correctly ranks TRIAL > DEMO > DOCUMENTATION > VENDOR
       score({ requirementId: 'r1', evidenceType: 'DEMO' }),
       score({ requirementId: 'r2', evidenceType: 'VENDOR_CLAIM' }),
     ])
-    // Both should be 50 % — TRIAL and DEMO are equivalent in the high bucket
+    // Both should be 50 %; TRIAL and DEMO are equivalent in the high bucket
     expect(trialResult.percentage).toBe(50)
     expect(demoResult.percentage).toBe(50)
   })
@@ -493,7 +493,7 @@ describe('Build Readiness Score only uses requirements in API/LTI/SSO/data-expor
       ...buildReqs.map(r => score({ requirementId: r.id, value: 1 })),
       ...nonBuildReqs.map(r => score({ requirementId: r.id, value: 3 })),
     ]
-    // Build readiness ≈ 33.3 % — non-build scores must not inflate it
+    // Build readiness approx 33.3 %; non-build scores must not inflate it
     const pct = calculateBuildReadinessScore(mixedScores, allReqs)
     expect(pct).toBeCloseTo(33.33, 1)
   })

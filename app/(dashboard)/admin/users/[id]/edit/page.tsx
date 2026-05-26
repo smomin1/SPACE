@@ -1,7 +1,9 @@
+import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { Button } from '@/components/ui/button'
 import { UserForm } from '@/components/admin/users/UserForm'
 
 export default async function EditUserPage({
@@ -24,13 +26,18 @@ export default async function EditUserPage({
 
   return (
     <div className="container mx-auto max-w-2xl py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit User</h1>
-        <p className="text-muted-foreground">
-          Update profile details, role, or set a new password.
-        </p>
+      <div className="mb-6 flex items-center gap-4">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/admin/users">← Back</Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Edit User</h1>
+          <p className="text-muted-foreground">
+            Update profile details, role, or set a new password.
+          </p>
+        </div>
       </div>
-      <UserForm mode="edit" user={user} isSelf={isSelf} />
+      <UserForm mode="edit" user={user} isSelf={isSelf} currentUserRole={session.user.role} />
     </div>
   )
 }

@@ -277,7 +277,7 @@ describe('detectConflicts()', () => {
     expect(conflicts[0].maxDiff).toBe(3)
   })
 
-  it('skips N/A (null) scores — they have no numeric position', async () => {
+  it('skips N/A (null) scores; they have no numeric position', async () => {
     mockPrisma.score.findMany.mockResolvedValue([
       makeScore('req-1', 'u-ped-1', null),
       makeScore('req-1', 'u-ped-2', 3),
@@ -286,7 +286,7 @@ describe('detectConflicts()', () => {
       makeAssignment('u-ped-1', 'PEDAGOGY'),
       makeAssignment('u-ped-2', 'PEDAGOGY'),
     ])
-    // Only one non-null score — no disagreement possible
+    // Only one non-null score; no disagreement possible
     expect(await detectConflicts('eval-1')).toEqual([])
   })
 
@@ -432,7 +432,7 @@ describe('transitionEvaluation()', () => {
       mockTx.score.findMany
         // compliance gate FAIL scores (none)
         .mockResolvedValueOnce([])
-        // all scores for conflict detection — two PEDAGOGY evaluators disagree by 2
+        // all scores for conflict detection; two PEDAGOGY evaluators disagree by 2
         .mockResolvedValueOnce([
           { requirementId: 'req-1', userId: 'u-ped-1', value: 3, requirement: { title: 'Curriculum' } },
           { requirementId: 'req-1', userId: 'u-ped-2', value: 1, requirement: { title: 'Curriculum' } },

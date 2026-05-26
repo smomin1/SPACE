@@ -9,6 +9,7 @@ datasource db {
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
   PEDAGOGY_EVALUATOR
   TECHNICAL_EVALUATOR

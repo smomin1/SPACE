@@ -95,7 +95,7 @@ function makeParams(id: string) {
 
 beforeEach(() => vi.clearAllMocks())
 
-// ── 1. GET /api/requirements — all authenticated roles ───────────────────────
+// ── 1. GET /api/requirements: all authenticated roles ───────────────────────
 
 describe('GET /api/requirements', () => {
   it('returns 401 when unauthenticated', async () => {
@@ -157,7 +157,7 @@ describe('GET /api/requirements', () => {
   })
 })
 
-// ── 2. POST /api/requirements — ADMIN only ───────────────────────────────────
+// ── 2. POST /api/requirements: ADMIN only ───────────────────────────────────
 
 describe('POST /api/requirements', () => {
   const validBody = {
@@ -206,7 +206,7 @@ describe('POST /api/requirements', () => {
   })
 })
 
-// ── 3. DELETE /api/requirements/[id] — ADMIN only ───────────────────────────
+// ── 3. DELETE /api/requirements/[id]: ADMIN only ───────────────────────────
 
 describe('DELETE /api/requirements/[id]', () => {
   const req = SAMPLE_REQUIREMENTS[1] // non-gate requirement, no scores

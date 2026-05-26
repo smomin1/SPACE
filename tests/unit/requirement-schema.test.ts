@@ -95,7 +95,7 @@ describe('requirementBaseSchema', () => {
   })
 })
 
-describe('requirementRowSchema — XLSX row parsing', () => {
+describe('requirementRowSchema: XLSX row parsing', () => {
   const valid = {
     title: 'LTI Integration',
     description: 'Supports LTI 1.3.',

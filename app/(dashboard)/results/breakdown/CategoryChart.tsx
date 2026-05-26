@@ -28,7 +28,7 @@ type Props = {
 }
 
 function barFill(pct: number | null): string {
-  if (pct === null)  return '#e7e5e4'
+  if (pct === null)  return '#F7F4EF'
   if (pct >= 85)     return '#059669'
   if (pct >= 70)     return '#10b981'
   if (pct >= 50)     return '#f59e0b'
@@ -36,11 +36,11 @@ function barFill(pct: number | null): string {
 }
 
 const tooltipStyle = {
-  backgroundColor: '#fff',
+  backgroundColor: '#ffffff',
   border: '1px solid #e7e5e4',
-  borderRadius: 8,
+  borderRadius: 4,
   fontSize: 12,
-  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
 }
 
 export function CategoryChart({ data, chartType, platformName }: Props) {
@@ -68,10 +68,10 @@ export function CategoryChart({ data, chartType, platformName }: Props) {
           <Radar
             name={platformName}
             dataKey="pct"
-            stroke="#059669"
-            fill="#059669"
+            stroke="#1A4731"
+            fill="#1A4731"
             fillOpacity={0.18}
-            dot={{ r: 3, fill: '#059669', strokeWidth: 0 }}
+            dot={{ r: 3, fill: '#1A4731', strokeWidth: 0 }}
           />
           <Tooltip
             contentStyle={tooltipStyle}

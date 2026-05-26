@@ -1,5 +1,5 @@
 /**
- * Dev setup script — seeds users, requirements, and one test evaluation.
+ * Dev setup script: seeds users, requirements, and one test evaluation.
  * Run with: DATABASE_URL=... npx tsx prisma/setup-dev.ts
  */
 import { PrismaClient } from '@prisma/client'
@@ -83,9 +83,9 @@ async function main() {
       state: 'IN_PROGRESS',
       assignments: {
         create: [
-          { userId: users[1].id, evaluatorType: 'PEDAGOGY',  isLead: true  },   // Alice — Pedagogy Lead
+          { userId: users[1].id, evaluatorType: 'PEDAGOGY',  isLead: true  },   // Alice, Pedagogy Lead
           { userId: users[2].id, evaluatorType: 'PEDAGOGY',  isLead: false },   // Bob
-          { userId: users[3].id, evaluatorType: 'TECHNICAL', isLead: true  },   // Charlie — Technical Lead
+          { userId: users[3].id, evaluatorType: 'TECHNICAL', isLead: true  },   // Charlie, Technical Lead
           { userId: users[4].id, evaluatorType: 'TECHNICAL', isLead: false },   // Dana
         ],
       },
@@ -95,10 +95,10 @@ async function main() {
   console.log()
   console.log('── Accounts ──────────────────────────────────────────────────')
   console.log('  admin@eval.com        / Admin1234!         (Admin)')
-  console.log('  ped1@eval.com         / Evaluator1234!     (Alice — Pedagogy)')
-  console.log('  ped2@eval.com         / Evaluator1234!     (Bob — Pedagogy)')
-  console.log('  tech1@eval.com        / Evaluator1234!     (Charlie — Technical)')
-  console.log('  tech2@eval.com        / Evaluator1234!     (Dana — Technical)')
+  console.log('  ped1@eval.com         / Evaluator1234!     (Alice, Pedagogy)')
+  console.log('  ped2@eval.com         / Evaluator1234!     (Bob, Pedagogy)')
+  console.log('  tech1@eval.com        / Evaluator1234!     (Charlie, Technical)')
+  console.log('  tech2@eval.com        / Evaluator1234!     (Dana, Technical)')
   console.log('  viewer@eval.com       / Viewer1234!        (Viewer)')
   console.log()
   console.log('── Workspace URL ─────────────────────────────────────────────')

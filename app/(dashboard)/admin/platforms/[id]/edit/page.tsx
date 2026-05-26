@@ -1,7 +1,9 @@
+import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { Button } from '@/components/ui/button'
 import { PlatformForm } from '@/components/admin/platforms/PlatformForm'
 
 interface Props {
@@ -34,10 +36,15 @@ export default async function EditPlatformPage({ params }: Props) {
   if (!platform) notFound()
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Platform</h1>
-        <p className="text-muted-foreground">Update details for &ldquo;{platform.name}&rdquo;.</p>
+    <div className="container mx-auto max-w-3xl py-8">
+      <div className="mb-6 flex items-center gap-4">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/admin/platforms">← Back</Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Edit Platform</h1>
+          <p className="text-muted-foreground">Update details for &ldquo;{platform.name}&rdquo;.</p>
+        </div>
       </div>
       <PlatformForm
         platformId={id}

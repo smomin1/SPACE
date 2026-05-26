@@ -23,7 +23,7 @@ vi.mock('next/link', () => ({
 vi.mock('radix-ui', async () => {
   const R = await import('react')
 
-  // Slot — merges props (incl. id, aria-*) from FormControl into its child
+  // Slot: merges props (incl. id, aria-*) from FormControl into its child
   const SlotImpl = R.forwardRef<unknown, { children?: R.ReactNode; [k: string]: unknown }>(
     function Slot({ children, ...props }, ref) {
       const child = R.Children.only(children) as R.ReactElement
@@ -53,7 +53,7 @@ vi.mock('radix-ui', async () => {
   const passThrough = ({ children }: { children?: R.ReactNode }) =>
     R.createElement(R.Fragment, null, children)
 
-  // Switch — must expose role="switch" + aria-checked for accessible queries
+  // Switch: must expose role="switch" + aria-checked for accessible queries
   const SwitchRoot = R.forwardRef<
     HTMLButtonElement,
     { checked?: boolean; onCheckedChange?: (v: boolean) => void; [k: string]: unknown }
@@ -89,7 +89,7 @@ vi.mock('radix-ui', async () => {
   }: { children?: R.ReactNode; value: string }) =>
     R.createElement('option', { value }, children)
 
-  // Label — must render as <label htmlFor=...> for accessible name lookup
+  // Label: must render as <label htmlFor=...> for accessible name lookup
   const LabelRoot = R.forwardRef<
     HTMLLabelElement,
     { children?: R.ReactNode; htmlFor?: string; className?: string; [k: string]: unknown }
@@ -97,7 +97,7 @@ vi.mock('radix-ui', async () => {
     return R.createElement('label', { htmlFor, className, ref, ...rest }, children)
   })
 
-  // Popover / DropdownMenu — content hidden by default (not needed in tests)
+  // Popover / DropdownMenu: content hidden by default (not needed in tests)
   const hidden = () => null
 
   return {
@@ -356,7 +356,7 @@ describe('ComplianceGateBadge', () => {
   })
 })
 
-describe('RequirementsTable — compliance gate row', () => {
+describe('RequirementsTable: compliance gate row', () => {
   it('renders ComplianceGateBadge for a gate requirement', async () => {
     const { RequirementsTable } = await import(
       '@/app/(dashboard)/admin/requirements/components/RequirementsTable'
@@ -394,7 +394,7 @@ describe('RequirementsTable — compliance gate row', () => {
   })
 })
 
-// ── 5. RequirementForm — validation errors on empty submit ───────────────────
+// ── 5. RequirementForm: validation errors on empty submit ───────────────────
 
 describe('RequirementForm validation', () => {
   it('shows a title error when title is empty on submit', async () => {

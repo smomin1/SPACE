@@ -1,14 +1,17 @@
 import { PrismaClient, Role, EvaluatorType, WeightLevel } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const testUsers = [
-    { email: "admin@eval.com",     name: "Admin",               role: Role.ADMIN,               password: "Admin1234!" },
-    { email: "pedagogy@eval.com",  name: "Pedagogy Evaluator",  role: Role.PEDAGOGY_EVALUATOR,  password: "Evaluator1234!" },
-    { email: "technical@eval.com", name: "Technical Evaluator", role: Role.TECHNICAL_EVALUATOR, password: "Evaluator1234!" },
-    { email: "viewer@eval.com",    name: "Viewer",              role: Role.VIEWER,               password: "Viewer1234!" },
+    { email: "superadmin@eval.com", name: "Super Admin",          role: Role.SUPER_ADMIN,         password: "Admin1234!" },
+    { email: "admin@eval.com",      name: "Admin",                role: Role.ADMIN,               password: "Admin1234!" },
+    { email: "pedagogy@eval.com",   name: "Pedagogy Evaluator",   role: Role.PEDAGOGY_EVALUATOR,  password: "Evaluator1234!" },
+    { email: "technical@eval.com",  name: "Technical Evaluator",  role: Role.TECHNICAL_EVALUATOR, password: "Evaluator1234!" },
+    { email: "viewer@eval.com",     name: "Viewer",               role: Role.VIEWER,              password: "Viewer1234!" },
   ];
 
   for (const u of testUsers) {
@@ -20,7 +23,7 @@ async function main() {
   }
 
   const requirements = [
-    // Compliance gate — FAIL immediately disqualifies the platform
+    // Compliance gate: FAIL immediately disqualifies the platform
     {
       title: "Data Protection Compliance",
       description: "Platform must demonstrate GDPR/UK GDPR compliance.",

@@ -27,7 +27,7 @@ export type TransitionResult =
   | { ok: true; complianceResult?: ComplianceResult; conflictCount?: number }
   | { ok: false; error: EvalStateError; message: string }
 
-// Minimal shape the pure helpers need — avoids coupling to Prisma's full model type
+// Minimal shape the pure helpers need; avoids coupling to Prisma's full model type
 export interface EvaluationSnapshot {
   state: EvaluationState
   lockedAt: Date | null
@@ -82,7 +82,7 @@ export function canTransitionTo(
 
 /**
  * Attempt to finalise the evaluation if it is in MERGED state and all conflict
- * threads are resolved. Safe to call speculatively — returns false instead of
+ * threads are resolved. Safe to call speculatively; returns false instead of
  * throwing when the evaluation isn't ready yet.
  */
 export async function autoFinaliseIfReady(
@@ -103,7 +103,7 @@ export async function checkAllTeamsSubmitted(evaluationId: string): Promise<bool
 /**
  * Returns every requirement where the absolute difference between any
  * PEDAGOGY score and any TECHNICAL score exceeds 1 point.
- * N/A (null) scores are excluded — they have no numeric position.
+ * N/A (null) scores are excluded; they have no numeric position.
  * Intra-team differences do not trigger a conflict.
  */
 export async function detectConflicts(evaluationId: string): Promise<Conflict[]> {
@@ -281,7 +281,7 @@ export async function transitionEvaluation(
           where: { id: evaluation.platformId },
           data: { status: 'DISQUALIFIED' },
         })
-        // Disqualified platform skips conflict detection — no resolution phase needed
+        // Disqualified platform skips conflict detection; no resolution phase needed
         await tx.evaluation.update({
           where: { id: evaluationId },
           data: { state: 'MERGED' },

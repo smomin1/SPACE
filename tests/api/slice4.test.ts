@@ -420,7 +420,7 @@ describe('Scenario 4: Deleting a context does not delete requirements', () => {
 
     expect(res.status).toBe(204)
 
-    // Transaction was called — it removes RequirementContext rows and the context
+    // Transaction was called; it removes RequirementContext rows and the context
     expect(mockPrisma.$transaction).toHaveBeenCalledOnce()
 
     // The Requirement table is never touched
@@ -429,13 +429,13 @@ describe('Scenario 4: Deleting a context does not delete requirements', () => {
 
   it('requirements are still retrievable after context deletion', async () => {
     // After the context is deleted, querying requirements should still return them.
-    // The mock simulates a fresh call to the requirement table — it returns the row.
+    // The mock simulates a fresh call to the requirement table; it returns the row.
     mockAuth.mockResolvedValueOnce(ADMIN_SESSION)
     mockPrisma.requirement.findMany.mockResolvedValueOnce([REQUIREMENT])
     mockPrisma.requirementContext.findMany.mockResolvedValueOnce([])
 
     // GET /api/contexts/[id]/requirements for a *different* context (ctx-b)
-    // req-1 should be present (unassigned) — it was never deleted
+    // req-1 should be present (unassigned); it was never deleted
     const res = await getContextRequirements(
       new Request('http://localhost'),
       makeParams('ctx-b')

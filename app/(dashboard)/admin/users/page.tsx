@@ -21,10 +21,14 @@ export default async function UsersPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">User Accounts</h1>
         <p className="text-muted-foreground">
-          Create and manage accounts, assign roles, and deactivate users.
+          Manage accounts, assign roles, and deactivate users.
         </p>
       </div>
-      <UsersTable initialData={users} currentUserId={session.user.id} />
+      <UsersTable
+        initialData={users}
+        currentUserId={session.user.id}
+        canCreate={canDo(session.user.role, 'create:users')}
+      />
     </div>
   )
 }

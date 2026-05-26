@@ -82,7 +82,7 @@ const s = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
     fontSize: 9,
-    color: '#1c1917',
+    color: '#2B2B2B',
     paddingTop: 48,
     paddingBottom: 48,
     paddingHorizontal: 48,
@@ -91,7 +91,7 @@ const s = StyleSheet.create({
   pageLandscape: {
     fontFamily: 'Helvetica',
     fontSize: 6,
-    color: '#1c1917',
+    color: '#2B2B2B',
     paddingTop: 32,
     paddingBottom: 32,
     paddingHorizontal: 32,
@@ -115,7 +115,7 @@ const s = StyleSheet.create({
   coverTitle: {
     fontSize: 28,
     fontFamily: 'Helvetica-Bold',
-    color: '#064e3b',
+    color: '#1A4731',
     marginBottom: 8,
   },
   coverSub: {
@@ -137,7 +137,7 @@ const s = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontFamily: 'Helvetica-Bold',
-    color: '#064e3b',
+    color: '#1A4731',
     marginBottom: 8,
     marginTop: 20,
   },
@@ -181,7 +181,7 @@ const s = StyleSheet.create({
   },
   td: {
     fontSize: 8,
-    color: '#292524',
+    color: '#2B2B2B',
   },
   tdLight: {
     fontSize: 8,
@@ -245,7 +245,7 @@ const s = StyleSheet.create({
   },
   matrixTd: {
     fontSize: 6,
-    color: '#292524',
+    color: '#2B2B2B',
   },
   matrixTdLight: {
     fontSize: 6,
@@ -280,14 +280,14 @@ function scoreTextColor(pct: number | null): string {
 }
 
 function fmtMatrixScore(v: number | null): string {
-  if (v === null) return '—'
+  if (v === null) return '-'
   if (v === 0) return 'FAIL'
   return v.toFixed(1)
 }
 
 const REC_COLORS: Record<string, { bg: string; text: string }> = {
-  TOP_PICK:        { bg: '#065f46', text: '#ffffff' },
-  RECOMMENDED:     { bg: '#d1fae5', text: '#065f46' },
+  TOP_PICK:        { bg: '#1A4731', text: '#ffffff' },
+  RECOMMENDED:     { bg: '#d1fae5', text: '#1A4731' },
   CONSIDER:        { bg: '#fef3c7', text: '#92400e' },
   NOT_RECOMMENDED: { bg: '#f5f5f4', text: '#57534e' },
   DISQUALIFIED:    { bg: '#fee2e2', text: '#991b1b' },
@@ -393,7 +393,7 @@ export function EvaluationReportPDF({
               <View style={{ width: cmpColW[7] }}>
                 {row.recommendation ? (
                   <View style={[s.badgePill, { backgroundColor: REC_COLORS[row.recommendation]?.bg ?? '#f5f5f4' }]}>
-                    <Text style={[s.badgeText, { color: REC_COLORS[row.recommendation]?.text ?? '#292524' }]}>
+                    <Text style={[s.badgeText, { color: REC_COLORS[row.recommendation]?.text ?? '#2B2B2B' }]}>
                       {row.recommendation.replace(/_/g, ' ')}
                     </Text>
                   </View>
@@ -476,10 +476,10 @@ export function EvaluationReportPDF({
         </Page>
       )}
 
-      {/* ── 4. Best Fit — Recommended Combination ────────────────────────── */}
+      {/* ── 4. Best Fit: Recommended Combination ────────────────────────── */}
       {bestFitData !== null && (
         <Page size="A4" style={s.page}>
-          <Text style={s.sectionTitle}>Best Fit — Recommended Combination</Text>
+          <Text style={s.sectionTitle}>Best Fit: Recommended Combination</Text>
           <Text style={s.sectionSub}>
             Greedy set-cover algorithm selects the minimum combination of platforms that
             best satisfies all requirements (≥75% of max score = satisfied).
@@ -496,7 +496,7 @@ export function EvaluationReportPDF({
             gap: 16,
           }}>
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 16, fontFamily: 'Helvetica-Bold', color: '#064e3b' }}>
+              <Text style={{ fontSize: 16, fontFamily: 'Helvetica-Bold', color: '#1A4731' }}>
                 {bestFitData.combinedPct.toFixed(1)}%
               </Text>
               <Text style={{ fontSize: 7, color: '#78716c' }}>combined score</Text>
@@ -655,12 +655,12 @@ export function EvaluationReportPDF({
 
         return (
           <Page key={`matrix-${groupIdx}`} size="A4" orientation="landscape" style={s.pageLandscape}>
-            <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#064e3b', marginBottom: 6 }}>
+            <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#1A4731', marginBottom: 6 }}>
               Full Requirements Score Matrix
               {platformGroups.length > 1 ? ` (${groupIdx + 1}/${platformGroups.length})` : ''}
             </Text>
             <Text style={{ fontSize: 6, color: '#78716c', marginBottom: 8 }}>
-              All requirements × platforms with evaluated scores. N/A shown as —, failure as FAIL.
+              All requirements × platforms with evaluated scores. N/A shown as -, failure as FAIL.
               Scores are averages (1 decimal). Platform names truncated to 10 chars.
             </Text>
 
@@ -693,7 +693,7 @@ export function EvaluationReportPDF({
                 <View key={cat}>
                   {/* Category header row */}
                   <View style={s.matrixCatHeader}>
-                    <Text style={[s.matrixTh, { flex: 1, color: '#064e3b' }]}>{cat}</Text>
+                    <Text style={[s.matrixTh, { flex: 1, color: '#1A4731' }]}>{cat}</Text>
                     {/* Pad remaining cols */}
                     {platformGroup.map(p => (
                       <View key={p.id} style={{ width: platColW }} />
@@ -739,7 +739,7 @@ export function EvaluationReportPDF({
                                 {
                                   width: platColW,
                                   textAlign: 'center',
-                                  color: isFail ? '#dc2626' : isNA ? '#d6d3d1' : '#292524',
+                                  color: isFail ? '#dc2626' : isNA ? '#d6d3d1' : '#2B2B2B',
                                   fontFamily: isFail ? 'Helvetica-Bold' : 'Helvetica',
                                 },
                               ]}

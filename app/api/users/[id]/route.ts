@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
 const updateSchema = z.object({
   email:    z.string().email().max(200).optional(),
   name:     z.string().min(1).max(120).optional(),
-  role:     z.enum(['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']).optional(),
+  role:     z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']).optional(),
   isActive: z.boolean().optional(),
   password: z.string().min(8).max(200).optional(),
 })
@@ -53,14 +53,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (clash) return Response.json({ error: 'A user with this email already exists', code: 'EMAIL_TAKEN' }, { status: 409 })
   }
 
-  // Self-protection: prevent locking yourself out of admin
+  // Self-protection: cannot change own role or deactivate self
   if (session.user.id === id) {
-    if (role && role !== 'ADMIN') {
-      return Response.json({ error: 'You cannot change your own role away from ADMIN', code: 'SELF_DEMOTE' }, { status: 400 })
+    if (role && role !== session.user.role) {
+      return Response.json({ error: 'You cannot change your own role', code: 'SELF_DEMOTE' }, { status: 400 })
     }
     if (isActive === false) {
       return Response.json({ error: 'You cannot deactivate your own account', code: 'SELF_DEACTIVATE' }, { status: 400 })
     }
+  }
+
+  // ADMIN cannot elevate anyone to SUPER_ADMIN
+  if (role === 'SUPER_ADMIN' && session.user.role !== 'SUPER_ADMIN') {
+    return Response.json({ error: 'Only a Super Admin can assign the Super Admin role', code: 'FORBIDDEN_ROLE' }, { status: 403 })
   }
 
   const data: Record<string, unknown> = {}

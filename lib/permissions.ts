@@ -11,6 +11,7 @@ export type Action =
   | 'lock:evaluation'
   | 'finalise:evaluation'
   | 'manage:users'
+  | 'create:users'
   | 'manage:platform'
   | 'manage:requirements'
   | 'manage:contexts'
@@ -18,20 +19,21 @@ export type Action =
   | 'access:evaluate'
 
 const PERMISSIONS: Record<Action, Role[]> = {
-  'view:dashboard':         ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
-  'view:results':           ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+  'view:dashboard':         ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+  'view:results':           ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
   // Score isolation: evaluators cannot see each other's scores until both sides submit
-  'view:all_scores':        ['ADMIN', 'VIEWER'],
-  'submit:pedagogy_score':  ['ADMIN', 'PEDAGOGY_EVALUATOR'],
-  'submit:technical_score': ['ADMIN', 'TECHNICAL_EVALUATOR'],
-  'lock:evaluation':        ['ADMIN'],
-  'finalise:evaluation':    ['ADMIN'],
-  'manage:users':           ['ADMIN'],
-  'manage:platform':        ['ADMIN'],
-  'manage:requirements':    ['ADMIN'],
-  'manage:contexts':        ['ADMIN'],
-  'access:admin':           ['ADMIN'],
-  'access:evaluate':        ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'],
+  'view:all_scores':        ['SUPER_ADMIN', 'ADMIN', 'VIEWER'],
+  'submit:pedagogy_score':  ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR'],
+  'submit:technical_score': ['SUPER_ADMIN', 'ADMIN', 'TECHNICAL_EVALUATOR'],
+  'lock:evaluation':        ['SUPER_ADMIN', 'ADMIN'],
+  'finalise:evaluation':    ['SUPER_ADMIN', 'ADMIN'],
+  'manage:users':           ['SUPER_ADMIN'],
+  'create:users':           ['SUPER_ADMIN'],
+  'manage:platform':        ['SUPER_ADMIN', 'ADMIN'],
+  'manage:requirements':    ['SUPER_ADMIN', 'ADMIN'],
+  'manage:contexts':        ['SUPER_ADMIN', 'ADMIN'],
+  'access:admin':           ['SUPER_ADMIN', 'ADMIN'],
+  'access:evaluate':        ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'],
 }
 
 export function canDo(role: Role, action: Action): boolean {

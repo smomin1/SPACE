@@ -22,7 +22,7 @@ export const requirementBaseSchema = z.object({
   order: z.number().int('Order must be a whole number').min(0, 'Order must be 0 or greater').default(0),
 })
 
-// Used for XLSX bulk import — handles string/number/boolean cell values from sheet_to_json
+// Used for XLSX bulk import; handles string/number/boolean cell values from sheet_to_json
 export const requirementRowSchema = z.object({
   title: z.string().min(1, 'title is required'),
   description: z.string().min(1, 'description is required'),

@@ -141,7 +141,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
 
-      {/* Context — multi-select */}
+      {/* Context: multi-select */}
       <MultiSelect
         placeholder="All contexts"
         selected={selectedContexts}
@@ -149,7 +149,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         onChange={vals => setMulti('context', vals)}
       />
 
-      {/* Platform — multi-select */}
+      {/* Platform: multi-select */}
       <MultiSelect
         placeholder="All platforms"
         selected={selectedPlatforms}
@@ -162,7 +162,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         onChange={vals => setMulti('platform', vals)}
       />
 
-      {/* Category — multi-select */}
+      {/* Category: multi-select */}
       <MultiSelect
         placeholder="All categories"
         selected={selectedCategories}
@@ -170,7 +170,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         onChange={vals => setMulti('category', vals)}
       />
 
-      {/* Evaluator type — single-select */}
+      {/* Evaluator type: single-select */}
       <FilterSelect
         placeholder="All types"
         value={evalTypeValue}
@@ -181,7 +181,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         ))}
       </FilterSelect>
 
-      {/* Evidence quality — single-select */}
+      {/* Evidence quality: single-select */}
       <FilterSelect
         placeholder="Any evidence"
         value={evidenceValue}
@@ -192,7 +192,7 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
         ))}
       </FilterSelect>
 
-      {/* Status — multi-select, default = Finalised */}
+      {/* Status: multi-select, default = Finalised */}
       <MultiSelect
         placeholder="All statuses"
         selected={selectedStatuses}

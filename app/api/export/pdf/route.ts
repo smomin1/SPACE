@@ -26,8 +26,8 @@ const MAX_SET_SIZE           = 5
 const BUILD_READINESS_KEYWORDS = ['api', 'lti', 'export', 'sso', 'integration', 'interoperability']
 
 const PLATFORM_PALETTE = [
-  '#059669','#0284c7','#7c3aed','#dc2626','#d97706',
-  '#0891b2','#be185d','#65a30d','#9333ea','#0f766e',
+  '#1A4731','#C9973A','#3A5A72','#2B2B2B','#6B8C6B',
+  '#8B6914','#4A7A8A','#2E6B4F','#A07820','#1E3A5F',
 ]
 
 // ─── Converters ────────────────────────────────────────────────────────────────
@@ -312,7 +312,7 @@ export async function GET() {
       else                              partialCount++
     }
 
-    // Gaps — sorted HIGH first, then MEDIUM, then LOW
+    // Gaps: sorted HIGH first, then MEDIUM, then LOW
     const weightOrder: WeightLevel[] = ['HIGH', 'MEDIUM', 'LOW']
     const gaps: BestFitData['gaps'] = []
     for (const req of nonComplianceReqs) {

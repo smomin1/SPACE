@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
 const createSchema = z.object({
   email: z.string().email().max(200),
   name:  z.string().min(1).max(120),
-  role:  z.enum(['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']),
+  role:  z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']),
   password: z.string().min(8).max(200),
   isActive: z.boolean().optional(),
 })
@@ -32,7 +32,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await auth()
   if (!session?.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  if (!canDo(session.user.role, 'manage:users')) {
+  if (!canDo(session.user.role, 'create:users')) {
     return Response.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -43,6 +43,14 @@ export async function POST(req: Request) {
   }
 
   const { email, name, role, password, isActive } = parsed.data
+
+  // Enforce single SUPER_ADMIN
+  if (role === 'SUPER_ADMIN') {
+    const superAdminCount = await prisma.user.count({ where: { role: 'SUPER_ADMIN' } })
+    if (superAdminCount > 0) {
+      return Response.json({ error: 'A Super Admin account already exists', code: 'SUPER_ADMIN_EXISTS' }, { status: 409 })
+    }
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {

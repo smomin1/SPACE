@@ -29,7 +29,7 @@ export type PlatformSeries = {
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const COLORS = ['#059669', '#2563eb', '#d97706'] as const
+const COLORS = ['#1A6B45', '#D4921A', '#2B7AC4'] as const
 
 const tooltipStyle = {
   backgroundColor: '#fff',
@@ -155,7 +155,9 @@ export function ComparisonChart({
                   style={{ backgroundColor: colorOf(i) }}
                 />
                 <span className="text-[12.5px] font-semibold text-stone-700">{p.name}</span>
-                <span className="text-[11.5px] text-stone-400">{p.vendor}</span>
+                {p.vendor && p.vendor !== p.name && (
+                  <span className="text-[11.5px] text-stone-400">{p.vendor}</span>
+                )}
               </div>
             ))}
           </div>

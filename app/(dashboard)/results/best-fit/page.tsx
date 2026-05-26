@@ -260,7 +260,7 @@ function buildCombinedAnalysis(
     for (const rid of scores.keys()) scoredReqIds.add(rid)
   }
 
-  // Satisfaction counts — a req is "satisfied" only if best set score ≥ 75% of MAX
+  // Satisfaction counts: a req is "satisfied" only if best set score >= 75% of MAX
   let satisfiedCount = 0
   let partialCount   = 0
   let uncoveredCount = 0
@@ -272,7 +272,7 @@ function buildCombinedAnalysis(
     else                              partialCount++
   }
 
-  // Gap analysis — gaps are reqs not yet satisfied (< SATISFACTION_THRESHOLD)
+  // Gap analysis: gaps are reqs not yet satisfied (< SATISFACTION_THRESHOLD)
   const gaps: GapItem[] = []
   for (const req of requirements) {
     const best     = bestPerReq.get(req.id)
@@ -562,7 +562,7 @@ export default async function BestFitPage({
 
   if (isContextMode) {
     // One analysis card per selected context.
-    // Context = a requirement subset — ALL active platforms are scored against it.
+    // Context = a requirement subset; ALL active platforms are scored against it.
     const contextAnalyses = contexts.map(ctx => {
       const ctxReqIds = new Set(ctx.requirements.map(r => r.requirementId))
       const ctxReqs   = allRequirements.filter(r => ctxReqIds.has(r.id))
@@ -664,7 +664,7 @@ function CombinedSetSection({ analysis: a }: { analysis: CombinedAnalysis }) {
         <div>
           <h2 className="text-base font-semibold text-emerald-950">Recommended Combination</h2>
           <p className="text-xs text-stone-400 mt-0.5">
-            Minimum set that best covers all requirements — a requirement is satisfied at ≥75% score
+            Minimum set that best covers all requirements. A requirement is satisfied at 75% score or above.
           </p>
         </div>
         {/* Combined stats */}
@@ -879,7 +879,7 @@ function GapAnalysisSection({ analysis: a }: { analysis: CombinedAnalysis }) {
       {uncovered.length > 0 && (
         <GapGroup
           title="Unevaluated Requirements"
-          subtitle="No platform has scored these yet — data is needed before procurement decisions can be made"
+          subtitle="No platform has scored these yet. Data is needed before procurement decisions can be made."
           items={uncovered}
           color="red"
         />
@@ -889,7 +889,7 @@ function GapAnalysisSection({ analysis: a }: { analysis: CombinedAnalysis }) {
       {weak.length > 0 && (
         <GapGroup
           title="Weakly Covered Requirements"
-          subtitle="These are scored but the best available score is low — consider additional vendor trials or demos"
+          subtitle="These are scored but the best available score is low. Consider additional vendor trials or demos."
           items={weak}
           color="amber"
         />

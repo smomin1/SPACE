@@ -36,12 +36,16 @@ export default async function ContextRequirementsPage({ params }: Props) {
     }),
     prisma.requirementContext.findMany({
       where: { contextId: id },
-      select: { requirementId: true },
+      select: { requirementId: true, weightOverride: true },
     }),
   ])
 
-  const assignedIds = new Set(assigned.map((r) => r.requirementId))
-  const requirements = allRequirements.map((r) => ({ ...r, assigned: assignedIds.has(r.id) }))
+  const assignedMap = new Map(assigned.map((r) => [r.requirementId, r.weightOverride]))
+  const requirements = allRequirements.map((r) => ({
+    ...r,
+    assigned: assignedMap.has(r.id),
+    weightOverride: assignedMap.get(r.id) ?? null,
+  }))
 
   return (
     <div className="container mx-auto py-8">

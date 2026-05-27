@@ -105,6 +105,26 @@ export function filterByContext(
 }
 
 /**
+ * Applies context-specific weight overrides to a set of requirements.
+ * Returns a new array where each requirement's `weight` is replaced by the
+ * context override when one is present; requirements without an override
+ * retain their global weight.
+ *
+ * @param requirements  Full requirement list
+ * @param overrides     Map of requirementId -> context-specific WeightLevel
+ */
+export function applyContextWeights(
+  requirements: Requirement[],
+  overrides: Map<string, WeightLevel>,
+): Requirement[] {
+  if (overrides.size === 0) return requirements
+  return requirements.map(r => {
+    const override = overrides.get(r.id)
+    return override ? { ...r, weight: override } : r
+  })
+}
+
+/**
  * Maps a weighted percentage to a procurement recommendation tier.
  * Disqualification is a platform status (compliance gate failure), never a score outcome.
  */

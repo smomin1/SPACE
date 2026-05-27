@@ -12,7 +12,7 @@ export function ProgressBar({ total, scored, hasSubmitted }: ProgressBarProps) {
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium">
-          {hasSubmitted ? 'Submitted' : `${scored} of ${total} requirements scored`}
+          {hasSubmitted ? 'Submitted' : `${scored} of ${total} requirements answered`}
         </span>
         <span className="text-sm text-muted-foreground">{pct}%</span>
       </div>
@@ -32,7 +32,7 @@ export function ProgressBar({ total, scored, hasSubmitted }: ProgressBarProps) {
 
       {!hasSubmitted && allDone && (
         <p className="mt-2 text-xs text-muted-foreground">
-          All requirements scored - you can now submit.
+          All requirements answered - you can now submit.
         </p>
       )}
       {hasSubmitted && (

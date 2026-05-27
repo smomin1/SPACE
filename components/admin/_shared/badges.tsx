@@ -47,6 +47,7 @@ const TYPE_META: Record<EvaluatorType, { tone: Tone; mark: string; label: string
   COMPLIANCE: { tone: "neutral", mark: "C", label: "Compliance" },
   PEDAGOGY:   { tone: "emerald", mark: "P", label: "Pedagogy"   },
   TECHNICAL:  { tone: "forest",  mark: "T", label: "Technical"  },
+  BOTH:       { tone: "amber",   mark: "B", label: "Both"       },
 }
 
 export function TypeBadge({ value }: { value: EvaluatorType }) {

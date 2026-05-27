@@ -5,8 +5,10 @@ import { prisma } from '@/lib/prisma'
 import {
   calculateWeightedPercentage,
   getRecommendedAction,
+  applyContextWeights,
 } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
+import type { WeightLevel } from '@prisma/client'
 import type { EvaluationState, PlatformStatus } from '@prisma/client'
 import ComparisonTable from './ComparisonTable'
 
@@ -66,7 +68,7 @@ export default async function ComparisonPage({
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [rawRequirements, rawPlatforms, evaluations] = await Promise.all([
+  const [rawRequirements, rawPlatforms, evaluations, contextOverrides] = await Promise.all([
     prisma.requirement.findMany({
       where: {
         ...(contextIds.length > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
@@ -102,7 +104,24 @@ export default async function ComparisonPage({
         },
       },
     }),
+    // Fetch context-specific weight overrides when filtering by context
+    contextIds.length > 0
+      ? prisma.requirementContext.findMany({
+          where: { contextId: { in: contextIds } },
+          select: { requirementId: true, weightOverride: true },
+        })
+      : Promise.resolve([] as { requirementId: string; weightOverride: WeightLevel | null }[]),
   ])
+
+  // ── Context weight overrides ───────────────────────────────────────────────
+
+  // When multiple contexts are selected and a requirement appears in both with
+  // different overrides, last-write wins. For single-context filtering this is deterministic.
+  const weightOverrideMap = new Map<string, WeightLevel>(
+    contextOverrides
+      .filter((o): o is { requirementId: string; weightOverride: WeightLevel } => o.weightOverride !== null)
+      .map(o => [o.requirementId, o.weightOverride]),
+  )
 
   // ── Derived lookups ────────────────────────────────────────────────────────
 
@@ -123,15 +142,19 @@ export default async function ComparisonPage({
   for (const cat of categories) {
     reqsByCategory.set(
       cat,
-      rawRequirements
-        .filter(r => r.category === cat && !r.isComplianceGate)
-        .map(toScoringReq),
+      applyContextWeights(
+        rawRequirements
+          .filter(r => r.category === cat && !r.isComplianceGate)
+          .map(toScoringReq),
+        weightOverrideMap,
+      ),
     )
   }
 
-  const allScoredReqs = rawRequirements
-    .filter(r => !r.isComplianceGate)
-    .map(toScoringReq)
+  const allScoredReqs = applyContextWeights(
+    rawRequirements.filter(r => !r.isComplianceGate).map(toScoringReq),
+    weightOverrideMap,
+  )
 
   // Best evaluation per platform (prefer FINALISED over MERGED)
   const evalByPlatform = new Map<string, (typeof evaluations)[number]>()

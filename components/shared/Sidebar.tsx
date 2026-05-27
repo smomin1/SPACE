@@ -16,6 +16,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   LogOutIcon,
+  UserCogIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -202,6 +203,17 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
                 </p>
               </div>
             )}
+            <Link
+              href="/profile"
+              title="Profile settings"
+              className={cn(
+                'flex size-7 items-center justify-center rounded-md text-white/55 transition-colors hover:bg-white/[0.06] hover:text-gold',
+                collapsed && 'mx-auto',
+              )}
+            >
+              <UserCogIcon className="size-4" />
+              <span className="sr-only">Profile settings</span>
+            </Link>
             <AlertDialogTrigger asChild>
               <button
                 title="Sign out"

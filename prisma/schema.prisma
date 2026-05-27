@@ -26,6 +26,7 @@ enum EvaluatorType {
   COMPLIANCE
   PEDAGOGY
   TECHNICAL
+  BOTH        // Scored by both PEDAGOGY and TECHNICAL evaluators
 }
 
 // Quality ranking (highest → lowest): TRIAL > DEMO > DOCUMENTATION > VENDOR_CLAIM
@@ -203,8 +204,10 @@ model Requirement {
 }
 
 model RequirementContext {
-  requirementId String
-  contextId     String
+  requirementId  String
+  contextId      String
+  // When set, overrides the requirement's global weight for scoring within this context only
+  weightOverride WeightLevel?
 
   requirement Requirement @relation(fields: [requirementId], references: [id])
   context     Context     @relation(fields: [contextId], references: [id])

@@ -105,7 +105,7 @@ export default async function EvaluationWorkspacePage({
 
     const [requirements, ownScores] = await Promise.all([
       prisma.requirement.findMany({
-        where: { evaluatorType: myAssignment.evaluatorType },
+        where: { evaluatorType: { in: [myAssignment.evaluatorType, 'BOTH'] } },
         select: REQUIREMENT_SELECT,
         orderBy: [{ category: 'asc' }, { order: 'asc' }],
       }),

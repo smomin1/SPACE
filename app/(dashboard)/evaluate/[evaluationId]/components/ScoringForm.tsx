@@ -85,6 +85,14 @@ const SCORE_BUTTONS = [
   { label: '4', value: 4 },
 ]
 
+// Compliance gate requirements use a binary Yes/No scale
+// Yes = 1 (pass), No = 0 (fail — immediately disqualifies the platform)
+const GATE_BUTTONS = [
+  { label: 'N/A', value: null },
+  { label: 'No',  value: 0 },
+  { label: 'Yes', value: 1 },
+]
+
 export function ScoringForm({
   evaluationId,
   requirements,
@@ -100,8 +108,11 @@ export function ScoringForm({
   const [savingId, setSavingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  // A requirement is "answered" when a score record exists for it (value may be null = N/A)
+  const answeredCount = requirements.filter(r => scores.has(r.id)).length
+  const allScored = answeredCount === requirements.length
+  // Show numeric progress only for non-N/A responses
   const scoredCount = [...scores.values()].filter(s => s.value !== null).length
-  const allScored = scoredCount === requirements.length
 
   const categories = [...new Set(requirements.map(r => r.category ?? 'General'))].sort()
 
@@ -182,7 +193,7 @@ export function ScoringForm({
     <div className="space-y-6">
       <ProgressBar
         total={requirements.length}
-        scored={scoredCount}
+        scored={answeredCount}
         hasSubmitted={assignment.hasSubmitted}
       />
 
@@ -265,30 +276,39 @@ export function ScoringForm({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      {SCORE_BUTTONS.map(btn => (
-                        <button
-                          key={String(btn.value)}
-                          onClick={() =>
-                            saveScore(
-                              req.id,
-                              btn.value,
-                              score?.evidenceType ?? null,
-                              score?.comment ?? null,
-                            )
-                          }
-                          disabled={assignment.hasSubmitted || isSaving}
-                          className={`min-w-[2.5rem] rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
-                            ${
-                              score?.value === btn.value
-                                ? btn.value === 0
-                                  ? 'border-destructive bg-destructive text-destructive-foreground'
-                                  : 'border-primary bg-primary text-primary-foreground'
-                                : 'border-border bg-background hover:bg-accent'
-                            }`}
-                        >
-                          {btn.label}
-                        </button>
-                      ))}
+                      {(req.isComplianceGate ? GATE_BUTTONS : SCORE_BUTTONS).map(btn => {
+                        const isSelected = score?.value === btn.value && scores.has(req.id)
+                        const isNo = req.isComplianceGate && btn.value === 0
+                        const isYes = req.isComplianceGate && btn.value === 1
+                        return (
+                          <button
+                            key={String(btn.value)}
+                            onClick={() =>
+                              saveScore(
+                                req.id,
+                                btn.value,
+                                score?.evidenceType ?? null,
+                                score?.comment ?? null,
+                              )
+                            }
+                            disabled={assignment.hasSubmitted || isSaving}
+                            className={`min-w-[2.5rem] rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
+                              ${
+                                isSelected
+                                  ? isNo
+                                    ? 'border-destructive bg-destructive text-destructive-foreground'
+                                    : isYes
+                                    ? 'border-emerald-700 bg-emerald-700 text-white'
+                                    : btn.value === 0
+                                    ? 'border-destructive bg-destructive text-destructive-foreground'
+                                    : 'border-primary bg-primary text-primary-foreground'
+                                  : 'border-border bg-background hover:bg-accent'
+                              }`}
+                          >
+                            {btn.label}
+                          </button>
+                        )
+                      })}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

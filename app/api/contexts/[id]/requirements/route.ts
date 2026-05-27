@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { WeightLevel } from '@prisma/client'
 
 export async function GET(
   _request: Request,
@@ -25,12 +26,16 @@ export async function GET(
       }),
       prisma.requirementContext.findMany({
         where: { contextId: id },
-        select: { requirementId: true },
+        select: { requirementId: true, weightOverride: true },
       }),
     ])
 
-    const assignedIds = new Set(assigned.map((r) => r.requirementId))
-    const requirements = allRequirements.map((r) => ({ ...r, assigned: assignedIds.has(r.id) }))
+    const assignedMap = new Map(assigned.map((r) => [r.requirementId, r.weightOverride]))
+    const requirements = allRequirements.map((r) => ({
+      ...r,
+      assigned: assignedMap.has(r.id),
+      weightOverride: assignedMap.get(r.id) ?? null,
+    }))
 
     return Response.json({ requirements })
   } catch {
@@ -41,6 +46,7 @@ export async function GET(
 const assignSchema = z.object({
   requirementId: z.string().min(1),
   assigned: z.boolean(),
+  weightOverride: z.nativeEnum(WeightLevel).nullable().optional(),
 })
 
 export async function POST(
@@ -72,19 +78,19 @@ export async function POST(
     )
   }
 
-  const { requirementId, assigned } = parsed.data
+  const { requirementId, assigned, weightOverride = null } = parsed.data
 
   try {
     if (assigned) {
       await prisma.requirementContext.upsert({
         where: { requirementId_contextId: { requirementId, contextId } },
-        create: { requirementId, contextId },
-        update: {},
+        create: { requirementId, contextId, weightOverride },
+        update: { weightOverride },
       })
     } else {
       await prisma.requirementContext.deleteMany({ where: { requirementId, contextId } })
     }
-    return Response.json({ requirementId, contextId, assigned })
+    return Response.json({ requirementId, contextId, assigned, weightOverride })
   } catch {
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })
   }

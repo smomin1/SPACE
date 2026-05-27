@@ -12,6 +12,7 @@ const TYPE_LABEL: Record<EvaluatorType, string> = {
   COMPLIANCE: 'Compliance',
   PEDAGOGY:   'Pedagogy',
   TECHNICAL:  'Technical',
+  BOTH:       'Both',
 }
 
 const STATE_ORDER: Record<EvaluationState, number> = {

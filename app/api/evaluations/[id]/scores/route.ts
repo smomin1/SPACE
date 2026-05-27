@@ -90,7 +90,10 @@ export async function POST(
     return Response.json({ error: 'Requirement not found', code: 'NOT_FOUND' }, { status: 404 })
   }
 
-  if (requirement.evaluatorType !== assignment.evaluatorType) {
+  if (
+    requirement.evaluatorType !== 'BOTH' &&
+    requirement.evaluatorType !== assignment.evaluatorType
+  ) {
     return Response.json(
       {
         error: `This requirement is scored by ${requirement.evaluatorType} evaluators`,
@@ -248,7 +251,7 @@ export async function GET(
     // Requirements are scoped to this evaluator's type - DB-level filter
     const [requirements, ownScores] = await Promise.all([
       prisma.requirement.findMany({
-        where: { evaluatorType: assignment.evaluatorType }, // ← DB-level filter
+        where: { evaluatorType: { in: [assignment.evaluatorType, 'BOTH'] } }, // ← DB-level filter
         orderBy: [{ category: 'asc' }, { order: 'asc' }],
       }),
       prisma.score.findMany({

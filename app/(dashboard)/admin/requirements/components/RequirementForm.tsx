@@ -207,6 +207,7 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
                       <SelectItem value="COMPLIANCE">Compliance</SelectItem>
                       <SelectItem value="PEDAGOGY">Pedagogy</SelectItem>
                       <SelectItem value="TECHNICAL">Technical</SelectItem>
+                      <SelectItem value="BOTH">Both (Pedagogy + Technical)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -280,12 +281,11 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
             name="isComplianceGate"
             render={({ field }) => (
               <FormItem
-                onClick={() => handleComplianceGateChange(field.value, field.onChange)}
                 className={cn(
-                  'flex flex-row items-center gap-3 rounded-lg border p-4 transition-colors cursor-pointer select-none',
+                  'flex flex-row items-center gap-3 rounded-lg border p-4 transition-colors select-none',
                   watchIsComplianceGate
                     ? 'border-amber-500 bg-amber-100/80'
-                    : 'border-stone-200/80 hover:bg-stone-50/50',
+                    : 'border-stone-200/80',
                 )}
               >
                 <FormControl>
@@ -297,17 +297,25 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
                     aria-label="Compliance gate"
                   />
                 </FormControl>
-                <div className={cn(
-                  'size-5 shrink-0 rounded-full border-2 transition-all flex items-center justify-center',
-                  watchIsComplianceGate
-                    ? 'border-amber-700 bg-amber-700'
-                    : 'border-stone-300 bg-white',
-                )}>
+                <button
+                  type="button"
+                  aria-pressed={field.value}
+                  onClick={() => handleComplianceGateChange(field.value, field.onChange)}
+                  className={cn(
+                    'size-5 shrink-0 rounded-full border-2 transition-all flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500',
+                    watchIsComplianceGate
+                      ? 'border-amber-700 bg-amber-700'
+                      : 'border-stone-300 bg-white hover:border-stone-400',
+                  )}
+                >
                   {watchIsComplianceGate && (
                     <div className="size-2 rounded-full bg-white" />
                   )}
-                </div>
-                <div className="space-y-0.5 flex-1">
+                </button>
+                <div
+                  className="space-y-0.5 flex-1 cursor-pointer"
+                  onClick={() => handleComplianceGateChange(field.value, field.onChange)}
+                >
                   <FormLabel className={cn('cursor-pointer text-base', watchIsComplianceGate && 'text-amber-900')}>
                     Compliance Gate
                     {watchIsComplianceGate && (

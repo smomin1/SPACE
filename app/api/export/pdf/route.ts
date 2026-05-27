@@ -196,11 +196,11 @@ export async function GET() {
   }
 
   // Separate requirement groups
-  const nonComplianceReqs = allRequirements.filter(r => r.evaluatorType !== 'COMPLIANCE')
   const complianceReqs    = allRequirements.filter(r => r.isComplianceGate)
-  const pedagogyReqs      = nonComplianceReqs.filter(r => r.evaluatorType === 'PEDAGOGY').map(toReq)
-  const technicalReqs     = nonComplianceReqs.filter(r => r.evaluatorType === 'TECHNICAL').map(toReq)
-  const combinedReqs      = [...pedagogyReqs, ...technicalReqs]
+  const nonComplianceReqs = allRequirements.filter(r => !r.isComplianceGate)
+  const pedagogyReqs      = nonComplianceReqs.filter(r => r.evaluatorType === 'PEDAGOGY' || r.evaluatorType === 'BOTH').map(toReq)
+  const technicalReqs     = nonComplianceReqs.filter(r => r.evaluatorType === 'TECHNICAL' || r.evaluatorType === 'BOTH').map(toReq)
+  const combinedReqs      = nonComplianceReqs.map(toReq)
 
   const activePlatforms = platforms.filter(p => p.status === 'ACTIVE')
 

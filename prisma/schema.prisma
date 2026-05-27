@@ -23,7 +23,6 @@ enum EvaluationState {
 }
 
 enum EvaluatorType {
-  COMPLIANCE
   PEDAGOGY
   TECHNICAL
   BOTH        // Scored by both PEDAGOGY and TECHNICAL evaluators

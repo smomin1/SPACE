@@ -426,9 +426,8 @@ export default async function BestFitPage({
 
     prisma.requirement.findMany({
       where: {
-        evaluatorType: { not: 'COMPLIANCE' },
         ...(categoryFilters.length > 0 && { category: { in: categoryFilters } }),
-        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
+        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' | 'BOTH' }),
       },
       select: { id: true, title: true, weight: true, category: true, isComplianceGate: true },
     }),

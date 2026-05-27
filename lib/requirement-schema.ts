@@ -8,7 +8,7 @@ export const requirementBaseSchema = z.object({
     .min(1, 'Description is required')
     .max(2000, 'Description must be 2000 characters or fewer'),
   evaluatorType: z.nativeEnum(EvaluatorType, {
-    message: 'Evaluator type must be COMPLIANCE, PEDAGOGY, TECHNICAL, or BOTH',
+    message: 'Evaluator type must be PEDAGOGY, TECHNICAL, or BOTH',
   }),
   weight: z.nativeEnum(WeightLevel, {
     message: 'Weight must be HIGH, MEDIUM, or LOW',
@@ -31,7 +31,7 @@ export const requirementRowSchema = z.object({
     .transform((v) => v.trim().toUpperCase())
     .pipe(
       z.nativeEnum(EvaluatorType, {
-        message: 'evaluatorType must be COMPLIANCE, PEDAGOGY, TECHNICAL, or BOTH',
+        message: 'evaluatorType must be PEDAGOGY, TECHNICAL, or BOTH',
       })
     ),
   weight: z

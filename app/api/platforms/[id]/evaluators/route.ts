@@ -6,10 +6,9 @@ import { EvaluatorType, type Role } from '@prisma/client'
 
 // Roles permitted to be assigned as each evaluator type
 const ALLOWED_ROLES_FOR_TYPE: Record<EvaluatorType, Role[]> = {
-  PEDAGOGY:   ['PEDAGOGY_EVALUATOR', 'ADMIN'],
-  TECHNICAL:  ['TECHNICAL_EVALUATOR', 'ADMIN'],
-  COMPLIANCE: ['ADMIN'],
-  BOTH:       ['PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'ADMIN'],
+  PEDAGOGY:  ['PEDAGOGY_EVALUATOR', 'ADMIN'],
+  TECHNICAL: ['TECHNICAL_EVALUATOR', 'ADMIN'],
+  BOTH:      ['PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'ADMIN'],
 }
 
 export async function GET(

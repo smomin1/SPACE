@@ -27,7 +27,7 @@ async function main() {
     {
       title: "Data Protection Compliance",
       description: "Platform must demonstrate GDPR/UK GDPR compliance.",
-      evaluatorType: EvaluatorType.COMPLIANCE,
+      evaluatorType: EvaluatorType.BOTH,
       weight: WeightLevel.HIGH,
       isComplianceGate: true,
       category: "Compliance",
@@ -36,7 +36,7 @@ async function main() {
     {
       title: "Accessibility Standard",
       description: "Platform must meet WCAG 2.1 AA accessibility requirements.",
-      evaluatorType: EvaluatorType.COMPLIANCE,
+      evaluatorType: EvaluatorType.BOTH,
       weight: WeightLevel.HIGH,
       isComplianceGate: true,
       category: "Compliance",

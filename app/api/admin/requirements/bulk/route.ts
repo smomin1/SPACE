@@ -15,13 +15,14 @@ function parseWeight(raw: unknown): WeightLevel {
   return WeightLevel.MEDIUM
 }
 
-// Map common EvaluatorType strings to enum, default COMPLIANCE
+// Map common EvaluatorType strings to enum, default BOTH
 function parseEvaluatorType(raw: unknown): EvaluatorType {
   const s = String(raw ?? '').trim().toUpperCase()
-  if (s === 'PEDAGOGY')  return EvaluatorType.PEDAGOGY
-  if (s === 'TECHNICAL') return EvaluatorType.TECHNICAL
-  if (s === 'COMPLIANCE') return EvaluatorType.COMPLIANCE
-  return EvaluatorType.COMPLIANCE
+  if (s === 'PEDAGOGY')   return EvaluatorType.PEDAGOGY
+  if (s === 'TECHNICAL')  return EvaluatorType.TECHNICAL
+  if (s === 'BOTH')       return EvaluatorType.BOTH
+  if (s === 'COMPLIANCE') return EvaluatorType.BOTH  // legacy value — map to BOTH
+  return EvaluatorType.BOTH
 }
 
 // Map common boolean-ish values, default false

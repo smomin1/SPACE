@@ -723,7 +723,7 @@ export function EvaluationReportPDF({
                           </View>
                         </View>
                         <Text style={[s.matrixTdLight, { width: fixedW.type }]}>
-                          {row.evaluatorType === 'COMPLIANCE' ? 'COMP' : row.evaluatorType === 'PEDAGOGY' ? 'PED' : 'TECH'}
+                          {row.evaluatorType === 'PEDAGOGY' ? 'PED' : row.evaluatorType === 'TECHNICAL' ? 'TECH' : 'BOTH'}
                         </Text>
                         {platformGroup.map(p => {
                           const scoreIdx = platformIndexInAll[p.id]

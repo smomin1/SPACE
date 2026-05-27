@@ -1,9 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { UploadIcon, CheckCircleIcon, XCircleIcon, DownloadIcon } from "lucide-react"
+import {
+  UploadIcon,
+  CheckCircleIcon,
+  DownloadIcon,
+  FileSpreadsheetIcon,
+  AlertTriangleIcon,
+} from "lucide-react"
 import * as XLSX from "xlsx"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -90,7 +97,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
         setFailures([])
       }
     } catch {
-      setGlobalError("Network error - please try again")
+      setGlobalError("Network error — please try again")
       setFailures([])
     }
 
@@ -101,28 +108,34 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <UploadIcon className="mr-2 size-4" />
+          <UploadIcon className="mr-1.5 size-3.5" />
           Bulk Import
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Bulk Import Requirements</DialogTitle>
-          <DialogDescription>
-            Upload an XLSX file to import multiple requirements at once.
+          <DialogTitle className="font-serif text-[20px] tracking-tight text-emerald-950">
+            Bulk import requirements
+          </DialogTitle>
+          <DialogDescription className="text-[13px] text-stone-600">
+            Upload an XLSX file to import multiple requirements at once. Maximum 500 rows.
           </DialogDescription>
         </DialogHeader>
 
         {step === "idle" && (
-          <div className="space-y-4">
-            <div className="rounded-lg border border-dashed p-6 text-center">
-              <UploadIcon className="mx-auto mb-2 size-8 text-muted-foreground" />
-              <p className="mb-1 text-sm font-medium">Select an XLSX file</p>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Columns: title, description, evaluatorType, weight, isComplianceGate, category, order
-                <br />
-                Max 500 rows
+          <div className="space-y-3">
+            {/* Dropzone */}
+            <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50/30 px-6 py-8 text-center">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-emerald-900/[0.06] text-emerald-800 ring-1 ring-emerald-900/10">
+                <UploadIcon className="size-4" />
+              </div>
+              <p className="mt-3 text-[13.5px] font-medium text-emerald-950">
+                Select an XLSX file
+              </p>
+              <p className="mx-auto mt-1 max-w-sm text-[12px] leading-relaxed text-stone-500">
+                Required columns: <span className="font-mono">title, description,
+                evaluatorType, weight, isComplianceGate, category, order</span>
               </p>
               <input
                 ref={fileInputRef}
@@ -132,46 +145,49 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
                 id="bulk-import-file"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
-              <label htmlFor="bulk-import-file">
-                <Button variant="outline" size="sm" asChild>
-                  <span className="cursor-pointer">Choose File</span>
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <label htmlFor="bulk-import-file">
+                  <Button variant="outline" size="sm" asChild>
+                    <span className="cursor-pointer">Choose file</span>
+                  </Button>
+                </label>
+                <Button variant="ghost" size="sm" onClick={downloadTemplate}>
+                  <DownloadIcon className="mr-1.5 size-3.5" />
+                  Download template
                 </Button>
-              </label>
+              </div>
+
               {file && (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Selected: <span className="font-medium">{file.name}</span>
+                <p className="mt-4 inline-flex h-7 items-center gap-2 rounded-md bg-white px-3 ring-1 ring-stone-200 text-[12px] text-emerald-950">
+                  <FileSpreadsheetIcon className="size-3.5 text-emerald-800/70" />
+                  <span className="font-medium">{file.name}</span>
                 </p>
               )}
             </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full"
-              onClick={downloadTemplate}
-            >
-              <DownloadIcon className="mr-2 size-4" />
-              Download template
-            </Button>
           </div>
         )}
 
         {step === "uploading" && (
           <div className="flex flex-col items-center gap-3 py-8">
-            <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="text-sm text-muted-foreground">Importing requirements…</p>
+            <div className="size-8 animate-spin rounded-full border-2 border-emerald-700 border-t-transparent" />
+            <p className="text-[13px] text-stone-500">Importing requirements…</p>
           </div>
         )}
 
         {step === "results" && !globalError && failures.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-6">
-            <CheckCircleIcon className="size-12 text-green-500" />
-            <p className="text-lg font-medium">Import successful</p>
-            <p className="text-sm text-muted-foreground">
-              {importedCount} requirement{importedCount !== 1 ? "s" : ""} imported
+            <div className="flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-700/20">
+              <CheckCircleIcon className="size-6" />
+            </div>
+            <p className="font-serif text-[20px] tracking-tight text-emerald-950">
+              Import successful
+            </p>
+            <p className="text-[13px] text-stone-600">
+              <span className="font-mono tabular-nums text-emerald-950">{importedCount}</span>{" "}
+              requirement{importedCount !== 1 ? "s" : ""} imported
               {skippedCount > 0 && (
-                <span className="block text-xs mt-0.5">
-                  {skippedCount} skipped (already exist)
+                <span className="mt-0.5 block text-[12px] text-stone-500">
+                  <span className="font-mono tabular-nums">{skippedCount}</span> skipped (already exist)
                 </span>
               )}
             </p>
@@ -180,33 +196,42 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
 
         {step === "results" && (globalError || failures.length > 0) && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-destructive">
-              <XCircleIcon className="size-5" />
-              <p className="font-medium">
-                {globalError ?? `${failures.length} row${failures.length !== 1 ? "s" : ""} failed validation`}
+            <div className="flex items-start gap-2.5 rounded-lg bg-amber-50/60 px-3 py-2.5 ring-1 ring-amber-700/20">
+              <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-amber-800" />
+              <p className="text-[13px] font-medium text-amber-900">
+                {globalError ??
+                  `${failures.length} row${failures.length !== 1 ? "s" : ""} failed validation`}
               </p>
             </div>
             {failures.length > 0 && (
-              <div className="max-h-60 overflow-y-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-medium">Row</th>
-                      <th className="px-3 py-2 text-left font-medium">Errors</th>
+              <div className="max-h-60 overflow-y-auto overflow-hidden rounded-lg border border-stone-200/80">
+                <table className="w-full text-[12.5px]">
+                  <thead>
+                    <tr className="bg-stone-50/60">
+                      <th className="px-3 py-2 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
+                        Row
+                      </th>
+                      <th className="px-3 py-2 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
+                        Errors
+                      </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-stone-200/60">
                     {failures.map((f) => (
                       <tr key={f.row}>
-                        <td className="px-3 py-2 font-mono">{f.row}</td>
-                        <td className="px-3 py-2 text-destructive">{f.errors.join("; ")}</td>
+                        <td className="px-3 py-2 font-mono tabular-nums text-emerald-950">
+                          {f.row}
+                        </td>
+                        <td className={cn("px-3 py-2 text-amber-900")}>
+                          {f.errors.join("; ")}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[12px] text-stone-500">
               No rows were imported. Fix the errors in your file and try again.
             </p>
           </div>
@@ -223,9 +248,7 @@ export function BulkImportDialog({ onSuccess }: BulkImportDialogProps) {
               </Button>
             </>
           )}
-          {step === "uploading" && (
-            <Button disabled>Importing…</Button>
-          )}
+          {step === "uploading" && <Button disabled>Importing…</Button>}
           {step === "results" && failures.length === 0 && !globalError && (
             <Button onClick={() => handleOpenChange(false)}>Done</Button>
           )}

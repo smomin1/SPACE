@@ -47,7 +47,7 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
     defaultValues: {
       title: "",
       description: "",
-      evaluatorType: "COMPLIANCE",
+      evaluatorType: "BOTH",
       weight: "MEDIUM",
       isComplianceGate: false,
       category: null,
@@ -130,9 +130,9 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="COMPLIANCE">Compliance</SelectItem>
                     <SelectItem value="PEDAGOGY">Pedagogy</SelectItem>
                     <SelectItem value="TECHNICAL">Technical</SelectItem>
+                    <SelectItem value="BOTH">Both (Pedagogy + Technical)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -236,10 +236,9 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
           </Alert>
         )}
 
-        {watchIsComplianceGate && watchEvaluatorType !== "COMPLIANCE" && (
+        {watchIsComplianceGate && (
           <p className="text-sm text-muted-foreground">
-            Note: Compliance gate is enabled for a non-COMPLIANCE evaluator type. The
-            platform disqualification rule still applies.
+            Note: Compliance gate is enabled. A No/Fail score will immediately disqualify the platform.
           </p>
         )}
 

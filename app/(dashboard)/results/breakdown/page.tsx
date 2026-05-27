@@ -68,10 +68,9 @@ export default async function BreakdownPage({
   const [rawRequirements, rawPlatforms, evaluations] = await Promise.all([
     prisma.requirement.findMany({
       where: {
-        evaluatorType: { not: 'COMPLIANCE' },
         ...(contextIds.length      > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
         ...(categoryFilters.length > 0 && { category: { in: categoryFilters } }),
-        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' }),
+        ...(evalTypeFilter             && { evaluatorType: evalTypeFilter as 'PEDAGOGY' | 'TECHNICAL' | 'BOTH' }),
       },
       select: { id: true, weight: true, category: true, isComplianceGate: true },
       orderBy: [{ category: 'asc' }, { order: 'asc' }],

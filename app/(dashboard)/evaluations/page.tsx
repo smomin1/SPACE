@@ -9,10 +9,9 @@ import type { EvaluationState, EvaluatorType } from '@prisma/client'
 import { cn } from '@/lib/utils'
 
 const TYPE_LABEL: Record<EvaluatorType, string> = {
-  COMPLIANCE: 'Compliance',
-  PEDAGOGY:   'Pedagogy',
-  TECHNICAL:  'Technical',
-  BOTH:       'Both',
+  PEDAGOGY:  'Pedagogy',
+  TECHNICAL: 'Technical',
+  BOTH:      'Both',
 }
 
 const STATE_ORDER: Record<EvaluationState, number> = {

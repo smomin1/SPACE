@@ -388,9 +388,9 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
           column={table.getColumn('evaluatorType')!}
           title="Type"
           options={[
-            { label: 'Compliance', value: 'COMPLIANCE' },
-            { label: 'Pedagogy',   value: 'PEDAGOGY' },
-            { label: 'Technical',  value: 'TECHNICAL' },
+            { label: 'Pedagogy',  value: 'PEDAGOGY' },
+            { label: 'Technical', value: 'TECHNICAL' },
+            { label: 'Both',      value: 'BOTH' },
           ]}
         />
 

@@ -4,7 +4,8 @@ import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { EvalStateBadge } from '@/components/admin/_shared/badges'
-import { ArrowRightIcon } from 'lucide-react'
+import { PageHeader } from '@/components/shared/PageHeader'
+import { ArrowRightIcon, ClipboardCheckIcon } from 'lucide-react'
 import type { EvaluationState, EvaluatorType } from '@prisma/client'
 import { cn } from '@/lib/utils'
 
@@ -82,13 +83,14 @@ export default async function EvaluationsPage() {
   )
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-emerald-950">Evaluations</h1>
-        <p className="text-sm text-stone-500 mt-0.5">
-          {isAdmin ? 'All active evaluation assignments.' : 'Your assigned evaluations.'}
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={ClipboardCheckIcon}
+        kicker="Layer 2: Tool Evaluator"
+        title="Evaluations"
+        description={isAdmin ? 'All active evaluation assignments.' : 'Your assigned evaluations.'}
+      />
+      <main className="mx-auto max-w-7xl px-6 py-6">
 
       {sorted.length === 0 ? (
         <div className="rounded-xl border border-stone-200/80 bg-white py-16 text-center text-sm text-stone-400">
@@ -139,6 +141,7 @@ export default async function EvaluationsPage() {
           })}
         </div>
       )}
+      </main>
     </div>
   )
 }

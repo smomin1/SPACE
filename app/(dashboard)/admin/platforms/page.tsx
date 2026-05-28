@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import { MonitorIcon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { PlatformsTable } from '@/components/admin/platforms/PlatformsTable'
 
 export default async function PlatformsPage() {
@@ -29,14 +31,16 @@ export default async function PlatformsPage() {
   })
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Platform Registry</h1>
-        <p className="text-muted-foreground">
-          Register platforms and manage evaluator assignments.
-        </p>
-      </div>
-      <PlatformsTable initialData={platforms} />
+    <div>
+      <PageHeader
+        icon={MonitorIcon}
+        kicker="Catalogue"
+        title="Platforms"
+        description="Register platforms and manage evaluator assignments."
+      />
+      <main className="mx-auto max-w-7xl px-6 py-6">
+        <PlatformsTable initialData={platforms} />
+      </main>
     </div>
   )
 }

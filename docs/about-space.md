@@ -1,4 +1,4 @@
-# SPACE — A Plain-English Explanation
+# SPACE: A Plain-English Explanation
 
 ## What is SPACE?
 
@@ -22,7 +22,7 @@ is fast, transparent, and audit-friendly.
 SPACE has two complementary tools. They share the same underlying requirement
 set but operate at different speeds and confidence levels.
 
-### Layer 1: Tool Scanner — the fast triage
+### Layer 1: Tool Scanner (the fast triage)
 
 Tool Scanner is the exploratory layer. You give it the name of a platform and
 its website URL, and an AI agent goes off and reads everything publicly
@@ -51,7 +51,7 @@ The scanner also respects **contexts** (more on those below): you can switch
 into a context like "K-12 Reading Intervention" and everything reweights
 according to that context's priorities.
 
-### Layer 2: Tool Evaluator — the deliberate human review
+### Layer 2: Tool Evaluator (the deliberate human review)
 
 Tool Evaluator is the structured workflow your evaluators use when you've
 narrowed the field and need authoritative judgement. Two teams score every
@@ -153,15 +153,15 @@ neither help nor hurt the platform's score.
 
 SPACE has five roles, each with carefully scoped permissions.
 
-* **Super Admin** — full control, including user account management. Usually
+* **Super Admin**: full control, including user account management. Usually
   the system owner.
-* **Admin** — manages requirements, contexts, platforms, and evaluations. Sets
+* **Admin**: manages requirements, contexts, platforms, and evaluations. Sets
   up the catalogue and assigns evaluators.
-* **Pedagogy Evaluator** — scores pedagogy-typed requirements during an
+* **Pedagogy Evaluator**: scores pedagogy-typed requirements during an
   evaluation. Sees only what they're assigned to score.
-* **Technical Evaluator** — scores technical-typed requirements during an
+* **Technical Evaluator**: scores technical-typed requirements during an
   evaluation. Sees only what they're assigned to score.
-* **Viewer** — read-only access. Can use Tool Scanner and explore Results, but
+* **Viewer**: read-only access. Can use Tool Scanner and explore Results, but
   cannot edit requirements, platforms, or scores. Useful for stakeholders who
   need visibility but no editorial control.
 
@@ -225,8 +225,8 @@ over the course of a procurement cycle.
 
 6. The evaluation is **finalised**. It flows into Results.
 
-7. Decision-makers consult Results — usually filtered by the specific context
-   they care about — to compare platforms, identify the best single fit or the
+7. Decision-makers consult Results, usually filtered by the specific context
+   they care about, to compare platforms, identify the best single fit or the
    best combination of platforms, and export a PDF report to circulate.
 
 8. The audit trail records exactly who scored what, when, and why.

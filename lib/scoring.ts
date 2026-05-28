@@ -4,7 +4,7 @@ import type { EvidenceType, WeightLevel } from '@prisma/client'
 
 export type Score = {
   requirementId: string
-  value: number | null        // null = N/A, 0 = FAIL, 1–3 = score
+  value: number | null        // null = N/A, 0 = FAIL (compliance gate only), 1-4 = score
   evidenceType: EvidenceType | null
 }
 

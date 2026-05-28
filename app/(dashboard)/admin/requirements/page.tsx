@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import { ClipboardListIcon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { RequirementsTable } from './components/RequirementsTable'
 
 export default async function RequirementsPage() {
@@ -14,14 +16,16 @@ export default async function RequirementsPage() {
   })
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Requirements Master</h1>
-        <p className="text-muted-foreground">
-          Manage evaluation requirements across all platforms.
-        </p>
-      </div>
-      <RequirementsTable initialData={requirements} />
+    <div>
+      <PageHeader
+        icon={ClipboardListIcon}
+        kicker="Catalogue"
+        title="Requirements"
+        description="Manage evaluation requirements across all platforms."
+      />
+      <main className="mx-auto max-w-7xl px-6 py-6">
+        <RequirementsTable initialData={requirements} />
+      </main>
     </div>
   )
 }

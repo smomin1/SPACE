@@ -216,8 +216,8 @@ model RequirementContext {
 }
 
 // One evaluator's score for one requirement within one evaluation.
-// value: null = N/A (excluded from weighted calc); 0 = FAIL (compliance gate only); 1–5 = numeric.
-// Score isolation is enforced at the API layer — during IN_PROGRESS, cross-team scores are never returned.
+// value: null = N/A (excluded from weighted calc); 0 = FAIL (compliance gate only); 1-4 = numeric.
+// Score isolation is enforced at the API layer - during IN_PROGRESS, cross-team scores are never returned.
 model Score {
   id            String       @id @default(cuid())
   evaluationId  String
@@ -237,7 +237,7 @@ model Score {
   @@unique([evaluationId, requirementId, userId])
 }
 
-// Immutable audit trail — one row per score write (create or update).
+// Immutable audit trail - one row per score write (create or update).
 // Never update or delete rows from this table.
 model ScoreAuditLog {
   id                  String        @id @default(cuid())

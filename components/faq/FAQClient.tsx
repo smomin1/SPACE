@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { SearchIcon, XIcon, ChevronDownIcon, HelpCircleIcon } from 'lucide-react'
+// HelpCircleIcon is still used in the empty-state below.
 import { cn } from '@/lib/utils'
 import type { FAQCategory, FAQItem } from '@/lib/faq-data'
 
@@ -54,23 +55,6 @@ export function FAQClient({ categories }: Props) {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2.5">
-          <HelpCircleIcon className="size-5 text-emerald-800" />
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-emerald-800/70">
-            Help Centre
-          </p>
-        </div>
-        <h1 className="mt-1 font-serif text-[28px] tracking-tight text-emerald-950">
-          Frequently Asked Questions
-        </h1>
-        <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-stone-600">
-          Everything you need to know about SPACE, Tool Scanner, Tool Evaluator,
-          scoring, and the workflow that ties them together.
-        </p>
-      </div>
-
       {/* Search */}
       <div className="relative">
         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-stone-400" />

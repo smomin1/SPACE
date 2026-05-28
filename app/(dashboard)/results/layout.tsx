@@ -1,8 +1,10 @@
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
+import { BarChart2Icon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { ResultsNav } from './components/ResultsNav'
 import { FilterBar } from './components/FilterBar'
 import { ExportButtons } from '@/components/export/ExportButtons'
@@ -37,25 +39,19 @@ export default async function ResultsLayout({
 
   return (
     <div className="flex flex-col">
-      {/* Sticky header - title + tab nav + filter bar */}
+      <PageHeader
+        icon={BarChart2Icon}
+        kicker="Analytics"
+        title="Results"
+        description="Analytics across all evaluated platforms."
+        actions={<ExportButtons />}
+      />
+
+      {/* Sticky sub-nav + filter strip */}
       <div className="sticky top-0 z-20 bg-white border-b border-stone-200/80 shadow-sm">
         <div className="container mx-auto max-w-7xl px-6">
-          {/* Title row */}
-          <div className="pt-5 pb-3 flex items-center gap-3">
-            <h1 className="text-xl font-semibold tracking-tight text-emerald-950">
-              Results
-            </h1>
-            <span className="text-sm text-stone-400 flex-1">
-              Analytics across all evaluated platforms
-            </span>
-            <ExportButtons />
-          </div>
-
-          {/* Tab navigation */}
           <ResultsNav />
         </div>
-
-        {/* Filter bar - full-width strip below tabs */}
         <div className="border-t border-stone-100 bg-stone-50/70">
           <div className="container mx-auto max-w-7xl px-6 py-2.5">
             <Suspense fallback={<FilterBarSkeleton />}>
@@ -70,9 +66,9 @@ export default async function ResultsLayout({
       </div>
 
       {/* Scrollable content */}
-      <div className="container mx-auto max-w-7xl px-6 py-8">
+      <main className="container mx-auto max-w-7xl px-6 py-6">
         {children}
-      </div>
+      </main>
     </div>
   )
 }

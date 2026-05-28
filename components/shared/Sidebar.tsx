@@ -16,7 +16,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   LogOutIcon,
-  UserCogIcon,
+  SparklesIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -43,6 +43,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboardIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/tool-scanner',
+    label: 'Tool Scanner',
+    icon: SparklesIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
   },
   {
@@ -110,8 +116,9 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
           collapsed ? 'justify-center px-2' : 'px-5',
         )}
       >
-        <div className="relative group flex size-7 shrink-0 items-center justify-center rounded-md bg-white/8 ring-1 ring-white/15">
-          <MonitorIcon className="size-4 text-white/80" />
+        <div className="relative group flex size-8 shrink-0 items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/dome.svg" alt="SPACE" className="size-8" />
           {collapsed && (
             <span
               className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded px-[0.85rem] py-[0.4rem] text-[0.78rem] text-white opacity-0 transition-opacity duration-150 ease-in group-hover:opacity-100"
@@ -190,29 +197,27 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
               collapsed && 'justify-center px-0',
             )}
           >
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-[11px] font-medium tracking-wide text-white ring-1 ring-white/15">
-              {userInitials}
-            </div>
-            {!collapsed && (
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[12.5px] font-medium text-white">
-                  {userName ?? 'Signed in'}
-                </p>
-                <p className="font-mono text-[10.5px] uppercase tracking-wider text-white/55">
-                  {roleLabel ?? role.replace(/_/g, ' ').toLowerCase()}
-                </p>
-              </div>
-            )}
             <Link
               href="/profile"
               title="Profile settings"
               className={cn(
-                'flex size-7 items-center justify-center rounded-md text-white/55 transition-colors hover:bg-white/[0.06] hover:text-gold',
-                collapsed && 'mx-auto',
+                'flex shrink-0 items-center gap-2.5 min-w-0 rounded-md transition-colors hover:opacity-80',
+                collapsed ? 'justify-center' : 'flex-1',
               )}
             >
-              <UserCogIcon className="size-4" />
-              <span className="sr-only">Profile settings</span>
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-[11px] font-medium tracking-wide text-white ring-1 ring-white/15">
+                {userInitials}
+              </div>
+              {!collapsed && (
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[12.5px] font-medium text-white">
+                    {userName ?? 'Signed in'}
+                  </p>
+                  <p className="font-mono text-[10.5px] uppercase tracking-wider text-white/55">
+                    {roleLabel ?? role.replace(/_/g, ' ').toLowerCase()}
+                  </p>
+                </div>
+              )}
             </Link>
             <AlertDialogTrigger asChild>
               <button

@@ -86,7 +86,7 @@ const SCORE_BUTTONS = [
 ]
 
 // Compliance gate requirements use a binary Yes/No scale
-// Yes = 1 (pass), No = 0 (fail — immediately disqualifies the platform)
+// Yes = 1 (pass), No = 0 (fail - immediately disqualifies the platform)
 const GATE_BUTTONS = [
   { label: 'N/A', value: null },
   { label: 'No',  value: 0 },

@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { AdminDashboard } from './components/AdminDashboard'
 import { EvaluatorDashboard } from './components/EvaluatorDashboard'
+import { ViewerDashboard } from './components/ViewerDashboard'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -18,5 +19,5 @@ export default async function DashboardPage() {
     return <EvaluatorDashboard userId={userId} />
   }
 
-  redirect('/results')
+  return <ViewerDashboard />
 }

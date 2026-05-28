@@ -21,7 +21,7 @@ function parseEvaluatorType(raw: unknown): EvaluatorType {
   if (s === 'PEDAGOGY')   return EvaluatorType.PEDAGOGY
   if (s === 'TECHNICAL')  return EvaluatorType.TECHNICAL
   if (s === 'BOTH')       return EvaluatorType.BOTH
-  if (s === 'COMPLIANCE') return EvaluatorType.BOTH  // legacy value — map to BOTH
+  if (s === 'COMPLIANCE') return EvaluatorType.BOTH  // legacy value - map to BOTH
   return EvaluatorType.BOTH
 }
 

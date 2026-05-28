@@ -107,6 +107,7 @@ model User {
   closedThreads            ConflictThread[]
   platformAssignments      PlatformEvaluatorAssignment[]
   teamMerges               EvaluationTeamMerge[]
+  searchEvaluations        SearchEvaluation[]
 }
 
 model Platform {
@@ -302,6 +303,20 @@ model ConflictMessage {
 
   thread ConflictThread @relation(fields: [threadId], references: [id])
   author User           @relation(fields: [authorId], references: [id])
+}
+
+// Layer 1 Search: AI-driven auto-evaluation of any platform from public web sources.
+// Scores are stored as JSON { requirementId: 0|1|2|3|4|null } using the same 0–4 scale as PET.
+model SearchEvaluation {
+  id           String   @id @default(cuid())
+  platformName String
+  url          String
+  metadata     Json?    // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
+  scores       Json     // { requirementId: number | null }
+  createdAt    DateTime @default(now())
+  createdById  String
+
+  createdBy User @relation(fields: [createdById], references: [id])
 }
 
 // Records when a team lead merges their team's scores.

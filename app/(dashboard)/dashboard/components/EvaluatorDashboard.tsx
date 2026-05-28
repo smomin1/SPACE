@@ -13,6 +13,7 @@ import type { EvaluatorType } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { relativeTime } from '@/lib/utils'
 import { StatCard } from './StatCard'
+import { ToolPicker } from './ToolPicker'
 import { EvalStateBadge, TypeBadge } from '@/components/admin/_shared/badges'
 
 interface EvaluatorDashboardProps {
@@ -317,6 +318,8 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
           )}
         </div>
       </div>
+
+      <ToolPicker />
 
       {/* Conflict resolution needed (MERGED evals) */}
       {mergedAssignments.length > 0 && (

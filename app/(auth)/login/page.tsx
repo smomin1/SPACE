@@ -11,10 +11,25 @@ export default function LoginPage() {
   const [error, action, isPending] = useActionState(loginAction, undefined)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Sign in</CardTitle>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-primary p-4">
+      {/* Brand: dome + SPACE wordmark above the card */}
+      <div className="mb-8 flex flex-col items-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/dome.svg" alt="SPACE" className="size-20" />
+        <p className="mt-3 font-serif text-[28px] tracking-[0.18em] text-gold">
+          SPACE
+        </p>
+        <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-white">
+          Software Platform Analysis, Comparison, and Evaluation
+        </p>
+      </div>
+
+      {/* Sign-in card */}
+      <Card className="w-full max-w-sm shadow-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="font-serif text-[22px] tracking-tight text-emerald-950">
+            Sign in
+          </CardTitle>
           <CardDescription>Enter your credentials to access the platform</CardDescription>
         </CardHeader>
         <CardContent>

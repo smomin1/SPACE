@@ -12,6 +12,7 @@ import {
 import { prisma } from '@/lib/prisma'
 import { cn, relativeTime } from '@/lib/utils'
 import { StatCard } from './StatCard'
+import { ToolPicker } from './ToolPicker'
 import { EvalStateBadge } from '@/components/admin/_shared/badges'
 
 function getNow() { return Date.now() }
@@ -314,6 +315,8 @@ export async function AdminDashboard() {
           )}
         </div>
       </div>
+
+      <ToolPicker />
 
       {/* Quick actions */}
       <div className="flex items-center gap-3">

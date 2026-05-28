@@ -8,7 +8,7 @@
   --color-text:      #2B2B2B;
   --color-accent:    #3A5A72;
 
-  /* Gold alias — used for CTA buttons, left-border accents, dividers */
+  /* Gold alias - used for CTA buttons, left-border accents, dividers */
   --gold: #C9973A;
 
   /* ── shadcn semantic tokens ──────────────────────────────────────────── */
@@ -82,7 +82,7 @@
   --color-input:                var(--input);
   --color-ring:                 var(--ring);
 
-  /* Gold utility — bg-gold, text-gold, border-gold */
+  /* Gold utility - bg-gold, text-gold, border-gold */
   --color-gold:                 var(--gold);
 
   --radius-sm: var(--radius-sm);

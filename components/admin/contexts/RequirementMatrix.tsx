@@ -186,7 +186,7 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                       isSaving && 'opacity-50 cursor-wait'
                     )}
                   >
-                    {/* Checkbox — clicking this toggles assignment */}
+                    {/* Checkbox - clicking this toggles assignment */}
                     <button
                       type="button"
                       disabled={isSaving}
@@ -201,7 +201,7 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                       {isAssigned && <CheckIcon className="size-2.5" />}
                     </button>
 
-                    {/* Title + description — clicking here also toggles */}
+                    {/* Title + description - clicking here also toggles */}
                     <div
                       className="min-w-0 cursor-pointer"
                       onClick={() => !isSaving && toggle(req.id, !isAssigned)}

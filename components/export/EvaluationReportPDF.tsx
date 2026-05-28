@@ -4,8 +4,26 @@ import {
   Text,
   View,
   StyleSheet,
+  Svg,
+  Path,
+  Rect,
 } from '@react-pdf/renderer'
 import type { WeightLevel } from '@prisma/client'
+
+// SPACE dome mark for the PDF cover and footer
+function DomeMark({ size = 48 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 48 48">
+      <Path
+        d="M 10 44 L 10 22 Q 10 6 24 4 Q 38 6 38 22 L 38 44 Z"
+        fill="none"
+        stroke="#C9973A"
+        strokeWidth={1.1}
+      />
+      <Rect x={5} y={45.4} width={38} height={1.4} fill="#C9973A" />
+    </Svg>
+  )
+}
 
 // ─── Exported types ────────────────────────────────────────────────────────────
 
@@ -112,11 +130,47 @@ const s = StyleSheet.create({
     letterSpacing: 1.5,
     marginBottom: 12,
   },
+  coverBrand: {
+    fontSize: 14,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1A4731',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  coverBrandTagline: {
+    fontSize: 8,
+    color: '#78716c',
+    letterSpacing: 0.5,
+    marginBottom: 28,
+  },
   coverTitle: {
     fontSize: 28,
     fontFamily: 'Helvetica-Bold',
     color: '#1A4731',
+    lineHeight: 1.15,
     marginBottom: 8,
+  },
+  pageFooter: {
+    position: 'absolute',
+    bottom: 16,
+    left: 32,
+    right: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 6,
+    borderTopWidth: 0.5,
+    borderTopColor: '#e7e5e4',
+  },
+  footerBrand: {
+    fontSize: 7,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1A4731',
+    letterSpacing: 1.2,
+  },
+  footerMeta: {
+    fontSize: 7,
+    color: '#a8a29e',
   },
   coverSub: {
     fontSize: 10,
@@ -321,13 +375,35 @@ export function EvaluationReportPDF({
   // Fixed column widths for comparison
   const cmpColW = ['22%', '16%', '8%', '10%', '10%', '10%', '12%', '12%']
 
+  // Reusable page footer - appears on every page (skipped on the cover)
+  const Footer = () => (
+    <View style={s.pageFooter} fixed>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+        <DomeMark size={10} />
+        <Text style={s.footerBrand}>SPACE</Text>
+      </View>
+      <Text
+        style={s.footerMeta}
+        render={({ pageNumber, totalPages }) =>
+          `Page ${pageNumber} of ${totalPages}`
+        }
+      />
+    </View>
+  )
+
   return (
     <Document title="Platform Evaluation Report">
 
       {/* ── 1. Cover Page ─────────────────────────────────────────────────── */}
       <Page size="A4" style={s.page}>
         <View style={s.coverPage}>
-          <Text style={s.coverLabel}>Confidential</Text>
+          <View style={{ marginBottom: 12 }}>
+            <DomeMark size={56} />
+          </View>
+          <Text style={s.coverBrand}>SPACE</Text>
+          <Text style={s.coverBrandTagline}>
+            Software Platform Analysis, Comparison, and Evaluation
+          </Text>
           <Text style={s.coverTitle}>Platform{'\n'}Evaluation{'\n'}Report</Text>
           <Text style={s.coverSub}>
             A structured assessment of educational technology platforms.
@@ -404,6 +480,7 @@ export function EvaluationReportPDF({
             </View>
           ))}
         </View>
+        <Footer />
       </Page>
 
       {/* ── 3. Category Breakdown ─────────────────────────────────────────── */}
@@ -473,6 +550,7 @@ export function EvaluationReportPDF({
               </View>
             ))}
           </View>
+          <Footer />
         </Page>
       )}
 
@@ -595,6 +673,7 @@ export function EvaluationReportPDF({
               </View>
             </View>
           )}
+          <Footer />
         </Page>
       )}
 
@@ -632,6 +711,7 @@ export function EvaluationReportPDF({
               </View>
             ))}
           </View>
+          <Footer />
         </Page>
       )}
 
@@ -754,6 +834,7 @@ export function EvaluationReportPDF({
                 </View>
               )
             })}
+            <Footer />
           </Page>
         )
       })}

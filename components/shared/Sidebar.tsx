@@ -17,6 +17,7 @@ import {
   ChevronRightIcon,
   LogOutIcon,
   SparklesIcon,
+  HelpCircleIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -46,10 +47,10 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
   },
   {
-    href: '/tool-scanner',
-    label: 'Tool Scanner',
-    icon: SparklesIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+    href: '/admin/users',
+    label: 'Users',
+    icon: UsersIcon,
+    roles: ['SUPER_ADMIN'],
   },
   {
     href: '/admin/requirements',
@@ -70,10 +71,10 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
-    href: '/admin/users',
-    label: 'Users',
-    icon: UsersIcon,
-    roles: ['SUPER_ADMIN'],
+    href: '/tool-scanner',
+    label: 'Tool Scanner',
+    icon: SparklesIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/evaluations',
@@ -85,6 +86,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/results',
     label: 'Results',
     icon: BarChart2Icon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/faq',
+    label: 'FAQ',
+    icon: HelpCircleIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
   },
 ]

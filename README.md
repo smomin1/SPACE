@@ -36,58 +36,123 @@ npm install
 
 ---
 
-## 3. Configure Environment Variables
+## 3. Install and Configure PostgreSQL
 
-Create a `.env.local` file in the project root:
+1. Download PostgreSQL from https://www.postgresql.org/download/windows/
+2. Run the installer and complete the setup wizard
+3. **Important:** Set a password for the `postgres` user when prompted (write it down)
+4. Skip Stack Builder at the end (you can click Cancel)
 
-```bash
-cp .env .env.local
+### Verify PostgreSQL is on your PATH (Windows)
+
+If the `psql` command is not recognised in your terminal, add PostgreSQL to your PATH:
+
+```powershell
+$env:Path += ";C:\Program Files\PostgreSQL\18\bin"
 ```
 
-Open `.env.local` and set both values:
+Replace `18` with your installed PostgreSQL version. To make this permanent, add the line above to your PowerShell profile (`notepad $PROFILE`).
 
-```env
-# Your PostgreSQL connection string
-DATABASE_URL="postgresql://<user>@<host>:<port>/<database>"
+### Create the Database
 
-# Secret used to sign session tokens — generate with: openssl rand -base64 32
-AUTH_SECRET="your-secret-here"
+Connect to PostgreSQL and create the project database:
+
+```powershell
+psql -U postgres
 ```
 
-**Local PostgreSQL example:**
+Enter the password you set during installation. Then at the `postgres=#` prompt run:
 
-```env
-DATABASE_URL="postgresql://postgres@localhost:5432/space_eval"
-AUTH_SECRET="TFKnHvZlUMXDy7ESUHpNvBJ2OvMqiFQxCJ9H63A0/cU="
+```sql
+CREATE DATABASE space_evaluator;
+\q
 ```
-
-> The database does not need to exist yet. The next step creates all tables automatically.
 
 ---
 
-## 4. Run Database Migrations
+## 4. Configure Environment Variables
 
-```bash
-DATABASE_URL="postgresql://<user>@<host>:<port>/<database>" npx prisma migrate deploy
+Prisma reads from `.env` by default, and Next.js also reads `.env.local`. Create **both files** in the project root with the same content:
+
+```env
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/space_evaluator"
+AUTH_SECRET="super-secret-key-change-this-in-production"
+NEXTAUTH_URL="http://localhost:3000"
 ```
 
-This creates the database schema and applies all migrations.
+Replace `YOUR_PASSWORD` with the PostgreSQL password you set during installation.
+
+**Quick way to create both files (PowerShell):**
+
+```powershell
+@"
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/space_evaluator"
+AUTH_SECRET="super-secret-key-change-this-in-production"
+NEXTAUTH_URL="http://localhost:3000"
+"@ | Out-File .env.local -Encoding UTF8
+
+Copy-Item .env.local .env
+```
+
+> Both `.env` and `.env.local` are needed: `.env` is read by Prisma CLI commands, and `.env.local` is read by Next.js at runtime.
 
 ---
 
-## 5. Seed Sample Data (Optional)
+## 5. Generate Prisma Client
+
+Before running migrations or seeding, generate the Prisma client based on the schema:
+
+```bash
+npx prisma generate
+```
+
+This creates the typed database client used by the application code.
+
+---
+
+## 6. Run Database Migrations
+
+```bash
+npx prisma migrate deploy
+```
+
+This applies all migrations from `prisma/migrations/` and creates the schema in your `space_evaluator` database.
+
+---
+
+## 7. Seed Sample Data (Optional)
 
 To pre-populate the database with sample requirements and test accounts:
 
 ```bash
-DATABASE_URL="postgresql://<user>@<host>:<port>/<database>" npx prisma db seed
+npx prisma db seed
 ```
 
-Skip this step if you prefer to start with an empty database.
+This creates the following test accounts:
+
+| Role | Email | Password |
+|---|---|---|
+| Super Admin | `superadmin@eval.com` | `Admin1234!` |
+| Admin | `admin@eval.com` | `Admin1234!` |
+| Pedagogy Evaluator | `pedagogy@eval.com` | `Evaluator1234!` |
+| Technical Evaluator | `technical@eval.com` | `Evaluator1234!` |
+| Viewer | `viewer@eval.com` | `Viewer1234!` |
+
+> **Skip this step** if you want to start with an empty database and create your own Super Admin account via the `/setup` page.
+
+### Resetting the Database
+
+To wipe all data and start fresh:
+
+```bash
+npx prisma migrate reset
+```
+
+This drops all tables, re-runs migrations, and asks whether to re-seed. Choose `n` to keep the database empty.
 
 ---
 
-## 6. Start the Development Server
+## 8. Start the Development Server
 
 ```bash
 npm run dev
@@ -97,9 +162,13 @@ The app will be running at **http://localhost:3000**
 
 ---
 
-## 7. Create the Super Admin Account
+## 9. First Login
 
-The application cannot be used until a Super Admin account exists. This is a one-time setup step.
+**If you ran the seed command:**
+
+Open **http://localhost:3000/login** and sign in with one of the seeded accounts (Super Admin recommended for full access).
+
+**If you skipped seeding:**
 
 1. Open **http://localhost:3000** in your browser
 2. You will be redirected automatically to **http://localhost:3000/setup**
@@ -107,20 +176,18 @@ The application cannot be used until a Super Admin account exists. This is a one
 4. Click **Create Super Admin Account**
 5. You will be taken to the login page
 
-> Once created, the `/setup` page is permanently locked and redirects to login. There can only ever be one Super Admin.
+> Once a Super Admin exists, the `/setup` page is permanently locked and redirects to login. There can only ever be one Super Admin.
 
 ---
 
-## 8. Log In and Get Started
-
-Sign in with the Super Admin credentials you just created.
+## 10. Get Started
 
 Use the sidebar to configure the application:
 
-- **Requirements** — Define the criteria platforms will be evaluated against
-- **Contexts** — Create evaluation contexts such as K-12 or Higher Education
-- **Platforms** — Register platforms and assign evaluators to them
-- **Users** — Create accounts for other team members
+- **Requirements** - Define the criteria platforms will be evaluated against
+- **Contexts** - Create evaluation contexts such as K-12 or Higher Education
+- **Platforms** - Register platforms and assign evaluators to them
+- **Users** - Create accounts for other team members
 
 ---
 
@@ -182,8 +249,8 @@ This application is designed to run on **Vercel** with any PostgreSQL provider (
 1. Push the repository to GitHub
 2. Import the project in the [Vercel dashboard](https://vercel.com)
 3. Add the following environment variables:
-   - `DATABASE_URL` — your production PostgreSQL connection string
-   - `AUTH_SECRET` — a securely generated secret (`openssl rand -base64 32`)
+   - `DATABASE_URL` - your production PostgreSQL connection string
+   - `AUTH_SECRET` - a securely generated secret (`openssl rand -base64 32`)
 4. Vercel will build and deploy automatically on each push
 5. Run migrations against the production database once:
 
@@ -207,7 +274,7 @@ DATABASE_URL="your-production-url" npx prisma migrate deploy
     /results            Results and analytics dashboard
 
 /components
-  /ui                   Base UI components (shadcn/ui, do not modify)
+  /ui                   Base UI components (shadcn/ui - do not modify)
   /shared               Shared layout (Sidebar, Footer)
   /admin                Admin section components
   /export               PDF and XLSX export components
@@ -219,7 +286,7 @@ DATABASE_URL="your-production-url" npx prisma migrate deploy
 
 /prisma
   schema.prisma         Database schema
-  migrations/           Migration history (do not edit manually)
+  migrations/           Migration history - do not edit manually
   seed.ts               Sample data seed script
 ```
 

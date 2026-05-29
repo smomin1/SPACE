@@ -1,0 +1,2 @@
+IPv4 Address : 192.168.1.115
+streamlit run .\Evaluator.py --server.address 0.0.0.0

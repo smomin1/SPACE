@@ -1,0 +1,31 @@
+# ========================
+# Secrets & API Keys
+# ========================
+.env
+.streamlit/secrets.toml
+config.yaml
+
+# ========================
+# Local Data Output
+# ========================
+# It's usually best not to commit your generated database to version control
+App_Ledger.csv
+
+# ========================
+# Python & Environment Files
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments (if you ever use them)
+venv/
+env/
+.venv/
+
+# ========================
+# OS Generated Files
+# ========================
+.DS_Store
+Thumbs.db

@@ -8,6 +8,7 @@ import {
   CheckIcon,
   PlusIcon,
   BarChart2Icon,
+  InboxIcon,
 } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { cn, relativeTime } from '@/lib/utils'
@@ -19,7 +20,7 @@ function getNow() { return Date.now() }
 
 export async function AdminDashboard() {
   const now = getNow()
-  const [stateCounts, activeEvaluations, recentMessages, recentSubmissions, platformCount] =
+  const [stateCounts, activeEvaluations, recentMessages, recentSubmissions, platformCount, pendingAccessRequests] =
     await Promise.all([
       prisma.evaluation.groupBy({
         by: ['state'],
@@ -70,6 +71,7 @@ export async function AdminDashboard() {
         },
       }),
       prisma.platform.count(),
+      prisma.accessRequest.count({ where: { status: 'PENDING' } }),
     ])
 
   const inProgressCount = stateCounts.find(r => r.state === 'IN_PROGRESS')?._count.id ?? 0
@@ -176,6 +178,30 @@ export async function AdminDashboard() {
           icon={CheckCircle2Icon}
         />
       </div>
+
+      {/* Pending access requests callout */}
+      {pendingAccessRequests > 0 && (
+        <Link href="/admin/access-requests">
+          <div className="flex items-center gap-4 rounded-xl border border-amber-200 bg-amber-50/60 px-5 py-4 hover:bg-amber-50 transition-colors">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-100 ring-1 ring-amber-200">
+              <InboxIcon className="size-4 text-amber-700" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-900">
+                {pendingAccessRequests === 1
+                  ? '1 pending access request'
+                  : `${pendingAccessRequests} pending access requests`}
+              </p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Review and approve or reject account requests from team members.
+              </p>
+            </div>
+            <span className="shrink-0 flex h-7 min-w-7 items-center justify-center rounded-full bg-amber-400 px-2 text-[12px] font-bold text-emerald-950">
+              {pendingAccessRequests > 99 ? '99+' : pendingAccessRequests}
+            </span>
+          </div>
+        </Link>
+      )}
 
       {/* Stalled evaluations callout */}
       {stalledEvaluations.length > 0 && (

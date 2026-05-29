@@ -32,7 +32,7 @@ import {
   CheckIcon,
   SearchIcon,
 } from 'lucide-react'
-import type { Role } from '@prisma/client'
+import type { Role, Team } from '@prisma/client'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -71,11 +71,25 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 
+const TEAM_LABELS: Record<Team, string> = {
+  STRATEGY_1:              'Strategy 1',
+  STRATEGY_2:              'Strategy 2',
+  STRATEGY_3:              'Strategy 3',
+  STRATEGY_4:              'Strategy 4',
+  STRATEGY_5:              'Strategy 5',
+  STRATEGY_6:              'Strategy 6',
+  LEARNING_SCIENCES:       'Learning Sciences',
+  EMERGING_TECHNOLOGY:     'Emerging Technology',
+  RESEARCH_AND_INNOVATION: 'Research & Innovation',
+  STEERING_COMMITTEE:      'Steering Committee',
+}
+
 type UserRow = {
   id: string
   email: string
   name: string
   role: Role
+  team: Team | null
   isActive: boolean
   createdAt: Date
 }
@@ -315,6 +329,19 @@ function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
       cell: ({ row }) => <span className="text-stone-600 font-mono text-[12.5px]">{row.original.email}</span>,
     },
     {
+      accessorKey: 'team',
+      header: () => (
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-950/55">Team</span>
+      ),
+      enableSorting: false,
+      cell: ({ row }) =>
+        row.original.team ? (
+          <span className="text-[12.5px] text-stone-600">{TEAM_LABELS[row.original.team]}</span>
+        ) : (
+          <span className="text-[12px] text-stone-400">—</span>
+        ),
+    },
+    {
       accessorKey: 'role',
       header: ({ column }) => <ColHeader column={column} title="Role" />,
       cell: ({ row }) => (
@@ -516,6 +543,7 @@ export function UsersTable({ initialData, currentUserId, canCreate }: UsersTable
                   No users found.
                 </TableCell>
               </TableRow>
+
             )}
           </TableBody>
         </Table>

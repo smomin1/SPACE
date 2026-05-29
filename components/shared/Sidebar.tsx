@@ -18,6 +18,7 @@ import {
   LogOutIcon,
   SparklesIcon,
   HelpCircleIcon,
+  InboxIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -50,6 +51,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/users',
     label: 'Users',
     icon: UsersIcon,
+    roles: ['SUPER_ADMIN'],
+  },
+  {
+    href: '/admin/access-requests',
+    label: 'Access Requests',
+    icon: InboxIcon,
     roles: ['SUPER_ADMIN'],
   },
   {
@@ -101,9 +108,10 @@ interface SidebarProps {
   userName?: string
   userInitials?: string
   roleLabel?: string
+  pendingAccessRequests?: number
 }
 
-export function Sidebar({ role, userName, userInitials = '?', roleLabel }: SidebarProps) {
+export function Sidebar({ role, userName, userInitials = '?', roleLabel, pendingAccessRequests = 0 }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = React.useState(false)
 
@@ -169,7 +177,7 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
           {visible.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + '/')
             return (
-              <li key={item.href}>
+              <li key={item.href} className="relative">
                 <Link
                   href={item.href}
                   title={collapsed ? item.label : undefined}
@@ -187,7 +195,18 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel }: Sideb
                       active ? 'text-white/80' : 'text-white/55 group-hover:text-gold',
                     )}
                   />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
+                  {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+                  {item.href === '/admin/access-requests' && pendingAccessRequests > 0 && (
+                    collapsed ? (
+                      <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-bold text-emerald-950">
+                        {pendingAccessRequests > 9 ? '9+' : pendingAccessRequests}
+                      </span>
+                    ) : (
+                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-[10px] font-bold text-emerald-950">
+                        {pendingAccessRequests > 99 ? '99+' : pendingAccessRequests}
+                      </span>
+                    )
+                  )}
                 </Link>
               </li>
             )

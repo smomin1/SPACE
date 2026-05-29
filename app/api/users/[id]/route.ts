@@ -8,6 +8,11 @@ const updateSchema = z.object({
   email:    z.string().email().max(200).optional(),
   name:     z.string().min(1).max(120).optional(),
   role:     z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']).optional(),
+  team:     z.enum([
+    'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
+    'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
+    'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
+  ]).optional().nullable(),
   isActive: z.boolean().optional(),
   password: z.string().min(8).max(200).optional(),
 })
@@ -45,7 +50,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const target = await prisma.user.findUnique({ where: { id } })
   if (!target) return Response.json({ error: 'Not found' }, { status: 404 })
 
-  const { email, name, role, isActive, password } = parsed.data
+  const { email, name, role, team, isActive, password } = parsed.data
 
   // Email uniqueness check
   if (email && email !== target.email) {
@@ -72,6 +77,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (email    !== undefined) data.email    = email
   if (name     !== undefined) data.name     = name
   if (role     !== undefined) data.role     = role
+  if (team     !== undefined) data.team     = team
   if (isActive !== undefined) data.isActive = isActive
   if (password !== undefined) data.passwordHash = await bcrypt.hash(password, 10)
 

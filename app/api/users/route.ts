@@ -3,12 +3,18 @@ import bcrypt from 'bcryptjs'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { generateTempPassword } from '@/lib/auth-utils'
+import { sendTemporaryPassword } from '@/lib/email'
 
 const createSchema = z.object({
   email: z.string().email().max(200),
   name:  z.string().min(1).max(120),
   role:  z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']),
-  password: z.string().min(8).max(200),
+  team:  z.enum([
+    'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
+    'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
+    'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
+  ]).optional().nullable(),
   isActive: z.boolean().optional(),
 })
 
@@ -22,8 +28,8 @@ export async function GET() {
   const users = await prisma.user.findMany({
     orderBy: [{ isActive: 'desc' }, { name: 'asc' }],
     select: {
-      id: true, email: true, name: true, role: true, isActive: true,
-      createdAt: true, updatedAt: true,
+      id: true, email: true, name: true, role: true, team: true,
+      isActive: true, createdAt: true, updatedAt: true,
     },
   })
   return Response.json({ users })
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Invalid input', issues: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { email, name, role, password, isActive } = parsed.data
+  const { email, name, role, team, isActive } = parsed.data
 
   // Enforce single SUPER_ADMIN
   if (role === 'SUPER_ADMIN') {
@@ -57,11 +63,23 @@ export async function POST(req: Request) {
     return Response.json({ error: 'A user with this email already exists', code: 'EMAIL_TAKEN' }, { status: 409 })
   }
 
-  const passwordHash = await bcrypt.hash(password, 10)
+  const tempPassword = generateTempPassword()
+  const passwordHash = await bcrypt.hash(tempPassword, 10)
+
   const user = await prisma.user.create({
-    data: { email, name, role, passwordHash, isActive: isActive ?? true },
-    select: { id: true, email: true, name: true, role: true, isActive: true },
+    data: {
+      email,
+      name,
+      role,
+      team: team ?? null,
+      passwordHash,
+      isActive: isActive ?? true,
+      mustChangePassword: true,
+    },
+    select: { id: true, email: true, name: true, role: true, team: true, isActive: true },
   })
+
+  await sendTemporaryPassword(user.email, user.name, tempPassword).catch(console.error)
 
   return Response.json({ user }, { status: 201 })
 }

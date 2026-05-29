@@ -14,6 +14,7 @@ import {
   useReactTable,
   type ColumnDef,
   type ColumnFiltersState,
+  type RowSelectionState,
   type SortingState,
 } from '@tanstack/react-table'
 import {
@@ -256,8 +257,69 @@ function DeleteAction({ req }: { req: Requirement }) {
 
 // ── Column definitions ───────────────────────────────────────────────────────
 
+// Inline checkbox styled to match the rest of the app (no shadcn Checkbox in this project)
+function SelectCheckbox({
+  checked,
+  indeterminate,
+  onChange,
+  ariaLabel,
+}: {
+  checked: boolean
+  indeterminate?: boolean
+  onChange: (v: boolean) => void
+  ariaLabel: string
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={ariaLabel}
+      onClick={(e) => {
+        e.stopPropagation()
+        onChange(!checked)
+      }}
+      className={cn(
+        'flex size-4 shrink-0 items-center justify-center rounded border-2 transition-all cursor-pointer',
+        checked || indeterminate
+          ? 'border-emerald-700 bg-emerald-700 text-white'
+          : 'border-stone-300 bg-white hover:border-stone-400',
+      )}
+    >
+      {indeterminate ? (
+        <span className="block h-0.5 w-2 rounded bg-white" />
+      ) : checked ? (
+        <CheckIcon className="size-2.5" />
+      ) : null}
+    </button>
+  )
+}
+
 function buildColumns(): ColumnDef<Requirement>[] {
   return [
+    {
+      id: 'select',
+      size: 32,
+      enableSorting: false,
+      enableColumnFilter: false,
+      header: ({ table }) => (
+        <SelectCheckbox
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={
+            table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
+          }
+          onChange={(v) => table.toggleAllPageRowsSelected(v)}
+          ariaLabel="Select all on page"
+        />
+      ),
+      cell: ({ row }) => (
+        <SelectCheckbox
+          checked={row.getIsSelected()}
+          onChange={(v) => row.toggleSelected(v)}
+          ariaLabel={`Select ${row.original.title}`}
+        />
+      ),
+    },
     {
       accessorKey: 'order',
       header: '#',
@@ -342,6 +404,12 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
     { id: 'order', desc: false },
   ])
   const [gatesOnly, setGatesOnly] = React.useState(false)
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false)
+  const [bulkDeleteResult, setBulkDeleteResult] = React.useState<
+    { deleted: number; failed: { id: string; title: string; reason: string }[] } | null
+  >(null)
+  const [bulkDeleting, setBulkDeleting] = React.useState(false)
 
   const columns = React.useMemo(buildColumns, [])
 
@@ -353,8 +421,11 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => row.id,
     initialState: { pagination: { pageSize: PAGE_SIZE, pageIndex: 0 } },
-    state: { columnFilters, globalFilter, sorting },
+    state: { columnFilters, globalFilter, sorting, rowSelection },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
@@ -365,6 +436,35 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  const selectedIds = React.useMemo(
+    () => Object.keys(rowSelection).filter((id) => rowSelection[id]),
+    [rowSelection],
+  )
+
+  async function runBulkDelete() {
+    setBulkDeleting(true)
+    setBulkDeleteResult(null)
+    try {
+      const res = await fetch('/api/requirements/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setBulkDeleteResult({ deleted: 0, failed: [{ id: '', title: data.error ?? 'Delete failed', reason: 'UNKNOWN' }] })
+      } else {
+        setBulkDeleteResult({ deleted: data.deleted ?? 0, failed: data.failed ?? [] })
+        if ((data.deleted ?? 0) > 0) {
+          setRowSelection({})
+          router.refresh()
+        }
+      }
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
 
   const isFiltered = columnFilters.length > 0 || globalFilter !== '' || gatesOnly
   const { pageIndex, pageSize } = table.getState().pagination
@@ -445,6 +545,108 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
           </Button>
         </div>
       </div>
+
+      {/* Bulk action bar - shown when one or more rows are selected */}
+      {selectedIds.length > 0 && (
+        <div className="flex items-center justify-between rounded-lg bg-emerald-900/[0.04] px-3 py-2 ring-1 ring-emerald-900/10">
+          <p className="text-[13px] text-emerald-950">
+            <span className="font-mono tabular-nums font-semibold">{selectedIds.length}</span>{' '}
+            requirement{selectedIds.length === 1 ? '' : 's'} selected
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-stone-600 hover:text-emerald-950"
+              onClick={() => setRowSelection({})}
+            >
+              Clear
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1.5 border-amber-300 text-xs text-amber-800 hover:bg-amber-50"
+              onClick={() => {
+                setBulkDeleteResult(null)
+                setBulkDeleteOpen(true)
+              }}
+            >
+              <Trash2Icon className="size-3.5" />
+              Delete selected
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk delete confirmation */}
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete {selectedIds.length} requirement{selectedIds.length === 1 ? '' : 's'}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkDeleteResult ? (
+                <span className="block space-y-2">
+                  {bulkDeleteResult.deleted > 0 && (
+                    <span className="block text-emerald-800">
+                      Deleted <strong>{bulkDeleteResult.deleted}</strong> requirement
+                      {bulkDeleteResult.deleted === 1 ? '' : 's'}.
+                    </span>
+                  )}
+                  {bulkDeleteResult.failed.length > 0 && (
+                    <span className="block">
+                      <span className="block font-medium text-amber-800">
+                        {bulkDeleteResult.failed.length} could not be deleted:
+                      </span>
+                      <span className="mt-1 block max-h-32 overflow-y-auto rounded bg-amber-50 px-2 py-1 text-xs text-amber-900 ring-1 ring-amber-200">
+                        {bulkDeleteResult.failed.map((f, i) => (
+                          <span key={i} className="block">
+                            &ldquo;{f.title}&rdquo;{' '}
+                            <span className="text-amber-700">
+                              ({f.reason === 'HAS_SCORES'
+                                ? 'has recorded scores'
+                                : f.reason === 'NOT_FOUND'
+                                  ? 'not found'
+                                  : 'error'})
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <span>
+                  This will permanently remove the selected requirements. Items with
+                  recorded scores will be skipped and reported.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            {bulkDeleteResult ? (
+              <AlertDialogAction onClick={() => setBulkDeleteOpen(false)}>
+                Done
+              </AlertDialogAction>
+            ) : (
+              <>
+                <AlertDialogCancel disabled={bulkDeleting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-amber-700 text-amber-50 hover:bg-amber-800"
+                  disabled={bulkDeleting}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    runBulkDelete()
+                  }}
+                >
+                  {bulkDeleting ? 'Deleting…' : 'Delete'}
+                </AlertDialogAction>
+              </>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Table */}
       <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">

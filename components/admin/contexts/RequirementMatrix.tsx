@@ -153,13 +153,12 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
       ) : (
         <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden">
           {/* Column headers */}
-          <div className="sticky top-0 z-10 grid grid-cols-[2rem_1fr_9rem_8rem_10rem_4rem] gap-3 border-b border-stone-200/80 bg-stone-50/80 px-4 py-2.5 backdrop-blur text-[10.5px] font-semibold uppercase tracking-wider text-stone-400">
+          <div className="sticky top-0 z-10 grid grid-cols-[2rem_1fr_9rem_8rem_12rem] gap-3 border-b border-stone-200/80 bg-stone-50/80 px-4 py-2.5 backdrop-blur text-[10.5px] font-semibold uppercase tracking-wider text-stone-400">
             <span />
             <span>Requirement</span>
             <span>Type</span>
             <span>Global weight</span>
             <span>Context weight</span>
-            <span className="text-center">Incl.</span>
           </div>
 
           {Array.from(grouped.entries()).map(([category, reqs]) => (
@@ -179,9 +178,9 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                   <div
                     key={req.id}
                     className={cn(
-                      'grid grid-cols-[2rem_1fr_9rem_8rem_10rem_4rem] gap-3 items-center px-4 py-3 border-b border-stone-200/50 transition-colors select-none',
+                      'grid grid-cols-[2rem_1fr_9rem_8rem_12rem] gap-3 items-center px-4 py-3 border-b border-stone-200/50 transition-colors select-none',
                       isAssigned
-                        ? 'bg-emerald-900/[0.03]'
+                        ? 'bg-emerald-900/10'
                         : 'bg-white',
                       isSaving && 'opacity-50 cursor-wait'
                     )}
@@ -227,42 +226,36 @@ export function RequirementMatrix({ contextId, contextName, initialRequirements 
                       <WeightTier value={req.weight} />
                     </div>
 
-                    {/* Context weight override */}
-                    <div onClick={(e) => e.stopPropagation()}>
+                    {/* Context weight override - dropdown + live visual tier */}
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                       {isAssigned ? (
-                        <Select
-                          value={weightOverrides[req.id] ?? '__global__'}
-                          onValueChange={(v) =>
-                            setWeightOverride(req.id, v === '__global__' ? null : v as WeightLevel)
-                          }
-                          disabled={isSaving}
-                        >
-                          <SelectTrigger className="h-7 text-xs w-32 border-stone-200">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="__global__" className="text-xs text-stone-400">
-                              Use global
-                            </SelectItem>
-                            <SelectItem value="HIGH" className="text-xs">High (3×)</SelectItem>
-                            <SelectItem value="MEDIUM" className="text-xs">Medium (2×)</SelectItem>
-                            <SelectItem value="LOW" className="text-xs">Low (1×)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <>
+                          <Select
+                            value={weightOverrides[req.id] ?? '__global__'}
+                            onValueChange={(v) =>
+                              setWeightOverride(req.id, v === '__global__' ? null : v as WeightLevel)
+                            }
+                            disabled={isSaving}
+                          >
+                            <SelectTrigger className="h-7 text-xs w-24 border-stone-200">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__global__" className="text-xs text-stone-400">
+                                Use global
+                              </SelectItem>
+                              <SelectItem value="HIGH" className="text-xs">High (3×)</SelectItem>
+                              <SelectItem value="MEDIUM" className="text-xs">Medium (2×)</SelectItem>
+                              <SelectItem value="LOW" className="text-xs">Low (1×)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <WeightTier value={weightOverrides[req.id] ?? req.weight} />
+                        </>
                       ) : (
                         <span className="text-xs text-stone-300">-</span>
                       )}
                     </div>
 
-                    {/* Included indicator */}
-                    <div className="flex justify-center">
-                      <span className={cn(
-                        'text-xs font-medium tabular-nums',
-                        isAssigned ? 'text-emerald-700' : 'text-stone-300'
-                      )}>
-                        {isAssigned ? 'Yes' : '-'}
-                      </span>
-                    </div>
                   </div>
                 )
               })}

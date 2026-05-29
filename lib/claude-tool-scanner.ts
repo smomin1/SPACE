@@ -174,3 +174,70 @@ Return a flat JSON object mapping each requirement ID to its integer score (0–
     }
   }
 }
+
+/**
+ * Score a single requirement for a single already-scanned platform. Used to
+ * back-fill scores when a new requirement is added to the catalogue after
+ * platforms have already been scanned.
+ *
+ * Returns the integer score (0-4). Falls back to 0 on any error so the
+ * caller does not have to handle exceptions.
+ */
+export async function scoreSingleRequirement(
+  platformName: string,
+  url: string,
+  requirement: ToolScannerRequirement,
+): Promise<number> {
+  const category = requirement.category ?? 'General'
+
+  const prompt = `ROLE:
+You are an expert EdTech Product Auditor specializing in Technical Feature Verification.
+
+OBJECTIVE:
+Evaluate the platform **${platformName}** (${url}) against ONE specific requirement in the category "**${category}**".
+
+EVALUATION PROTOCOL:
+1. Multi-Source Verification: Use the provided URL as a starting point, but perform targeted web searches for "**${platformName}** ${category} features" to find:
+   - Technical support documentation and Help Center articles.
+   - User walkthroughs or YouTube feature demos.
+   - Detailed product spec sheets or "feature comparison" pages.
+2. Evidence-Driven Logic: Do not take marketing slogans at face value. Look for screenshots, specific UI mentions, or technical descriptions that prove a feature exists.
+
+SCORING RULES:
+- 0 (Absent/No Evidence): Not mentioned, no evidence found across web sources, OR explicitly stated as not supported.
+- 1 (Minimal): Feature is vaguely implied or mentioned in passing with no supporting detail.
+- 2 (Partial/Ambiguous): Feature is mentioned but lacks depth, is behind a "coming soon" tag, or is indirectly implied without clear documentation.
+- 3 (Mostly Supported): Feature is clearly present with reasonable evidence but minor gaps remain.
+- 4 (Full Support): Clearly and fully supported with documented evidence, screenshots, or technical descriptions.
+
+REQUIREMENT TO SCORE:
+${requirement.id}: ${requirement.title}. ${requirement.description}
+
+STRICTURES:
+- Prefer 0 over guessing: If you cannot find external proof or direct website mention, the score MUST be 0.
+- No Hallucinations: Base scores ONLY on information found during the current search and the provided site.
+
+OUTPUT FORMAT (STRICT JSON ONLY):
+{
+    "${requirement.id}": score
+}
+
+Return a flat JSON object mapping the requirement ID to its integer score (0 to 4). No preamble. No explanations. No extra text.`
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 256,
+      system: 'You are a strict, evidence-based scoring engine for EdTech products. You do not guess and you always return valid JSON.',
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const text = response.content[0].type === 'text' ? response.content[0].text : '{}'
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim()
+    const parsed = JSON.parse(cleaned) as Record<string, unknown>
+    const raw = parsed[requirement.id]
+    const n = typeof raw === 'number' ? raw : Number(raw)
+    return isNaN(n) ? 0 : Math.max(0, Math.min(4, Math.round(n)))
+  } catch {
+    return 0
+  }
+}

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboardIcon,
   ClipboardListIcon,
-  TagsIcon,
+  LayersIcon,
   MonitorIcon,
   BarChart2Icon,
   ClipboardCheckIcon,
@@ -61,7 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     href: '/admin/contexts',
     label: 'Contexts',
-    icon: TagsIcon,
+    icon: LayersIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {

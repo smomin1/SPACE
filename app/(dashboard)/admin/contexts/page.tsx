@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { TagsIcon } from 'lucide-react'
+import { LayersIcon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
@@ -27,7 +27,7 @@ export default async function ContextsPage() {
   return (
     <div>
       <PageHeader
-        icon={TagsIcon}
+        icon={LayersIcon}
         kicker="Catalogue"
         title="Contexts"
         description="Define evaluation contexts and assign requirements to each one."

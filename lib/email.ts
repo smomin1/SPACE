@@ -9,20 +9,25 @@ const FROM = process.env.EMAIL_FROM ?? `${APP_NAME} <noreply@space-eval.app>`
 const APP_URL = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
 
 async function sendEmail(payload: EmailPayload): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY
+  const sendgridKey = process.env.SENDGRID_API_KEY
 
-  if (resendKey) {
-    const res = await fetch('https://api.resend.com/emails', {
+  if (sendgridKey) {
+    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${resendKey}`,
+        Authorization: `Bearer ${sendgridKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: FROM, to: payload.to, subject: payload.subject, html: payload.html }),
+      body: JSON.stringify({
+        from: { email: FROM.match(/<(.+)>/)?.[1] ?? FROM, name: APP_NAME },
+        personalizations: [{ to: [{ email: payload.to }] }],
+        subject: payload.subject,
+        content: [{ type: 'text/html', value: payload.html }],
+      }),
     })
     if (!res.ok) {
       const body = await res.text()
-      console.error('[email] Resend API error', res.status, body)
+      throw new Error(`SendGrid error ${res.status}: ${body}`)
     }
     return
   }

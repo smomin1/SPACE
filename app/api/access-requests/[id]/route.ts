@@ -71,7 +71,19 @@ export async function PATCH(
     }),
   ])
 
-  await sendAccessRequestApproved(user.email, user.name, tempPassword).catch(console.error)
+  let emailSent = true
+  try {
+    await sendAccessRequestApproved(user.email, user.name, tempPassword)
+  } catch (err) {
+    console.error('[access-request] email failed:', err)
+    emailSent = false
+  }
 
-  return Response.json({ request: updated, userId: user.id })
+  return Response.json({
+    request: updated,
+    userId: user.id,
+    emailSent,
+    // Only included when email failed so admin can share manually
+    ...(!emailSent && { tempPassword }),
+  })
 }

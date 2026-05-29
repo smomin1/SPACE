@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckIcon, XIcon, ClockIcon } from 'lucide-react'
+import { CheckIcon, XIcon, ClockIcon, CopyIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 type AccessRequest = {
   id: string
@@ -68,6 +76,7 @@ const STATUS_BADGE: Record<string, string> = {
 function ActionButtons({ request }: { request: AccessRequest }) {
   const router = useRouter()
   const [loading, setLoading] = React.useState<'approve' | 'reject' | null>(null)
+  const [tempPassword, setTempPassword] = React.useState<string | null>(null)
 
   async function act(action: 'approve' | 'reject') {
     setLoading(action)
@@ -78,7 +87,16 @@ function ActionButtons({ request }: { request: AccessRequest }) {
         body: JSON.stringify({ action }),
       })
       if (res.ok) {
-        toast.success(action === 'approve' ? `Approved — account created for ${request.name}` : `Rejected request from ${request.name}`)
+        const data = await res.json()
+        if (action === 'approve') {
+          if (data.emailSent === false && data.tempPassword) {
+            setTempPassword(data.tempPassword)
+          } else {
+            toast.success(`Approved — temporary password emailed to ${request.email}`)
+          }
+        } else {
+          toast.success(`Rejected request from ${request.name}`)
+        }
         router.refresh()
       } else {
         const data = await res.json().catch(() => ({}))
@@ -90,6 +108,41 @@ function ActionButtons({ request }: { request: AccessRequest }) {
   }
 
   return (
+    <>
+      {/* Shown when email delivery fails — admin can copy and share manually */}
+      <Dialog open={tempPassword !== null} onOpenChange={(open) => { if (!open) setTempPassword(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Account created — email not sent</DialogTitle>
+            <DialogDescription>
+              The account for <strong>{request.name}</strong> ({request.email}) was created but the welcome email could not be delivered. Share this temporary password with them directly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2 rounded-md border border-stone-200 bg-stone-50 px-4 py-3">
+            <span className="flex-1 font-mono text-lg tracking-widest text-emerald-900">
+              {tempPassword}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="shrink-0"
+              onClick={() => {
+                navigator.clipboard.writeText(tempPassword ?? '')
+                toast.success('Copied to clipboard')
+              }}
+            >
+              <CopyIcon className="size-4" />
+            </Button>
+          </div>
+          <p className="text-[12px] text-stone-500">
+            They will be required to set a new password on first sign-in.
+          </p>
+          <DialogFooter>
+            <Button onClick={() => setTempPassword(null)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     <div className="flex items-center gap-1">
       <Button
         size="sm"
@@ -135,6 +188,7 @@ function ActionButtons({ request }: { request: AccessRequest }) {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </>
   )
 }
 

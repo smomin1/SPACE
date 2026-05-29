@@ -18,6 +18,7 @@ import {
   LogOutIcon,
   SparklesIcon,
   HelpCircleIcon,
+  InboxIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -50,6 +51,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/users',
     label: 'Users',
     icon: UsersIcon,
+    roles: ['SUPER_ADMIN'],
+  },
+  {
+    href: '/admin/access-requests',
+    label: 'Access Requests',
+    icon: InboxIcon,
     roles: ['SUPER_ADMIN'],
   },
   {

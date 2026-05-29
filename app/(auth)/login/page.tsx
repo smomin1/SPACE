@@ -1,6 +1,8 @@
 'use client'
 
 import { useActionState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { loginAction } from './actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -9,6 +11,8 @@ import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
   const [error, action, isPending] = useActionState(loginAction, undefined)
+  const searchParams = useSearchParams()
+  const changed = searchParams.get('changed')
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-primary p-4">
@@ -33,6 +37,11 @@ export default function LoginPage() {
           <CardDescription>Enter your credentials to access the platform</CardDescription>
         </CardHeader>
         <CardContent>
+          {changed && (
+            <p className="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              Password updated. Please sign in with your new password.
+            </p>
+          )}
           <form action={action} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -62,6 +71,14 @@ export default function LoginPage() {
               {isPending ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
+          <div className="mt-4 flex items-center justify-between text-[13px] text-stone-500">
+            <Link href="/forgot-password" className="text-emerald-700 hover:underline">
+              Forgot password?
+            </Link>
+            <Link href="/access-request" className="text-emerald-700 hover:underline">
+              Request access
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

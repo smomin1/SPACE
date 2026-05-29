@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { Role } from '@prisma/client'
+import type { Role, Team } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,11 +21,25 @@ const ALL_ROLE_OPTIONS: { value: Role; label: string; description: string }[] = 
   { value: 'VIEWER',               label: 'Viewer',               description: 'Read-only access to results and dashboards.' },
 ]
 
+const TEAM_OPTIONS: { value: Team; label: string }[] = [
+  { value: 'STRATEGY_1',              label: 'Strategy 1' },
+  { value: 'STRATEGY_2',              label: 'Strategy 2' },
+  { value: 'STRATEGY_3',              label: 'Strategy 3' },
+  { value: 'STRATEGY_4',              label: 'Strategy 4' },
+  { value: 'STRATEGY_5',              label: 'Strategy 5' },
+  { value: 'STRATEGY_6',              label: 'Strategy 6' },
+  { value: 'LEARNING_SCIENCES',       label: 'Learning Sciences' },
+  { value: 'EMERGING_TECHNOLOGY',     label: 'Emerging Technology' },
+  { value: 'RESEARCH_AND_INNOVATION', label: 'Research and Innovation Team' },
+  { value: 'STEERING_COMMITTEE',      label: 'Steering Committee' },
+]
+
 type UserData = {
   id: string
   email: string
   name: string
   role: Role
+  team?: Team | null
   isActive: boolean
 }
 
@@ -41,6 +55,7 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
   const [name,     setName]     = React.useState(user?.name  ?? '')
   const [email,    setEmail]    = React.useState(user?.email ?? '')
   const [role,     setRole]     = React.useState<Role>(user?.role ?? 'PEDAGOGY_EVALUATOR')
+  const [team,     setTeam]     = React.useState<Team | ''>((user?.team ?? '') as Team | '')
   const [isActive, setIsActive] = React.useState(user?.isActive ?? true)
   const [password, setPassword] = React.useState('')
   const [showPwd,  setShowPwd]  = React.useState(false)
@@ -60,11 +75,6 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
       return
     }
 
-    if (mode === 'create' && password.length < 8) {
-      toast.error('Password must be at least 8 characters')
-      return
-    }
-
     if (mode === 'edit' && password.length > 0 && password.length < 8) {
       toast.error('New password must be at least 8 characters')
       return
@@ -75,8 +85,14 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
       const url    = mode === 'create' ? '/api/users' : `/api/users/${user!.id}`
       const method = mode === 'create' ? 'POST' : 'PATCH'
 
-      const body: Record<string, unknown> = { name: name.trim(), email: email.trim(), role, isActive }
-      if (password.length > 0) body.password = password
+      const body: Record<string, unknown> = {
+        name: name.trim(),
+        email: email.trim(),
+        role,
+        team: team || null,
+        isActive,
+      }
+      if (mode === 'edit' && password.length > 0) body.password = password
 
       const res = await fetch(url, {
         method,
@@ -90,7 +106,11 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
         return
       }
 
-      toast.success(mode === 'create' ? 'User created' : 'User updated')
+      toast.success(
+        mode === 'create'
+          ? 'User created — a temporary password has been sent to their email'
+          : 'User updated',
+      )
       router.push('/admin/users')
       router.refresh()
     } finally {
@@ -127,6 +147,22 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="team">Team</Label>
+        <Select value={team} onValueChange={(v) => setTeam(v as Team)}>
+          <SelectTrigger id="team">
+            <SelectValue placeholder="Select team (optional)" />
+          </SelectTrigger>
+          <SelectContent>
+            {TEAM_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
         <Select value={role} onValueChange={(v) => setRole(v as Role)} disabled={isSelf && mode === 'edit'}>
           <SelectTrigger id="role">
@@ -148,32 +184,37 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">
-          {mode === 'create' ? 'Password' : 'New password'}
-          {mode === 'edit' && <span className="text-stone-400 font-normal ml-1">(leave blank to keep current)</span>}
-        </Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPwd ? 'text' : 'password'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={mode === 'create' ? 'At least 8 characters' : '••••••••'}
-            autoComplete="new-password"
-            required={mode === 'create'}
-            className="pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPwd((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
-            tabIndex={-1}
-          >
-            {showPwd ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-          </button>
+      {mode === 'create' ? (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-[13px] text-emerald-800">
+          A temporary password will be generated and emailed to the user. They will be required to set a new password on first sign-in.
         </div>
-      </div>
+      ) : (
+        <div className="space-y-2">
+          <Label htmlFor="password">
+            New password
+            <span className="text-stone-400 font-normal ml-1">(leave blank to keep current)</span>
+          </Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPwd ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPwd((s) => !s)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
+              tabIndex={-1}
+            >
+              {showPwd ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className={cn(
         'flex items-center justify-between rounded-md border px-4 py-3 transition-colors',

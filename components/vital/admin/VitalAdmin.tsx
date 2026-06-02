@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { PlusIcon, PencilIcon, Trash2Icon, LockIcon, RefreshCwIcon } from "lucide-react";
+import { PlusIcon, PencilIcon, Trash2Icon, LockIcon, RefreshCwIcon, LinkIcon } from "lucide-react";
 import type {
   VitalTool,
   VitalRecommendation,
@@ -60,6 +60,7 @@ interface ImportRow {
   importedAt: string;
   by: string;
 }
+type PlatformOption = { id: string; name: string; vendor: string };
 
 type Tab = "tools" | "recommendations" | "levels" | "skills" | "imports";
 
@@ -77,15 +78,22 @@ export function VitalAdmin({
   levels,
   skills,
   imports,
+  platforms,
 }: {
   tools: ToolWithChildren[];
   recommendations: RecWithRelations[];
   levels: VitalLevel[];
   skills: VitalSkill[];
   imports: ImportRow[];
+  platforms: PlatformOption[];
 }) {
   const router = useRouter();
   const [tab, setTab] = React.useState<Tab>("tools");
+
+  const platformName = React.useMemo(
+    () => new Map(platforms.map((p) => [p.id, p.name])),
+    [platforms],
+  );
 
   // Edit dialog state per entity
   const [editTool, setEditTool] = React.useState<ToolWithChildren | null>(null);
@@ -188,7 +196,7 @@ export function VitalAdmin({
 
       {tab === "tools" && (
         <EntityTable
-          headers={["Name", "Role", "Type", "VITAL/10", "Verdict", ""]}
+          headers={["Name", "Role", "Type", "VITAL/10", "Verdict", "Linked platform", ""]}
           rows={tools.map((t) => ({
             key: t.id,
             cells: [
@@ -197,6 +205,14 @@ export function VitalAdmin({
               t.isAssessmentTool ? "Assessment" : "Teaching",
               t.vitalScore10 ?? "-",
               t.verdict ? VERDICT_LABEL[t.verdict] : "-",
+              t.platformId ? (
+                <span className="inline-flex items-center gap-1.5 text-emerald-700">
+                  <LinkIcon className="size-3" />
+                  {platformName.get(t.platformId) ?? "Linked"}
+                </span>
+              ) : (
+                <span className="text-stone-300">-</span>
+              ),
             ],
             onEdit: () => setEditTool(t),
             onDelete: () => setDel({ url: `/api/vital/tools/${t.id}`, label: t.name }),
@@ -308,6 +324,7 @@ export function VitalAdmin({
           tool={editTool}
           skills={skills}
           levels={levels}
+          platforms={platforms}
           onClose={closeAll}
           onSaved={() => {
             closeAll();

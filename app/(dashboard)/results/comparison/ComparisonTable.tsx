@@ -6,6 +6,7 @@ import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, CheckIcon, XIcon } from
 import { cn } from '@/lib/utils'
 import type { PlatformRow } from './page'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
+import { VERDICT_LABEL, VERDICT_CLASS, RISK_LABEL, RISK_CLASS } from '@/lib/vital/labels'
 
 type SortKey = 'name' | 'compliance' | 'overall' | string
 type SortDir = 'asc' | 'desc'
@@ -29,9 +30,11 @@ function pctCellBg(pct?: number): string {
 export default function ComparisonTable({
   rows,
   categories,
+  hasVital,
 }: {
   rows: PlatformRow[]
   categories: string[]
+  hasVital?: boolean
 }) {
   const params = useSearchParams()
   const showDisqualified = params.has('showDq')
@@ -70,6 +73,9 @@ export default function ComparisonTable({
       } else if (sortKey === 'overall') {
         av = a.overallPct
         bv = b.overallPct
+      } else if (sortKey === 'vital') {
+        av = a.vital?.score10 ?? null
+        bv = b.vital?.score10 ?? null
       } else {
         av = a.categoryScores[sortKey] ?? null
         bv = b.categoryScores[sortKey] ?? null
@@ -134,6 +140,17 @@ export default function ComparisonTable({
                 align="right"
                 className="min-w-[120px]"
               />
+              {hasVital && (
+                <SortTh
+                  label="VITAL"
+                  sortKey="vital"
+                  current={sortKey}
+                  dir={sortDir}
+                  onSort={handleSort}
+                  align="center"
+                  className="min-w-[150px]"
+                />
+              )}
               <th className="py-3 px-4 text-left">
                 <span className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400">
                   Recommendation
@@ -146,7 +163,7 @@ export default function ComparisonTable({
             {displayed.length === 0 ? (
               <tr>
                 <td
-                  colSpan={visibleCategories.length + 4}
+                  colSpan={visibleCategories.length + (hasVital ? 5 : 4)}
                   className="py-16 text-center text-sm text-stone-400"
                 >
                   No platforms to display
@@ -226,6 +243,13 @@ export default function ComparisonTable({
                     )
                   })()}
 
+                  {/* VITAL */}
+                  {hasVital && (
+                    <td className="py-3 px-4 text-center align-middle">
+                      <VitalCell vital={row.vital} />
+                    </td>
+                  )}
+
                   {/* Recommendation */}
                   <td className="py-3 px-4 align-middle">
                     {row.recommendation ? (
@@ -293,6 +317,31 @@ function ScoreCell({ pct, bold }: { pct?: number; bold?: boolean }) {
     <span className={`text-sm tabular-nums ${bold ? 'font-semibold' : ''} ${pctColor(pct)}`}>
       {pct.toFixed(1)}%
     </span>
+  )
+}
+
+function VitalCell({ vital }: { vital: PlatformRow['vital'] }) {
+  if (!vital) return <span className="text-stone-300 text-xs">-</span>
+  return (
+    <div className="flex flex-col items-center gap-1">
+      {vital.verdict ? (
+        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold ring-1', VERDICT_CLASS[vital.verdict])}>
+          {VERDICT_LABEL[vital.verdict]}
+        </span>
+      ) : (
+        <span className="text-stone-300 text-xs">No verdict</span>
+      )}
+      <div className="flex items-center gap-1.5 text-[11px]">
+        {vital.score10 != null && (
+          <span className="font-semibold tabular-nums text-emerald-900">{vital.score10}/10</span>
+        )}
+        {vital.risk && (
+          <span className={cn('inline-flex items-center rounded px-1.5 py-0 text-[10px] font-medium ring-1', RISK_CLASS[vital.risk])}>
+            {RISK_LABEL[vital.risk]}
+          </span>
+        )}
+      </div>
+    </div>
   )
 }
 

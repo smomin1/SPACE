@@ -5,6 +5,11 @@ import { prisma } from '@/lib/prisma'
 import { calculateWeightedPercentage } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
 import type { PlatformStatus, WeightLevel } from '@prisma/client'
+import {
+  getLinkedVitalProfiles,
+  parseVitalFilterFromSearchParams,
+  matchesVitalFilter,
+} from '@/lib/vital/profile'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Build-readiness category ──────────────────────────────────────────────────
@@ -74,10 +79,11 @@ export default async function BuildReadinessPage({
   const platformIds = (typeof sp.platform === 'string' ? sp.platform : '').split(',').filter(Boolean)
   const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
   const showDq      = sp.showDq === '1'
+  const vitalFilter = parseVitalFilterFromSearchParams(sp)
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [rawPlatforms, buildReqsRaw, evaluations] = await Promise.all([
+  const [rawPlatformsAll, buildReqsRaw, evaluations] = await Promise.all([
     prisma.platform.findMany({
       where: {
         track: { not: 'VITAL' },
@@ -106,6 +112,14 @@ export default async function BuildReadinessPage({
       },
     }),
   ])
+
+  // Optional VITAL filter (narrows to linked platforms that match).
+  const vitalProfiles = vitalFilter
+    ? await getLinkedVitalProfiles(rawPlatformsAll.map(p => p.id))
+    : null
+  const rawPlatforms = vitalFilter
+    ? rawPlatformsAll.filter(p => matchesVitalFilter(vitalProfiles!.get(p.id), vitalFilter))
+    : rawPlatformsAll
 
   const buildReqs = buildReqsRaw.map(toScoringReq)
 

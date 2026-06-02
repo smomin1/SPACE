@@ -43,12 +43,14 @@ export function VitalToolForm({
   tool,
   skills,
   levels,
+  platforms,
   onClose,
   onSaved,
 }: {
   tool: Tool | null;
   skills: VitalSkill[];
   levels: VitalLevel[];
+  platforms: { id: string; name: string; vendor: string }[];
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -64,7 +66,13 @@ export function VitalToolForm({
     notes: tool?.notes ?? "",
     belowA0: tool?.belowA0 ?? false,
     isAssessmentTool: tool?.isAssessmentTool ?? false,
+    platformId: tool?.platformId ?? "",
   });
+
+  const platformOptions = React.useMemo(
+    () => platforms.map((p) => ({ value: p.id, label: p.vendor ? `${p.name} · ${p.vendor}` : p.name })),
+    [platforms],
+  );
 
   const [ratings, setRatings] = React.useState<Record<string, string>>(() => {
     const m: Record<string, string> = {};
@@ -179,6 +187,21 @@ export function VitalToolForm({
               Assessment tool
             </label>
           </div>
+        </div>
+
+        <div className="space-y-1.5 rounded-lg border border-stone-200/70 bg-stone-50/50 p-3">
+          <EnumSelect
+            label="Linked platform"
+            value={scalar.platformId}
+            onChange={(v) => setS("platformId", v)}
+            options={platformOptions}
+            allowEmpty
+            placeholder="Not linked"
+          />
+          <p className="text-[11px] text-stone-400">
+            Link this tool to a Tool-evaluator platform to surface its VITAL verdict, score and
+            risk in the results dashboard and enable VITAL filters.
+          </p>
         </div>
 
         <div className="space-y-1.5">

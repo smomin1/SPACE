@@ -126,6 +126,23 @@ export function parseVitalFilter(params: URLSearchParams): VitalFilter | null {
   return { verdict, minVital10: Number.isFinite(minVital10) ? minVital10 : null, maxRisk };
 }
 
+/**
+ * Server-component variant of {@link parseVitalFilter}: reads the same opt-in
+ * params straight from an awaited `searchParams` record. Returns null when no
+ * VITAL filter is active, so the results pages stay inert without linkage data.
+ */
+export function parseVitalFilterFromSearchParams(
+  sp: Record<string, string | string[] | undefined>,
+): VitalFilter | null {
+  const str = (key: string) => (typeof sp[key] === "string" ? (sp[key] as string) : null);
+  const verdict = str("vitalVerdict") as VitalVerdict | null;
+  const minRaw = str("minVital10");
+  const maxRisk = str("maxRisk") as VitalRisk | null;
+  const minVital10 = minRaw ? Number(minRaw) : null;
+  if (!verdict && !minVital10 && !maxRisk) return null;
+  return { verdict, minVital10: Number.isFinite(minVital10) ? minVital10 : null, maxRisk };
+}
+
 /** True when a platform's VITAL profile satisfies the given filter. */
 export function matchesVitalFilter(
   profile: PlatformVitalProfile | undefined,

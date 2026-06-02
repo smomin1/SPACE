@@ -40,11 +40,6 @@ const STATUS_OPTIONS = [
   { value: 'IN_PROGRESS', label: 'In Progress' },
 ] as const
 
-const EVIDENCE_OPTIONS = [
-  { value: 'high', label: 'High confidence' },
-  { value: 'low',  label: 'Low confidence' },
-] as const
-
 const EVALUATOR_TYPE_OPTIONS = [
   { value: 'PEDAGOGY',  label: 'Pedagogy' },
   { value: 'TECHNICAL', label: 'Technical' },
@@ -99,7 +94,6 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
 
   // Single-select state
   const evalTypeValue  = params.get('evaluatorType') ?? ''
-  const evidenceValue  = params.get('evidenceQuality') ?? ''
   const showDq         = params.has('showDq')
 
   // Phase 6 scaffold: VITAL filter state
@@ -159,7 +153,6 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
     selectedCategories.length > 0,
     !isDefaultStatuses(selectedStatuses),
     !!params.get('evaluatorType'),
-    !!params.get('evidenceQuality'),
     showDq,
     !!params.get('vitalVerdict'),
     !!params.get('minVital10'),
@@ -207,17 +200,6 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
         onChange={v => setSingle('evaluatorType', v)}
       >
         {EVALUATOR_TYPE_OPTIONS.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>{label}</SelectItem>
-        ))}
-      </FilterSelect>
-
-      {/* Evidence quality: single-select */}
-      <FilterSelect
-        placeholder="Any evidence"
-        value={evidenceValue}
-        onChange={v => setSingle('evidenceQuality', v)}
-      >
-        {EVIDENCE_OPTIONS.map(({ value, label }) => (
           <SelectItem key={value} value={value}>{label}</SelectItem>
         ))}
       </FilterSelect>

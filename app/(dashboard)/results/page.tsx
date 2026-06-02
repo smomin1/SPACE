@@ -10,7 +10,7 @@ export default async function ResultsPage({
   const qs = new URLSearchParams()
 
   // Forward any active filters so the redirect preserves them
-  const forwarded = ['context', 'platform', 'category', 'evaluatorType', 'evidenceQuality', 'status']
+  const forwarded = ['context', 'platform', 'category', 'evaluatorType', 'status', 'vitalVerdict', 'minVital10', 'maxRisk']
   for (const key of forwarded) {
     const val = params[key]
     if (typeof val === 'string' && val) qs.set(key, val)

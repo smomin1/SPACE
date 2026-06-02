@@ -5,21 +5,16 @@ import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { calculateWeightedPercentage } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
+import {
+  getLinkedVitalProfiles,
+  parseVitalFilterFromSearchParams,
+  matchesVitalFilter,
+} from '@/lib/vital/profile'
 import { ChartToggle } from './ChartToggle'
 import { ComparisonChart } from './ComparisonChart'
 import type { PlatformSeries } from './ComparisonChart'
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
-
-const EVIDENCE_HIGH = new Set(['TRIAL', 'DEMO'])
-const EVIDENCE_LOW  = new Set(['DOCUMENTATION', 'VENDOR_CLAIM'])
-
-function applyEvidenceFilter(scores: Score[], filter: string | null): Score[] {
-  if (!filter) return scores
-  if (filter === 'high') return scores.filter(s => s.evidenceType && EVIDENCE_HIGH.has(s.evidenceType))
-  if (filter === 'low')  return scores.filter(s => s.evidenceType && EVIDENCE_LOW.has(s.evidenceType))
-  return scores
-}
 
 function toScoringReq(r: {
   id: string
@@ -58,14 +53,14 @@ export default async function BreakdownPage({
   const platformIds     = (typeof sp.platform        === 'string' ? sp.platform        : '').split(',').filter(Boolean)
   const categoryFilters = (typeof sp.category        === 'string' ? sp.category        : '').split(',').filter(Boolean)
   const evalTypeFilter  = typeof sp.evaluatorType   === 'string' ? sp.evaluatorType   : null
-  const evidenceFilter  = typeof sp.evidenceQuality === 'string' ? sp.evidenceQuality : null
   const statuses        = (typeof sp.status === 'string' ? sp.status : 'FINALISED').split(',').filter(Boolean)
   const chartType       = sp.chart === 'radar' ? 'radar' : 'bar'
   const showDq          = sp.showDq === '1'
+  const vitalFilter     = parseVitalFilterFromSearchParams(sp)
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [rawRequirements, rawPlatforms, evaluations] = await Promise.all([
+  const [rawRequirements, rawPlatformsAll, evaluations] = await Promise.all([
     prisma.requirement.findMany({
       where: {
         ...(contextIds.length      > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
@@ -100,6 +95,15 @@ export default async function BreakdownPage({
     }),
   ])
 
+  // ── Optional VITAL filter (narrows to linked platforms that match) ──────────
+
+  const vitalProfiles = vitalFilter
+    ? await getLinkedVitalProfiles(rawPlatformsAll.map(p => p.id))
+    : null
+  const rawPlatforms = vitalFilter
+    ? rawPlatformsAll.filter(p => matchesVitalFilter(vitalProfiles!.get(p.id), vitalFilter))
+    : rawPlatformsAll
+
   // ── Build data ─────────────────────────────────────────────────────────────
 
   const allCategories = [...new Set(
@@ -126,7 +130,6 @@ export default async function BreakdownPage({
     }
 
     const allScores = ev.scores.map(toScoringScore)
-    const filtered  = applyEvidenceFilter(allScores, evidenceFilter)
 
     const scores: Record<string, number | null> = {}
     for (const cat of allCategories) {
@@ -134,7 +137,7 @@ export default async function BreakdownPage({
         .filter(r => (r.category ?? 'General') === cat)
         .map(toScoringReq)
       scores[cat] = catReqs.length
-        ? calculateWeightedPercentage(filtered, catReqs) || null
+        ? calculateWeightedPercentage(allScores, catReqs) || null
         : null
     }
 

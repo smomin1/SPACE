@@ -9,8 +9,15 @@ import {
 } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
 import type { WeightLevel } from '@prisma/client'
-import type { EvaluationState, PlatformStatus } from '@prisma/client'
+import type { EvaluationState, PlatformStatus, VitalRisk, VitalVerdict } from '@prisma/client'
+import {
+  getLinkedVitalProfiles,
+  parseVitalFilterFromSearchParams,
+  matchesVitalFilter,
+} from '@/lib/vital/profile'
 import ComparisonTable from './ComparisonTable'
+import { VitalScatter } from './VitalScatter'
+import type { VitalScatterPoint } from './VitalScatter'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -24,6 +31,11 @@ export type PlatformRow = {
   categoryScores: Record<string, number | null>
   overallPct: number | null
   recommendation: ReturnType<typeof getRecommendedAction> | 'DISQUALIFIED' | null
+  vital: {
+    verdict: VitalVerdict | null
+    score10: number | null
+    risk: VitalRisk | null
+  } | null
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -65,6 +77,7 @@ export default async function ComparisonPage({
   const platformIds = (typeof sp.platform === 'string' ? sp.platform : '').split(',').filter(Boolean)
   const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
   const showDq      = sp.showDq === '1'
+  const vitalFilter = parseVitalFilterFromSearchParams(sp)
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
@@ -113,6 +126,17 @@ export default async function ComparisonPage({
         })
       : Promise.resolve([] as { requirementId: string; weightOverride: WeightLevel | null }[]),
   ])
+
+  // ── VITAL profiles (opt-in link to the VITAL track) ────────────────────────
+
+  // Snapshot of each linked platform's VITAL standing. Drives the VITAL column,
+  // the scatter chart and the opt-in VITAL filters. Empty until a VitalTool is
+  // linked to a platform in VITAL admin, so the feature stays inert otherwise.
+  const vitalProfiles = await getLinkedVitalProfiles(rawPlatforms.map(p => p.id))
+
+  const platforms = vitalFilter
+    ? rawPlatforms.filter(p => matchesVitalFilter(vitalProfiles.get(p.id), vitalFilter))
+    : rawPlatforms
 
   // ── Context weight overrides ───────────────────────────────────────────────
 
@@ -169,7 +193,13 @@ export default async function ComparisonPage({
 
   // ── Build rows ─────────────────────────────────────────────────────────────
 
-  const rows: PlatformRow[] = rawPlatforms.map(p => {
+  const vitalOf = (id: string): PlatformRow['vital'] => {
+    const prof = vitalProfiles.get(id)
+    if (!prof) return null
+    return { verdict: prof.verdict, score10: prof.vitalScore10, risk: prof.deFactoRisk }
+  }
+
+  const rows: PlatformRow[] = platforms.map(p => {
     const ev = evalByPlatform.get(p.id) ?? null
 
     if (!ev) {
@@ -180,6 +210,7 @@ export default async function ComparisonPage({
         categoryScores: Object.fromEntries(categories.map(c => [c, null])),
         overallPct: null,
         recommendation: null,
+        vital: vitalOf(p.id),
       }
     }
 
@@ -217,6 +248,7 @@ export default async function ComparisonPage({
       categoryScores,
       overallPct,
       recommendation,
+      vital: vitalOf(p.id),
     }
   })
 
@@ -234,5 +266,25 @@ export default async function ComparisonPage({
     )
   }
 
-  return <ComparisonTable rows={rows} categories={categories} />
+  const hasVital = rows.some(r => r.vital !== null)
+
+  // Scatter needs both a Tool score and a VITAL/10 to place a point.
+  const scatterPoints: VitalScatterPoint[] = rows
+    .filter(r => r.status !== 'DISQUALIFIED' && r.overallPct !== null && r.vital?.score10 != null)
+    .map(r => ({
+      id: r.id,
+      name: r.name,
+      vendor: r.vendor,
+      overall: r.overallPct as number,
+      vital10: r.vital!.score10 as number,
+      risk: r.vital!.risk,
+      verdict: r.vital!.verdict,
+    }))
+
+  return (
+    <div className="space-y-5">
+      {scatterPoints.length > 0 && <VitalScatter points={scatterPoints} />}
+      <ComparisonTable rows={rows} categories={categories} hasVital={hasVital} />
+    </div>
+  )
 }

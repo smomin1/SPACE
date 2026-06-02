@@ -5,6 +5,11 @@ import { prisma } from '@/lib/prisma'
 import { getRecommendedAction } from '@/lib/scoring'
 import type { Score } from '@/lib/scoring'
 import type { WeightLevel } from '@prisma/client'
+import {
+  getLinkedVitalProfiles,
+  parseVitalFilterFromSearchParams,
+  matchesVitalFilter,
+} from '@/lib/vital/profile'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -16,16 +21,6 @@ const MAX_SET_SIZE           = 5    // cap on combination size
 const GAP_CATEGORY_THRESHOLD = 75   // below this % in category = gap (matches 75% satisfaction rule)
 
 // ─── Score helpers ────────────────────────────────────────────────────────────
-
-const EVIDENCE_HIGH = new Set(['TRIAL', 'DEMO'])
-const EVIDENCE_LOW  = new Set(['DOCUMENTATION', 'VENDOR_CLAIM'])
-
-function applyEvidenceFilter(scores: Score[], filter: string | null): Score[] {
-  if (!filter) return scores
-  if (filter === 'high') return scores.filter(s => s.evidenceType && EVIDENCE_HIGH.has(s.evidenceType))
-  if (filter === 'low')  return scores.filter(s => s.evidenceType && EVIDENCE_LOW.has(s.evidenceType))
-  return scores
-}
 
 function toScore(s: { requirementId: string; value: number | null; evidenceType: string | null }): Score {
   return {
@@ -103,13 +98,12 @@ type PlatformProfile = {
 function buildPlatformScores(
   platforms: PlatformRow[],
   evalByPlatform: Map<string, EvalRow>,
-  evidenceFilter: string | null,
 ): Map<string, Map<string, number>> {
   const result = new Map<string, Map<string, number>>()
   for (const p of platforms) {
     const ev = evalByPlatform.get(p.id)
     if (!ev) continue
-    const scores = applyEvidenceFilter(ev.scores.map(toScore), evidenceFilter)
+    const scores = ev.scores.map(toScore)
     const sums = new Map<string, number[]>()
     for (const s of scores) {
       if (s.value === null) continue
@@ -414,15 +408,15 @@ export default async function BestFitPage({
   const platformIds     = (typeof sp.platform       === 'string' ? sp.platform       : '').split(',').filter(Boolean)
   const categoryFilters = (typeof sp.category       === 'string' ? sp.category       : '').split(',').filter(Boolean)
   const evalTypeFilter  = typeof sp.evaluatorType  === 'string' ? sp.evaluatorType  : null
-  const evidenceFilter  = typeof sp.evidenceQuality === 'string' ? sp.evidenceQuality : null
   const statuses        = (typeof sp.status === 'string' ? sp.status : 'FINALISED').split(',').filter(Boolean)
+  const vitalFilter     = parseVitalFilterFromSearchParams(sp)
 
   const isSinglePlatform = platformIds.length === 1
   const isContextMode    = !isSinglePlatform && contextIds.length > 0
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [contexts, allActivePlatforms, allRequirements, evaluations] = await Promise.all([
+  const [contexts, allActivePlatformsRaw, allRequirements, evaluations] = await Promise.all([
     // Only fetch contexts when context filter is active; overview mode doesn't use them
     isContextMode
       ? prisma.context.findMany({
@@ -463,6 +457,14 @@ export default async function BestFitPage({
     }),
   ])
 
+  // Optional VITAL filter (narrows the platform pool to linked matches).
+  const vitalProfiles = vitalFilter
+    ? await getLinkedVitalProfiles(allActivePlatformsRaw.map(p => p.id))
+    : null
+  const allActivePlatforms = vitalFilter
+    ? allActivePlatformsRaw.filter(p => matchesVitalFilter(vitalProfiles!.get(p.id), vitalFilter))
+    : allActivePlatformsRaw
+
   // Best evaluation per platform (prefer FINALISED)
   const evalByPlatform = new Map<string, EvalRow>()
   for (const ev of evaluations) {
@@ -487,8 +489,7 @@ export default async function BestFitPage({
       return <EmptyState message="No evaluation data" hint="This platform has no scored evaluation yet." />
     }
 
-    const rawScores = ev.scores.map(toScore)
-    const scores    = applyEvidenceFilter(rawScores, evidenceFilter)
+    const scores = ev.scores.map(toScore)
 
     // Per-category breakdown
     const categoryBreakdown = allCategories.map(cat => {
@@ -539,7 +540,7 @@ export default async function BestFitPage({
       const catReqs = allRequirements.filter(r => (r.category ?? 'General') === gap.category)
       const alternatives = otherPlatforms.map(op => {
         const oev = evalByPlatform.get(op.id)!
-        const oscores = applyEvidenceFilter(oev.scores.map(toScore), evidenceFilter)
+        const oscores = oev.scores.map(toScore)
         const osums = new Map<string, number[]>()
         for (const s of oscores) {
           if (s.value === null) continue
@@ -590,7 +591,7 @@ export default async function BestFitPage({
 
       if (!ctxReqs.length) return { ctx, analysis: null }
 
-      const scores           = buildPlatformScores(allActivePlatforms, evalByPlatform, evidenceFilter)
+      const scores           = buildPlatformScores(allActivePlatforms, evalByPlatform)
       const platformsWithData = allActivePlatforms.filter(p => scores.has(p.id))
 
       if (!platformsWithData.length) return { ctx, analysis: null }
@@ -640,7 +641,7 @@ export default async function BestFitPage({
     return <EmptyState message="No data available" hint="Add platforms and requirements, then complete evaluations." />
   }
 
-  const overviewScores = buildPlatformScores(allActivePlatforms, evalByPlatform, evidenceFilter)
+  const overviewScores = buildPlatformScores(allActivePlatforms, evalByPlatform)
   const platformsWithData = allActivePlatforms.filter(p => overviewScores.has(p.id))
 
   if (!platformsWithData.length) {

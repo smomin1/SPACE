@@ -11,7 +11,7 @@ export default async function VitalAdminPage() {
   if (!session?.user) redirect("/login");
   if (!canDo(session.user.role, "manage:vital")) redirect("/dashboard");
 
-  const [tools, recommendations, levels, skills, imports] = await Promise.all([
+  const [tools, recommendations, levels, skills, imports, platforms] = await Promise.all([
     prisma.vitalTool.findMany({
       orderBy: [{ isAssessmentTool: "asc" }, { name: "asc" }],
       include: { pillarRatings: true, skillCoverage: true, levelMappings: true },
@@ -25,6 +25,12 @@ export default async function VitalAdminPage() {
       orderBy: { importedAt: "desc" },
       take: 10,
       include: { importedBy: { select: { name: true, email: true } } },
+    }),
+    // TOOL-track platforms a VITAL tool can be linked to (drives the results-dashboard VITAL filters).
+    prisma.platform.findMany({
+      where: { track: { not: "VITAL" } },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, vendor: true },
     }),
   ]);
 
@@ -42,6 +48,7 @@ export default async function VitalAdminPage() {
           recommendations={recommendations}
           levels={levels}
           skills={skills}
+          platforms={platforms}
           imports={imports.map((i) => ({
             id: i.id,
             fileName: i.fileName,

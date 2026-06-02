@@ -173,8 +173,10 @@ export function VitalEvaluatorWorkspace({
     setSaving(false);
     if (res.ok) {
       const data = await res.json().catch(() => ({}));
+      const created = data.recommendationsCreated ?? 0;
+      const changed = data.recommendationsChanged ?? 0;
       toast.success(
-        `Submitted. Recommendation engine reran (${data.recommendationsChanged ?? 0} updated).`
+        `Submitted. Recommendations refreshed (${changed} updated${created ? `, ${created} added` : ""}).`
       );
       router.refresh();
     } else {

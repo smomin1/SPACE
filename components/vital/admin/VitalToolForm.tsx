@@ -200,7 +200,8 @@ export function VitalToolForm({
           />
           <p className="text-[11px] text-stone-400">
             Link this tool to a Tool-evaluator platform to surface its VITAL verdict, score and
-            risk in the results dashboard and enable VITAL filters.
+            risk in the results dashboard and enable VITAL filters. Only platforms with a finalised
+            evaluation are listed.
           </p>
         </div>
 

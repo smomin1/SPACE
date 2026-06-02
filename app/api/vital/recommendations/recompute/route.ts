@@ -2,7 +2,10 @@ import { auth } from "@/lib/auth";
 import { canDo } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { deriveRecommendation } from "@/lib/vital/derive";
-import { loadToolsForDerive } from "@/lib/vital/derive-server";
+import {
+  loadToolsForDerive,
+  createMissingRecommendationCells,
+} from "@/lib/vital/derive-server";
 
 // Recompute recommendations from the tool catalogue.
 //   mode "respect-locks"  (default): keep locked tool slots, auto-pick the
@@ -27,10 +30,13 @@ export async function POST(request: Request) {
     // empty body → default mode
   }
 
-  const [tools, recs] = await Promise.all([
-    loadToolsForDerive(),
-    prisma.vitalRecommendation.findMany(),
-  ]);
+  const tools = await loadToolsForDerive();
+
+  // Fill in any missing skill × level cells from the catalogue first, so the
+  // matrix is complete before we refresh existing rows.
+  const { created } = await createMissingRecommendationCells(tools);
+
+  const recs = await prisma.vitalRecommendation.findMany();
 
   let changed = 0;
   let lockedCore = 0;
@@ -92,5 +98,5 @@ export async function POST(request: Request) {
     }
   });
 
-  return Response.json({ mode, total: recs.length, changed, lockedCore, lockedSupp });
+  return Response.json({ mode, total: recs.length, changed, created, lockedCore, lockedSupp });
 }

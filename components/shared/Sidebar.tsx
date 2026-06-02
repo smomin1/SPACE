@@ -68,6 +68,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
+    href: '/tool-scanner',
+    label: 'Tool Scanner',
+    icon: SparklesIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
     href: '/admin/contexts',
     label: 'Contexts',
     icon: LayersIcon,
@@ -80,22 +86,10 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
-    href: '/tool-scanner',
-    label: 'Tool Scanner',
-    icon: SparklesIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
-  },
-  {
     href: '/evaluations',
     label: 'Evaluations',
     icon: ClipboardCheckIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'],
-  },
-  {
-    href: '/vital',
-    label: 'VITAL Results',
-    icon: CompassIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/results',
@@ -108,6 +102,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'VITAL Admin',
     icon: GraduationCapIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
+  },
+  {
+    href: '/vital',
+    label: 'VITAL Results',
+    icon: CompassIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/faq',

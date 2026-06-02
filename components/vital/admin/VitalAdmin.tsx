@@ -120,7 +120,9 @@ export function VitalAdmin({
     setRecomputing(false);
     if (res.ok) {
       const d = await res.json().catch(() => ({}));
-      setRecomputeMsg(`Recomputed: ${d.changed ?? 0} of ${d.total ?? 0} updated.`);
+      setRecomputeMsg(
+        `Recomputed: ${d.changed ?? 0} of ${d.total ?? 0} updated${d.created ? `, ${d.created} added` : ""}.`,
+      );
       refresh();
     } else {
       const d = await res.json().catch(() => ({}));

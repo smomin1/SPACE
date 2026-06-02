@@ -27,8 +27,16 @@ export default async function VitalAdminPage() {
       include: { importedBy: { select: { name: true, email: true } } },
     }),
     // TOOL-track platforms a VITAL tool can be linked to (drives the results-dashboard VITAL filters).
+    // Only platforms with a FINALISED evaluation are offered, so links reflect completed work.
+    // Already-linked platforms are kept regardless, so editing a tool never silently drops its link.
     prisma.platform.findMany({
-      where: { track: { not: "VITAL" } },
+      where: {
+        track: { not: "VITAL" },
+        OR: [
+          { evaluations: { some: { state: "FINALISED" } } },
+          { vitalTools: { some: {} } },
+        ],
+      },
       orderBy: { name: "asc" },
       select: { id: true, name: true, vendor: true },
     }),

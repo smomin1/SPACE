@@ -134,8 +134,12 @@ export async function POST(
     return Response.json({ error: "Internal Server Error", code: "INTERNAL_ERROR" }, { status: 500 });
   }
 
-  // Catalogue changed → rerun the recommendation engine.
-  const { changed } = await recomputeRecommendations();
+  // Catalogue changed → rebuild the recommendation matrix from it.
+  const { changed, created } = await recomputeRecommendations();
 
-  return Response.json({ ok: true, recommendationsChanged: changed });
+  return Response.json({
+    ok: true,
+    recommendationsChanged: changed,
+    recommendationsCreated: created,
+  });
 }

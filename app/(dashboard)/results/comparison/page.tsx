@@ -16,8 +16,6 @@ import {
   matchesVitalFilter,
 } from '@/lib/vital/profile'
 import ComparisonTable from './ComparisonTable'
-import { VitalScatter } from './VitalScatter'
-import type { VitalScatterPoint } from './VitalScatter'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -268,22 +266,8 @@ export default async function ComparisonPage({
 
   const hasVital = rows.some(r => r.vital !== null)
 
-  // Scatter needs both a Tool score and a VITAL/10 to place a point.
-  const scatterPoints: VitalScatterPoint[] = rows
-    .filter(r => r.status !== 'DISQUALIFIED' && r.overallPct !== null && r.vital?.score10 != null)
-    .map(r => ({
-      id: r.id,
-      name: r.name,
-      vendor: r.vendor,
-      overall: r.overallPct as number,
-      vital10: r.vital!.score10 as number,
-      risk: r.vital!.risk,
-      verdict: r.vital!.verdict,
-    }))
-
   return (
     <div className="space-y-5">
-      {scatterPoints.length > 0 && <VitalScatter points={scatterPoints} />}
       <ComparisonTable rows={rows} categories={categories} hasVital={hasVital} />
     </div>
   )

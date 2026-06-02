@@ -40,13 +40,13 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What user roles exist?',
         answer:
-          'There are five roles: Super Admin (full system control including user management), Admin (manages requirements, contexts, platforms, and evaluations), Pedagogy Evaluator (scores pedagogy-typed requirements), Technical Evaluator (scores technical-typed requirements), and Viewer (read-only access to results and Tool Scanner).',
+          'There are six roles: Super Admin (full system control including user management), Admin (manages requirements, contexts, platforms, and evaluations), Pedagogy Evaluator (scores pedagogy-typed requirements), Technical Evaluator (scores technical-typed requirements), VITAL Evaluator (fills VITAL profiles for assigned platforms), and Viewer (read-only access to results and Tool Scanner).',
         keywords: ['permissions', 'access', 'admin', 'evaluator', 'viewer'],
       },
       {
         question: 'How do I sign in?',
         answer:
-          'Go to the login page, enter your email and password, and click Sign in. An administrator must create your account first. If you forgot your password, ask an administrator to reset it for you.',
+          'Go to the login page, enter your email and password, and click Sign in. If you do not have an account yet, use the Request access link to submit a self-service request for a Super Admin to approve. If you forgot your password, use the Forgot password link to reset it by email.',
         keywords: ['login', 'password', 'authentication'],
       },
       {
@@ -317,7 +317,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What is "Build Readiness"?',
         answer:
-          'Build Readiness highlights how each platform scores on technical integration requirements (APIs, LTI, data export, SSO, interoperability). It signals which platforms are easiest to incorporate into your existing infrastructure.',
+          'Build Readiness highlights how each platform scores on technical integration requirements. The score is drawn solely from requirements in the "Integration & APIs" category, so it reflects how those requirements were weighted and scored. It signals which platforms are easiest to incorporate into your existing infrastructure.',
         keywords: ['build readiness', 'technical', 'integration', 'api'],
       },
       {
@@ -390,7 +390,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What does the Recompute button do?',
         answer:
-          'On the Recommendations tab, Recompute re derives every recommendation from the current tool data while respecting locked slots. Pinned tools stay as they are, unlocked slots are auto picked again, and all downstream fields are refreshed. Use it after editing tools so the recommendations reflect the latest catalogue.',
+          'On the Recommendations tab, Recompute re derives every recommendation from the current tool data while respecting locked slots. It first fills in any missing skill and level cells so the matrix is complete, then refreshes the existing rows: pinned tools stay as they are, unlocked slots are auto picked again, and all downstream fields are recomputed. Use it after editing tools so the recommendations reflect the latest catalogue.',
         keywords: ['vital', 'recompute', 'refresh', 'recommendation', 'derive'],
       },
       {

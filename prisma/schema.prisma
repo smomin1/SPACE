@@ -13,6 +13,7 @@ enum Role {
   ADMIN
   PEDAGOGY_EVALUATOR
   TECHNICAL_EVALUATOR
+  VITAL_EVALUATOR
   VIEWER
 }
 
@@ -22,10 +23,20 @@ enum EvaluationState {
   FINALISED
 }
 
+// Which evaluation track a Platform belongs to.
+//   TOOL  → the Pedagogy/Technical scoring lifecycle (default, existing flow)
+//   VITAL → the VITAL evaluator fills a linked VitalTool profile; on submit the
+//           recommendation engine is recomputed.
+enum EvaluationTrack {
+  TOOL
+  VITAL
+}
+
 enum EvaluatorType {
   PEDAGOGY
   TECHNICAL
   BOTH        // Scored by both PEDAGOGY and TECHNICAL evaluators
+  VITAL       // Reserved for future Platform↔VitalTool linkage; standalone VITAL module does not use the scoring lifecycle
 }
 
 // Quality ranking (highest → lowest): TRIAL > DEMO > DOCUMENTATION > VENDOR_CLAIM
@@ -107,6 +118,81 @@ enum AccessRequestStatus {
   REJECTED
 }
 
+// ─── VITAL module enums ─────────────────────────────────────────────────────────
+
+// The five VITAL pillars: Visible learning, Inclusive pedagogy, right Technology,
+// Assessment for learning, Learner agency.
+enum VitalPillar {
+  V
+  I
+  T
+  A
+  L
+}
+
+// Per-pillar tool rating (Tool Landscape "VITAL RATING" columns).
+enum VitalRating {
+  Y
+  P
+  N
+}
+
+// Skill coverage + CEFR-level presence. Normalises Y/P/N, Yes/No/P, and ✓/— from the sheets.
+enum VitalCoverage {
+  FULL    // Y / Yes / ✓
+  PARTIAL // P
+  NONE    // N / No / —
+  NA      // N/A
+}
+
+// Per-skill teacher dependency (Tool Landscape "TEACHER DEPENDENCY" columns: TL / P / S / N/A).
+enum VitalDependency {
+  TEACHER_LED    // TL
+  PARTIAL        // P
+  STUDENT        // S
+  NOT_APPLICABLE // N/A
+}
+
+// Tool-level and recommendation core/supp dependency ("Overall dep." / "Core dep" / "Supp dep").
+enum VitalToolDependency {
+  FULLY_TEACHER_LED
+  MOSTLY_TEACHER_LED
+  BLENDED
+  MOSTLY_INDEPENDENT
+  FULLY_INDEPENDENT
+}
+
+// "De facto risk" column.
+enum VitalRisk {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// "Verdict" column.
+enum VitalVerdict {
+  POOR_FIT
+  PARTIAL_FIT
+  GOOD_FIT
+  STRONG_FIT
+}
+
+// Tool "Role" column across sheets (Core / Supplementary / Resource bank / Teacher tool only / assessment).
+enum VitalToolRole {
+  CORE
+  SUPPLEMENTARY
+  RESOURCE_BANK
+  TEACHER_TOOL
+  ASSESSMENT
+}
+
+// Recommendation combined-stack VITAL status (✅ all pillars / ⚠ 1 gap / ⛔ 2+ gaps).
+enum VitalComplianceStatus {
+  COMPLIANT
+  ONE_GAP
+  MULTI_GAP
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -132,6 +218,7 @@ model User {
   teamMerges               EvaluationTeamMerge[]
   searchEvaluations        SearchEvaluation[]
   reviewedAccessRequests   AccessRequest[]
+  vitalImports             VitalImportLog[]
 }
 
 model Platform {
@@ -139,6 +226,7 @@ model Platform {
   name           String
   vendor         String
   status         PlatformStatus @default(ACTIVE)
+  track          EvaluationTrack @default(TOOL)
   licenceType    LicenceType?
   trialAvailable Boolean        @default(false)
   createdAt      DateTime       @default(now())
@@ -147,6 +235,7 @@ model Platform {
   evaluations          Evaluation[]
   contexts             PlatformContext[]
   evaluatorAssignments PlatformEvaluatorAssignment[]
+  vitalTools           VitalTool[]
 }
 
 // Central aggregate for one scoring run on a Platform.
@@ -375,4 +464,154 @@ model EvaluationTeamMerge {
   mergedBy   User       @relation(fields: [mergedById], references: [id])
 
   @@unique([evaluationId, evaluatorType])
+}
+
+// ─── VITAL module models ────────────────────────────────────────────────────────
+// Standalone module: recreates the school's VITAL workbooks (tool catalogue, pillar
+// ratings, skill coverage, CEFR mapping, recommendation/level-stack engines, assessment
+// landscape). Seeded but fully editable. Decoupled from the Evaluation lifecycle.
+
+// The six English skills (editable list). Source order: Vocabulary, Listening, Speaking, Reading, Writing, Grammar.
+model VitalSkill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  skillCoverage   VitalToolSkillCoverage[]
+  recommendations VitalRecommendation[]
+}
+
+// The 22-point CEFR sub-level scale (A0 + 21) plus the assessment-only "A0 (Pre)" row.
+// scoreBand: "Pre-emergent" | "Up to 33%" | "34%–66%" | "67%–100%".
+// cefrStatus: "Standard CEFR" | "Non-CEFR (school-defined)".
+// bandGroup: A0 | A | B1 | B1.5 | B2 | B2.5 | C1.
+model VitalLevel {
+  id             String   @id @default(cuid())
+  code           String   @unique // e.g. "A1−" (U+2212 minus), "B1.5+", "A0 (Pre)"
+  label          String
+  order          Int      @default(0)
+  scoreBand      String
+  cefrStatus     String
+  bandGroup      String
+  isPreEmergent  Boolean  @default(false)
+  assessmentOnly Boolean  @default(false) // true only for the "A0 (Pre)" assessment-landscape column
+
+  levelMappings   VitalToolLevelMapping[]
+  recommendations VitalRecommendation[]
+}
+
+// A catalogue tool (28 teaching tools + 11 assessment/placement tools).
+model VitalTool {
+  id                String               @id @default(cuid())
+  name              String               @unique
+  role              VitalToolRole
+  vitalScore10      Int?                 // "VITAL /10"
+  v2Score50         Int?                 // "V2 /50"
+  verdict           VitalVerdict?
+  deFactoRisk       VitalRisk?
+  overallDependency VitalToolDependency?
+  belowA0           Boolean              @default(false)
+  cefrRangeLabel    String?              // e.g. "A1− → C1+ — all skills, CEFR-aligned core"
+  isAssessmentTool  Boolean              @default(false)
+  adaptiveTesting   String?              // assessment tools only, e.g. "Yes (partial)", "No (fixed)"
+  notes             String?
+  platformId        String?              // optional link to a Platform (future results-filter integration)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  platform           Platform?                @relation(fields: [platformId], references: [id])
+  pillarRatings      VitalToolPillarRating[]
+  skillCoverage      VitalToolSkillCoverage[]
+  levelMappings      VitalToolLevelMapping[]
+  coreRecommendations VitalRecommendation[]   @relation("CoreTool")
+  suppRecommendations VitalRecommendation[]   @relation("SuppTool")
+}
+
+// One pillar rating for one tool (5 rows per tool).
+model VitalToolPillarRating {
+  id     String      @id @default(cuid())
+  toolId String
+  pillar VitalPillar
+  rating VitalRating
+
+  tool VitalTool @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, pillar])
+}
+
+// One skill's coverage + teacher dependency for one tool (6 rows per tool).
+// dependency is null for assessment tools.
+model VitalToolSkillCoverage {
+  id         String           @id @default(cuid())
+  toolId     String
+  skillId    String
+  coverage   VitalCoverage
+  dependency VitalDependency?
+
+  tool  VitalTool  @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  skill VitalSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, skillId])
+}
+
+// Presence/coverage of one tool at one CEFR level.
+model VitalToolLevelMapping {
+  id       String        @id @default(cuid())
+  toolId   String
+  levelId  String
+  coverage VitalCoverage
+
+  tool  VitalTool  @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  level VitalLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, levelId])
+}
+
+// The 132 recommendation combos (6 skills × 22 levels). Powers the Recommendation Engine,
+// Level Stack Engine, and both Full Grid views. Pillar fields hold the combined core+supp coverage.
+model VitalRecommendation {
+  id             String                @id @default(cuid())
+  skillId        String
+  levelId        String
+  coreToolId     String?
+  suppToolId     String?
+  // When true the slot's tool is admin-pinned (override); when false the tool
+  // is auto-derived from the catalogue. Downstream fields always cascade from
+  // the effective core/supp. See lib/vital/derive.ts.
+  coreToolLocked Boolean             @default(false)
+  suppToolLocked Boolean             @default(false)
+  coreDependency VitalToolDependency?
+  suppDependency VitalToolDependency?
+  coreRisk       VitalRisk?
+  suppRisk       VitalRisk?
+  pillarV        VitalCoverage
+  pillarI        VitalCoverage
+  pillarT        VitalCoverage
+  pillarA        VitalCoverage
+  pillarL        VitalCoverage
+  status         VitalComplianceStatus
+  deploymentNote String?
+
+  skill    VitalSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  level    VitalLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  coreTool VitalTool? @relation("CoreTool", fields: [coreToolId], references: [id])
+  suppTool VitalTool? @relation("SuppTool", fields: [suppToolId], references: [id])
+
+  @@unique([skillId, levelId])
+}
+
+// Audit trail for xlsx imports.
+model VitalImportLog {
+  id           String   @id @default(cuid())
+  importedById String
+  fileName     String
+  workbookType String
+  created      Int      @default(0)
+  updated      Int      @default(0)
+  skipped      Int      @default(0)
+  detail       Json?
+  importedAt   DateTime @default(now())
+
+  importedBy User @relation(fields: [importedById], references: [id])
 }

@@ -85,6 +85,7 @@ export default async function ComparisonPage({
 
     prisma.platform.findMany({
       where: {
+        track: { not: 'VITAL' },
         ...(platformIds.length > 0 && { id: { in: platformIds } }),
         ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
       },

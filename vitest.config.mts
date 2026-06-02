@@ -7,9 +7,25 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['tests/unit/schema.test.ts', 'tests/unit/requirement-schema.test.ts'],
-    environmentMatchGlobs: [
-      ['tests/components/**', 'jsdom'],
-    ],
     setupFiles: ['tests/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+          exclude: ['tests/components/**', 'tests/unit/schema.test.ts', 'tests/unit/requirement-schema.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'components',
+          include: ['tests/components/**/*.test.tsx'],
+          environment: 'jsdom',
+        },
+      },
+    ],
   },
 })

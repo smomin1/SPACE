@@ -9,7 +9,7 @@ import {
   AlertTriangleIcon,
   BellIcon,
 } from 'lucide-react'
-import type { EvaluatorType } from '@prisma/client'
+import type { EvaluatorType, Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { relativeTime } from '@/lib/utils'
 import { StatCard } from './StatCard'
@@ -18,9 +18,15 @@ import { EvalStateBadge, TypeBadge } from '@/components/admin/_shared/badges'
 
 interface EvaluatorDashboardProps {
   userId: string
+  role: Role
 }
 
 function getNow() { return Date.now() }
+
+// VITAL-track evaluations use a dedicated profile workspace, not /evaluate.
+function hrefFor(track: 'TOOL' | 'VITAL', evaluationId: string) {
+  return track === 'VITAL' ? `/vital-evaluate/${evaluationId}` : `/evaluate/${evaluationId}`
+}
 
 type NotifItem =
   | {
@@ -30,6 +36,7 @@ type NotifItem =
       platformName: string
       vendor: string
       evaluationId: string
+      track: 'TOOL' | 'VITAL'
       evaluatorType: EvaluatorType
       isLead: boolean
     }
@@ -43,7 +50,8 @@ type NotifItem =
       content: string
     }
 
-export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
+export async function EvaluatorDashboard({ userId, role }: EvaluatorDashboardProps) {
+  const isVital = role === 'VITAL_EVALUATOR'
   const now = getNow()
   const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000)
 
@@ -60,7 +68,7 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
         select: {
           id: true,
           state: true,
-          platform: { select: { id: true, name: true, vendor: true } },
+          platform: { select: { id: true, name: true, vendor: true, track: true } },
           conflictThreads: {
             where: { isClosed: false },
             select: { id: true },
@@ -135,6 +143,7 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
         platformName: a.evaluation.platform.name,
         vendor: a.evaluation.platform.vendor,
         evaluationId: a.evaluation.id,
+        track: a.evaluation.platform.track,
         evaluatorType: a.evaluatorType,
         isLead: a.isLead,
       })),
@@ -205,7 +214,10 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
           ) : (
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
               {notifications.map(n => (
-                <Link key={n.key} href={`/evaluate/${n.evaluationId}`}>
+                <Link
+                  key={n.key}
+                  href={n.type === 'assignment' ? hrefFor(n.track, n.evaluationId) : `/evaluate/${n.evaluationId}`}
+                >
                   {n.type === 'assignment' ? (
                     <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-stone-200/80 bg-stone-50/60 hover:bg-stone-50 transition-colors">
                       <ClipboardListIcon className="size-4 text-emerald-700 mt-0.5 shrink-0" />
@@ -276,7 +288,7 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
                   return (
                     <Link
                       key={a.id}
-                      href={`/evaluate/${a.evaluation.id}`}
+                      href={hrefFor(a.evaluation.platform.track, a.evaluation.id)}
                       className="flex items-center gap-3 py-3 hover:bg-stone-50 -mx-1 px-1 rounded-md transition-colors group"
                     >
                       <div className="flex-1 min-w-0">
@@ -290,21 +302,29 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
                             </span>
                           )}
                         </div>
-                        {/* Progress bar */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 rounded-full bg-stone-100 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-emerald-500 transition-all"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <span className="text-[11px] tabular-nums text-stone-400 shrink-0 w-8 text-right">
-                            {pct}%
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-stone-400 mt-0.5">
-                          {scored} / {total} scored
-                        </p>
+                        {a.evaluation.platform.track === 'VITAL' ? (
+                          <p className="text-[11px] text-stone-400 mt-0.5">
+                            VITAL profile · not yet submitted
+                          </p>
+                        ) : (
+                          <>
+                            {/* Progress bar */}
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-1.5 rounded-full bg-stone-100 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-emerald-500 transition-all"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                              <span className="text-[11px] tabular-nums text-stone-400 shrink-0 w-8 text-right">
+                                {pct}%
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-stone-400 mt-0.5">
+                              {scored} / {total} scored
+                            </p>
+                          </>
+                        )}
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         <TypeBadge value={a.evaluatorType} />
@@ -319,7 +339,7 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
         </div>
       </div>
 
-      <ToolPicker />
+      <ToolPicker variant={isVital ? 'vital' : 'tool'} />
 
       {/* Conflict resolution needed (MERGED evals) */}
       {mergedAssignments.length > 0 && (
@@ -335,7 +355,7 @@ export async function EvaluatorDashboard({ userId }: EvaluatorDashboardProps) {
             {mergedAssignments.map(a => {
               const openCount = a.evaluation.conflictThreads.length
               return (
-                <Link key={a.id} href={`/evaluate/${a.evaluation.id}`}>
+                <Link key={a.id} href={hrefFor(a.evaluation.platform.track, a.evaluation.id)}>
                   <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-amber-200/80 bg-white hover:bg-amber-50/40 transition-colors group">
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-emerald-950 truncate">

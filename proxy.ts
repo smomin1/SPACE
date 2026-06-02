@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
-import { canAccess } from '@/lib/permissions'
+import { canAccess, canDo } from '@/lib/permissions'
 
 // Routes accessible without authentication
 const PUBLIC_PATHS = [
@@ -50,7 +50,24 @@ export const proxy = auth((request) => {
 
   const { role } = session.user
 
-  if (pathname.startsWith('/admin') && !canAccess(role, 'admin')) {
+  // The VITAL evaluator submit endpoint is an evaluate action (authorised
+  // per-assignment inside the route), not catalogue management; gate it by
+  // access:evaluate so VITAL evaluators can reach it.
+  if (pathname.startsWith('/api/vital/evaluations')) {
+    if (!canAccess(role, 'evaluate')) {
+      return NextResponse.redirect(new URL('/forbidden', request.url))
+    }
+  } else if (pathname.startsWith('/admin/vital') || pathname.startsWith('/api/vital')) {
+    // VITAL catalogue admin (UI + CRUD/import APIs): Super Admin / Admin only.
+    const isMutation = request.method !== 'GET' || pathname.startsWith('/admin/vital')
+    if (isMutation && !canDo(role, 'manage:vital')) {
+      return NextResponse.redirect(new URL('/forbidden', request.url))
+    }
+  } else if (pathname.startsWith('/admin') && !canAccess(role, 'admin')) {
+    return NextResponse.redirect(new URL('/forbidden', request.url))
+  }
+
+  if (pathname.startsWith('/vital') && !canDo(role, 'view:vital')) {
     return NextResponse.redirect(new URL('/forbidden', request.url))
   }
 

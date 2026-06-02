@@ -101,6 +101,7 @@ const ROLE_LABELS: Record<Role, string> = {
   ADMIN:               'Admin',
   PEDAGOGY_EVALUATOR:  'Pedagogy Evaluator',
   TECHNICAL_EVALUATOR: 'Technical Evaluator',
+  VITAL_EVALUATOR:     'VITAL Evaluator',
   VIEWER:              'Viewer',
 }
 
@@ -109,6 +110,7 @@ const ROLE_BADGE: Record<Role, string> = {
   ADMIN:               'bg-emerald-100 text-emerald-800 ring-emerald-300/60',
   PEDAGOGY_EVALUATOR:  'bg-blue-100 text-blue-800 ring-blue-300/60',
   TECHNICAL_EVALUATOR: 'bg-amber-100 text-amber-800 ring-amber-300/60',
+  VITAL_EVALUATOR:     'bg-teal-100 text-teal-800 ring-teal-300/60',
   VIEWER:              'bg-stone-100 text-stone-700 ring-stone-300/60',
 }
 
@@ -338,7 +340,7 @@ function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
         row.original.team ? (
           <span className="text-[12.5px] text-stone-600">{TEAM_LABELS[row.original.team]}</span>
         ) : (
-          <span className="text-[12px] text-stone-400">—</span>
+          <span className="text-[12px] text-stone-400">-</span>
         ),
     },
     {

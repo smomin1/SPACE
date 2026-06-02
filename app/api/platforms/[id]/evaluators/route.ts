@@ -8,6 +8,7 @@ import { EvaluatorType, type Role } from '@prisma/client'
 const ALLOWED_ROLES_FOR_TYPE: Record<EvaluatorType, Role[]> = {
   PEDAGOGY:  ['PEDAGOGY_EVALUATOR', 'ADMIN'],
   TECHNICAL: ['TECHNICAL_EVALUATOR', 'ADMIN'],
+  VITAL:     ['VITAL_EVALUATOR', 'ADMIN'],
   BOTH:      ['PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'ADMIN'],
 }
 

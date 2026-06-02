@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
 const updateSchema = z.object({
   email:    z.string().email().max(200).optional(),
   name:     z.string().min(1).max(120).optional(),
-  role:     z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER']).optional(),
+  role:     z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER']).optional(),
   team:     z.enum([
     'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
     'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',

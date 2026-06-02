@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, CheckIcon, XIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { PlatformRow } from './page'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
@@ -15,11 +17,13 @@ function pctColor(pct: number): string {
   return 'text-red-600'
 }
 
-function pctBarColor(pct: number): string {
-  if (pct >= 85) return 'bg-emerald-600'
-  if (pct >= 70) return 'bg-emerald-500'
-  if (pct >= 50) return 'bg-amber-400'
-  return 'bg-red-400'
+// Subtle heatmap tint for score cells, giving the comparison matrix an at-a-glance read.
+function pctCellBg(pct?: number): string {
+  if (pct === undefined) return ''
+  if (pct >= 85) return 'bg-emerald-50'
+  if (pct >= 70) return 'bg-emerald-50/60'
+  if (pct >= 50) return 'bg-amber-50/60'
+  return 'bg-red-50/50'
 }
 
 export default function ComparisonTable({
@@ -176,13 +180,19 @@ export default function ComparisonTable({
                       <p className="text-[11px] text-stone-400">{row.vendor}</p>
                       {row.evalState && (
                         <span
-                          className={`text-[10px] font-medium ${
-                            row.evalState === 'FINALISED'
-                              ? 'text-emerald-600'
-                              : 'text-amber-600'
-                          }`}
+                          className={cn(
+                            'inline-flex items-center gap-1.5 text-[10px] font-medium',
+                            row.evalState === 'FINALISED' ? 'text-emerald-600' : 'text-amber-600'
+                          )}
                         >
-                          {row.evalState === 'FINALISED' ? '● Finalised' : '● Merged'}
+                          <span
+                            className={cn(
+                              'size-1.5 rounded-full',
+                              row.evalState === 'FINALISED' ? 'bg-emerald-500' : 'bg-amber-500'
+                            )}
+                            aria-hidden
+                          />
+                          {row.evalState === 'FINALISED' ? 'Finalised' : 'Merged'}
                         </span>
                       )}
                     </div>
@@ -194,16 +204,27 @@ export default function ComparisonTable({
                   </td>
 
                   {/* Category scores */}
-                  {visibleCategories.map(cat => (
-                    <td key={cat} className="py-3 px-4 text-right align-middle tabular-nums">
-                      <ScoreCell pct={row.evalState === null ? undefined : (row.categoryScores[cat] ?? undefined)} />
-                    </td>
-                  ))}
+                  {visibleCategories.map(cat => {
+                    const pct = row.evalState === null ? undefined : (row.categoryScores[cat] ?? undefined)
+                    return (
+                      <td
+                        key={cat}
+                        className={cn('py-3 px-4 text-right align-middle tabular-nums', pctCellBg(pct))}
+                      >
+                        <ScoreCell pct={pct} />
+                      </td>
+                    )
+                  })}
 
                   {/* Overall */}
-                  <td className="py-3 px-4 text-right align-middle tabular-nums">
-                    <ScoreCell pct={row.evalState === null ? undefined : (row.overallPct ?? undefined)} bold />
-                  </td>
+                  {(() => {
+                    const pct = row.evalState === null ? undefined : (row.overallPct ?? undefined)
+                    return (
+                      <td className={cn('py-3 px-4 text-right align-middle tabular-nums', pctCellBg(pct))}>
+                        <ScoreCell pct={pct} bold />
+                      </td>
+                    )
+                  })()}
 
                   {/* Recommendation */}
                   <td className="py-3 px-4 align-middle">
@@ -252,9 +273,15 @@ function SortTh({
         className={`flex w-full items-center gap-1 ${justifyClass} text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 hover:text-stone-600 transition-colors`}
       >
         <span className="truncate max-w-[110px]">{label}</span>
-        <span className={`shrink-0 text-[9px] ${active ? 'text-emerald-600' : 'text-stone-300'}`}>
-          {active ? (dir === 'asc' ? '▲' : '▼') : '⇅'}
-        </span>
+        {active ? (
+          dir === 'asc' ? (
+            <ArrowUpIcon className="size-3 shrink-0 text-emerald-600" />
+          ) : (
+            <ArrowDownIcon className="size-3 shrink-0 text-emerald-600" />
+          )
+        ) : (
+          <ChevronsUpDownIcon className="size-3 shrink-0 text-stone-300" />
+        )}
       </button>
     </th>
   )
@@ -274,19 +301,12 @@ function ComplianceCell({ pass }: { pass: boolean | null }) {
     return <span className="text-stone-300 text-xs">No gates</span>
   return pass ? (
     <span className="inline-flex items-center justify-center gap-1 text-sm font-medium text-emerald-700">
-      <svg className="size-3.5" viewBox="0 0 16 16" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"
-        />
-      </svg>
+      <CheckIcon className="size-3.5" />
       Pass
     </span>
   ) : (
     <span className="inline-flex items-center justify-center gap-1 text-sm font-medium text-destructive">
-      <svg className="size-3.5" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M4.293 4.293a1 1 0 011.414 0L8 6.586l2.293-2.293a1 1 0 111.414 1.414L9.414 8l2.293 2.293a1 1 0 01-1.414 1.414L8 9.414l-2.293 2.293a1 1 0 01-1.414-1.414L6.586 8 4.293 5.707a1 1 0 010-1.414z" />
-      </svg>
+      <XIcon className="size-3.5" />
       Fail
     </span>
   )

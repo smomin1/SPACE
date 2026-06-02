@@ -12,7 +12,7 @@ export default async function NewPlatformPage() {
   if (!canDo(session.user.role, 'manage:platform')) redirect('/dashboard')
 
   const users = await prisma.user.findMany({
-    where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'] } },
+    where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'] } },
     orderBy: { name: 'asc' },
     select: { id: true, name: true, email: true, role: true },
   })

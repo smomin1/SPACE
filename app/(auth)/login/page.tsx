@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { Suspense, useActionState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { loginAction } from './actions'
@@ -10,6 +10,14 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const [error, action, isPending] = useActionState(loginAction, undefined)
   const searchParams = useSearchParams()
   const changed = searchParams.get('changed')

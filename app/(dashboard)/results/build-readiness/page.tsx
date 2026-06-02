@@ -4,30 +4,18 @@ import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { calculateWeightedPercentage } from '@/lib/scoring'
 import type { Score, Requirement } from '@/lib/scoring'
-import type { PlatformStatus } from '@prisma/client'
+import type { PlatformStatus, WeightLevel } from '@prisma/client'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 
-// ─── Build-readiness keyword groups ───────────────────────────────────────────
+// ─── Build-readiness category ──────────────────────────────────────────────────
+// Build Readiness is scored solely from requirements in this single category.
 
-const KEYWORD_GROUPS = [
-  { key: 'api',              label: 'API Integration' },
-  { key: 'lti',              label: 'LTI' },
-  { key: 'export',           label: 'Data Export' },
-  { key: 'sso',              label: 'SSO / Auth' },
-  { key: 'integration',      label: 'Integration' },
-  { key: 'interoperability', label: 'Interoperability' },
-] as const
-
-type KwGroup = (typeof KEYWORD_GROUPS)[number]
-
-function matchesGroup(category: string | null, kw: string): boolean {
-  return category?.toLowerCase().includes(kw) ?? false
-}
+const BUILD_READINESS_CATEGORY = 'Integration & APIs'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function toScoringReq(r: {
-  id: string; weight: 'HIGH' | 'MEDIUM' | 'LOW'
+  id: string; weight: WeightLevel
   category: string | null; isComplianceGate: boolean
 }): Requirement {
   return { ...r, contextIds: [] }
@@ -55,18 +43,19 @@ function pctTextColor(pct: number | null): string {
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-type SubScore = {
-  group: KwGroup
+type ReqScore = {
+  id: string
+  title: string
+  weight: WeightLevel
   pct: number | null
-  reqCount: number
 }
 
 type PlatformReadiness = {
   platform: { id: string; name: string; vendor: string; status: PlatformStatus }
   hasEval: boolean
   overallPct: number | null
-  totalReqCount: number
-  subScores: SubScore[]
+  reqCount: number
+  reqScores: ReqScore[]
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -88,9 +77,10 @@ export default async function BuildReadinessPage({
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [rawPlatforms, allRequirements, evaluations] = await Promise.all([
+  const [rawPlatforms, buildReqsRaw, evaluations] = await Promise.all([
     prisma.platform.findMany({
       where: {
+        track: { not: 'VITAL' },
         ...(platformIds.length > 0 && { id: { in: platformIds } }),
         ...(!showDq                && { status: { not: 'DISQUALIFIED' } }),
       },
@@ -98,13 +88,14 @@ export default async function BuildReadinessPage({
       select: { id: true, name: true, vendor: true, status: true },
     }),
 
-    // Fetch only TECHNICAL requirements (build readiness = integration/technical capability)
+    // Build readiness = the single "Integration & APIs" category only.
     prisma.requirement.findMany({
       where: {
-        evaluatorType: 'TECHNICAL',
+        category: BUILD_READINESS_CATEGORY,
         ...(contextIds.length > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
       },
-      select: { id: true, weight: true, category: true, isComplianceGate: true },
+      orderBy: [{ weight: 'desc' }, { order: 'asc' }],
+      select: { id: true, title: true, weight: true, category: true, isComplianceGate: true },
     }),
 
     prisma.evaluation.findMany({
@@ -116,22 +107,9 @@ export default async function BuildReadinessPage({
     }),
   ])
 
-  // ── Filter to build-readiness requirements ────────────────────────────────
+  const buildReqs = buildReqsRaw.map(toScoringReq)
 
-  const buildReqs = allRequirements.filter(r =>
-    r.category !== null &&
-    KEYWORD_GROUPS.some(g => matchesGroup(r.category, g.key)),
-  )
-
-  // Pre-build per-group requirement sets
-  const groupReqMap = new Map<string, typeof buildReqs>(
-    KEYWORD_GROUPS.map(g => [
-      g.key,
-      buildReqs.filter(r => matchesGroup(r.category, g.key)),
-    ]),
-  )
-
-  // Best eval per platform
+  // Best eval per platform (prefer FINALISED)
   const evalByPlatform = new Map<string, (typeof evaluations)[number]>()
   for (const ev of evaluations) {
     const cur = evalByPlatform.get(ev.platformId)
@@ -147,31 +125,30 @@ export default async function BuildReadinessPage({
     if (!ev) {
       return {
         platform: p, hasEval: false,
-        overallPct: null, totalReqCount: buildReqs.length,
-        subScores: KEYWORD_GROUPS.map(g => ({
-          group: g, pct: null, reqCount: groupReqMap.get(g.key)!.length,
-        })),
+        overallPct: null, reqCount: buildReqs.length,
+        reqScores: buildReqsRaw.map(r => ({ id: r.id, title: r.title, weight: r.weight, pct: null })),
       }
     }
 
     const scores     = ev.scores.map(toScore)
-    const allBuildSR = buildReqs.map(toScoringReq)
-    const overallPct = allBuildSR.length ? calculateWeightedPercentage(scores, allBuildSR) : null
+    const overallPct = buildReqs.length ? calculateWeightedPercentage(scores, buildReqs) : null
 
-    const subScores: SubScore[] = KEYWORD_GROUPS.map(g => {
-      const groupReqs = groupReqMap.get(g.key)!.map(toScoringReq)
-      return {
-        group: g,
-        reqCount: groupReqs.length,
-        pct: groupReqs.length ? calculateWeightedPercentage(scores, groupReqs) : null,
-      }
+    // Per-requirement coverage (average of non-N/A scores, /4)
+    const reqScores: ReqScore[] = buildReqsRaw.map(r => {
+      const vals = scores
+        .filter(s => s.requirementId === r.id && s.value !== null)
+        .map(s => s.value as number)
+      const pct = vals.length
+        ? (vals.reduce((a, b) => a + b, 0) / vals.length / 4) * 100
+        : null
+      return { id: r.id, title: r.title, weight: r.weight, pct }
     })
 
     return {
       platform: p, hasEval: true,
       overallPct: overallPct ?? null,
-      totalReqCount: buildReqs.length,
-      subScores,
+      reqCount: buildReqs.length,
+      reqScores,
     }
   })
     // Sort: highest score first, no-eval at bottom, DQ after active
@@ -204,24 +181,26 @@ export default async function BuildReadinessPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-stone-700">
-            Build Readiness - Technical Integration Score
+            Build Readiness: Technical Integration Score
           </p>
           <p className="text-xs text-stone-400 mt-0.5">
             {hasAnyBuildReqs
-              ? `${buildReqs.length} requirements matched across ${KEYWORD_GROUPS.filter(g => groupReqMap.get(g.key)!.length > 0).length} integration categories`
-              : 'No technical requirements matched build-readiness keywords'
+              ? `Scored solely from the ${BUILD_READINESS_CATEGORY} category · ${buildReqs.length} requirement${buildReqs.length !== 1 ? 's' : ''}`
+              : `No requirements found in the ${BUILD_READINESS_CATEGORY} category`
             }
           </p>
         </div>
-        <div className="shrink-0 text-[11px] text-stone-400 text-right leading-relaxed">
-          Categories matched: API, LTI, Data Export, SSO, Integration, Interoperability
+        <div className="shrink-0">
+          <span className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-600 ring-1 ring-inset ring-stone-200">
+            {BUILD_READINESS_CATEGORY}
+          </span>
         </div>
       </div>
 
       {!hasAnyBuildReqs && (
         <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 px-4 py-3 text-sm text-amber-700">
-          No TECHNICAL requirements are categorised with API, LTI, SSO, export, integration, or
-          interoperability keywords. Scores will show 0 until requirements are categorised.
+          No requirements are categorised as <strong>{BUILD_READINESS_CATEGORY}</strong>. Assign
+          requirements to this category for build-readiness scores to appear.
         </div>
       )}
 
@@ -239,10 +218,10 @@ export default async function BuildReadinessPage({
 // ─── Platform readiness card ───────────────────────────────────────────────────
 
 function ReadinessCard({ item, rank }: { item: PlatformReadiness; rank: number }) {
-  const { platform: p, overallPct, hasEval, subScores } = item
+  const { platform: p, overallPct, hasEval, reqScores } = item
   const isDQ = p.status === 'DISQUALIFIED'
 
-  const activeSubScores = subScores.filter(s => s.reqCount > 0)
+  const scoredReqs = reqScores.filter(r => r.pct !== null)
 
   return (
     <div className={`rounded-xl border bg-white overflow-hidden ${
@@ -281,7 +260,7 @@ function ReadinessCard({ item, rank }: { item: PlatformReadiness; rank: number }
               <p className={`text-2xl font-bold tabular-nums ${pctTextColor(overallPct)}`}>
                 {overallPct !== null ? `${overallPct.toFixed(1)}%` : '-'}
               </p>
-              <p className="text-[11px] text-stone-400 mt-0.5">Overall readiness</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">Integration readiness</p>
             </>
           )}
         </div>
@@ -299,37 +278,36 @@ function ReadinessCard({ item, rank }: { item: PlatformReadiness; rank: number }
         </div>
       )}
 
-      {/* Sub-scores */}
-      {hasEval && activeSubScores.length > 0 && (
+      {/* Per-requirement breakdown */}
+      {hasEval && scoredReqs.length > 0 && (
         <div className="border-t border-stone-100 px-5 py-3">
           <p className="text-[10.5px] font-semibold uppercase tracking-wider text-stone-400 mb-3">
-            Category breakdown
+            Requirement breakdown
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2.5">
-            {activeSubScores.map(({ group, pct, reqCount }) => (
-              <div key={group.key}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11.5px] text-stone-600 font-medium">{group.label}</span>
-                  <span className={`text-[11.5px] tabular-nums font-semibold ${pctTextColor(pct)}`}>
-                    {pct !== null ? `${pct.toFixed(0)}%` : '-'}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+            {scoredReqs.map(r => (
+              <div key={r.id}>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[11.5px] text-stone-600 truncate">{r.title}</span>
+                  <span className={`text-[11.5px] tabular-nums font-semibold shrink-0 ${pctTextColor(r.pct)}`}>
+                    {r.pct !== null ? `${r.pct.toFixed(0)}%` : '-'}
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${pctColor(pct)}`}
-                    style={{ width: pct !== null ? `${Math.min(100, pct)}%` : '0%' }}
+                    className={`h-full rounded-full ${pctColor(r.pct)}`}
+                    style={{ width: r.pct !== null ? `${Math.min(100, r.pct)}%` : '0%' }}
                   />
                 </div>
-                <p className="text-[10px] text-stone-400 mt-0.5">{reqCount} req{reqCount !== 1 ? 's' : ''}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {hasEval && activeSubScores.length === 0 && (
+      {hasEval && scoredReqs.length === 0 && (
         <div className="border-t border-stone-100 px-5 py-3 text-xs text-stone-400">
-          No requirements matched integration categories for this context filter.
+          No {BUILD_READINESS_CATEGORY} requirements scored for this platform.
         </div>
       )}
     </div>

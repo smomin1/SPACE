@@ -28,6 +28,8 @@ export interface FilterBarProps {
   contexts:   ContextOption[]
   platforms:  PlatformOption[]
   categories: string[]
+  /** Phase 6 scaffold: when true, the optional VITAL filters are shown. */
+  vitalEnabled?: boolean
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -48,6 +50,26 @@ const EVALUATOR_TYPE_OPTIONS = [
   { value: 'TECHNICAL', label: 'Technical' },
 ] as const
 
+// Phase 6 scaffold: optional VITAL filters (rendered only when a platform is linked).
+const VITAL_VERDICT_OPTIONS = [
+  { value: 'STRONG_FIT',  label: 'Strong fit' },
+  { value: 'GOOD_FIT',    label: 'Good fit' },
+  { value: 'PARTIAL_FIT', label: 'Partial fit' },
+  { value: 'POOR_FIT',    label: 'Poor fit' },
+] as const
+
+const VITAL_MIN_SCORE_OPTIONS = [
+  { value: '6', label: 'VITAL ≥ 6' },
+  { value: '7', label: 'VITAL ≥ 7' },
+  { value: '8', label: 'VITAL ≥ 8' },
+  { value: '9', label: 'VITAL ≥ 9' },
+] as const
+
+const VITAL_MAX_RISK_OPTIONS = [
+  { value: 'LOW',    label: 'Risk: Low only' },
+  { value: 'MEDIUM', label: 'Risk: ≤ Medium' },
+] as const
+
 // Default status when no param is present
 const DEFAULT_STATUSES = ['FINALISED']
 
@@ -64,7 +86,7 @@ function isDefaultStatuses(vals: string[]): boolean {
 
 // ─── Main component ─────────────────────────────────────────────────────────────
 
-export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
+export function FilterBar({ contexts, platforms, categories, vitalEnabled }: FilterBarProps) {
   const router   = useRouter()
   const pathname = usePathname()
   const params   = useSearchParams()
@@ -79,6 +101,11 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
   const evalTypeValue  = params.get('evaluatorType') ?? ''
   const evidenceValue  = params.get('evidenceQuality') ?? ''
   const showDq         = params.has('showDq')
+
+  // Phase 6 scaffold: VITAL filter state
+  const vitalVerdictValue = params.get('vitalVerdict') ?? ''
+  const minVital10Value   = params.get('minVital10') ?? ''
+  const maxRiskValue      = params.get('maxRisk') ?? ''
 
   // ── Update helpers ──────────────────────────────────────────────────────────
 
@@ -134,6 +161,9 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
     !!params.get('evaluatorType'),
     !!params.get('evidenceQuality'),
     showDq,
+    !!params.get('vitalVerdict'),
+    !!params.get('minVital10'),
+    !!params.get('maxRisk'),
   ].filter(Boolean).length
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -191,6 +221,41 @@ export function FilterBar({ contexts, platforms, categories }: FilterBarProps) {
           <SelectItem key={value} value={value}>{label}</SelectItem>
         ))}
       </FilterSelect>
+
+      {/* VITAL filters: opt-in, only when ≥1 platform is linked to a VITAL tool */}
+      {vitalEnabled && (
+        <>
+          <FilterSelect
+            placeholder="Any VITAL verdict"
+            value={vitalVerdictValue}
+            onChange={v => setSingle('vitalVerdict', v)}
+          >
+            {VITAL_VERDICT_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            placeholder="Any VITAL score"
+            value={minVital10Value}
+            onChange={v => setSingle('minVital10', v)}
+          >
+            {VITAL_MIN_SCORE_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            placeholder="Any risk"
+            value={maxRiskValue}
+            onChange={v => setSingle('maxRisk', v)}
+          >
+            {VITAL_MAX_RISK_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </FilterSelect>
+        </>
+      )}
 
       {/* Status: multi-select, default = Finalised */}
       <MultiSelect

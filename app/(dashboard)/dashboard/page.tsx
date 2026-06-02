@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   }
 
   if (canDo(role, 'access:evaluate')) {
-    return <EvaluatorDashboard userId={userId} />
+    return <EvaluatorDashboard userId={userId} role={role} />
   }
 
   return <ViewerDashboard />

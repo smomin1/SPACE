@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LicenceType, EvaluatorType, type Role } from '@prisma/client'
+import { LicenceType, EvaluatorType, EvaluationTrack, type Role } from '@prisma/client'
 import { platformBaseSchema, type PlatformFormValues } from '@/lib/platform-schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -154,15 +154,18 @@ export function PlatformForm({
     setError,
   } = useForm<PlatformFormValues>({
     resolver: zodResolver(platformBaseSchema) as import('react-hook-form').Resolver<PlatformFormValues>,
-    defaultValues: { trialAvailable: false, ...defaultValues },
+    defaultValues: { trialAvailable: false, track: EvaluationTrack.TOOL, ...defaultValues },
   })
 
   const trialAvailable = watch('trialAvailable')
+  const track = watch('track') ?? EvaluationTrack.TOOL
+  const isVital = track === EvaluationTrack.VITAL
 
   const [evaluators, setEvaluators] = React.useState<EvaluatorAssignment[]>(initialEvaluators)
   const [evalError, setEvalError] = React.useState<string | null>(null)
   const [pedagogyOpen, setPedagogyOpen] = React.useState(false)
   const [technicalOpen, setTechnicalOpen] = React.useState(false)
+  const [vitalOpen, setVitalOpen] = React.useState(false)
 
   function addEvaluator(user: UserOption, type: EvaluatorType) {
     if (evaluators.some((e) => e.userId === user.id)) return
@@ -201,6 +204,14 @@ export function PlatformForm({
   }
 
   function validateEvaluators(): boolean {
+    if (isVital) {
+      const hasVital = evaluators.some((e) => e.evaluatorType === EvaluatorType.VITAL)
+      if (!hasVital) {
+        setEvalError('At least one VITAL evaluator is required.')
+        return false
+      }
+      return true
+    }
     const hasPedagogy = evaluators.some((e) => e.evaluatorType === EvaluatorType.PEDAGOGY)
     const hasTechnical = evaluators.some((e) => e.evaluatorType === EvaluatorType.TECHNICAL)
     if (!hasPedagogy || !hasTechnical) {
@@ -278,6 +289,7 @@ export function PlatformForm({
 
   const pedagogyUsers = users.filter((u) => u.role === 'PEDAGOGY_EVALUATOR' || u.role === 'ADMIN')
   const technicalUsers = users.filter((u) => u.role === 'TECHNICAL_EVALUATOR' || u.role === 'ADMIN')
+  const vitalUsers = users.filter((u) => u.role === 'VITAL_EVALUATOR' || u.role === 'ADMIN')
   const assignedUserIds = new Set(evaluators.map((e) => e.userId))
 
   return (
@@ -286,6 +298,42 @@ export function PlatformForm({
       {/* ── Section 1: Platform Details ─────────────────────────── */}
       <div className="space-y-4">
         <h2 className="text-base font-semibold">Platform Details</h2>
+
+        {/* Evaluation track, chosen at registration, fixed thereafter. */}
+        <div className="space-y-1.5">
+          <Label>Evaluation track</Label>
+          {isEdit ? (
+            <div className="flex h-9 w-fit items-center rounded-md border border-stone-200 bg-stone-50 px-3 text-[13px] text-stone-700">
+              {isVital ? 'VITAL' : 'Tool Evaluator'}
+            </div>
+          ) : (
+            <div className="inline-flex rounded-md border border-stone-200 p-0.5">
+              {[
+                { value: EvaluationTrack.TOOL, label: 'Tool Evaluator' },
+                { value: EvaluationTrack.VITAL, label: 'VITAL' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => { setValue('track', opt.value); setEvalError(null) }}
+                  className={cn(
+                    'rounded px-3 h-8 text-[13px] font-medium transition-colors',
+                    track === opt.value
+                      ? 'bg-emerald-900 text-white'
+                      : 'text-stone-600 hover:bg-stone-100'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {isVital
+              ? 'A VITAL evaluator fills the tool profile; the recommendation engine reruns on submit.'
+              : 'Scored independently by Pedagogy and Technical evaluators.'}
+          </p>
+        </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="name">Name *</Label>
@@ -332,34 +380,53 @@ export function PlatformForm({
       <div className="space-y-4">
         <h2 className="text-base font-semibold">Evaluators</h2>
         <p className="text-sm text-muted-foreground">
-          Assign at least one Pedagogy and one Technical evaluator.
+          {isVital
+            ? 'Assign at least one VITAL evaluator. They fill the VITAL profile after registration.'
+            : 'Assign at least one Pedagogy and one Technical evaluator.'}
         </p>
 
-        {/* Pedagogy */}
-        <EvaluatorSection
-          label="Pedagogy"
-          type={EvaluatorType.PEDAGOGY}
-          evaluators={evaluators}
-          available={pedagogyUsers.filter((u) => !assignedUserIds.has(u.id))}
-          open={pedagogyOpen}
-          onOpenChange={setPedagogyOpen}
-          onAdd={(u) => { addEvaluator(u, EvaluatorType.PEDAGOGY); setPedagogyOpen(false) }}
-          onRemove={removeEvaluator}
-          onToggleLead={toggleLead}
-        />
+        {isVital ? (
+          /* VITAL */
+          <EvaluatorSection
+            label="VITAL"
+            type={EvaluatorType.VITAL}
+            evaluators={evaluators}
+            available={vitalUsers.filter((u) => !assignedUserIds.has(u.id))}
+            open={vitalOpen}
+            onOpenChange={setVitalOpen}
+            onAdd={(u) => { addEvaluator(u, EvaluatorType.VITAL); setVitalOpen(false) }}
+            onRemove={removeEvaluator}
+            onToggleLead={toggleLead}
+          />
+        ) : (
+          <>
+            {/* Pedagogy */}
+            <EvaluatorSection
+              label="Pedagogy"
+              type={EvaluatorType.PEDAGOGY}
+              evaluators={evaluators}
+              available={pedagogyUsers.filter((u) => !assignedUserIds.has(u.id))}
+              open={pedagogyOpen}
+              onOpenChange={setPedagogyOpen}
+              onAdd={(u) => { addEvaluator(u, EvaluatorType.PEDAGOGY); setPedagogyOpen(false) }}
+              onRemove={removeEvaluator}
+              onToggleLead={toggleLead}
+            />
 
-        {/* Technical */}
-        <EvaluatorSection
-          label="Technical"
-          type={EvaluatorType.TECHNICAL}
-          evaluators={evaluators}
-          available={technicalUsers.filter((u) => !assignedUserIds.has(u.id))}
-          open={technicalOpen}
-          onOpenChange={setTechnicalOpen}
-          onAdd={(u) => { addEvaluator(u, EvaluatorType.TECHNICAL); setTechnicalOpen(false) }}
-          onRemove={removeEvaluator}
-          onToggleLead={toggleLead}
-        />
+            {/* Technical */}
+            <EvaluatorSection
+              label="Technical"
+              type={EvaluatorType.TECHNICAL}
+              evaluators={evaluators}
+              available={technicalUsers.filter((u) => !assignedUserIds.has(u.id))}
+              open={technicalOpen}
+              onOpenChange={setTechnicalOpen}
+              onAdd={(u) => { addEvaluator(u, EvaluatorType.TECHNICAL); setTechnicalOpen(false) }}
+              onRemove={removeEvaluator}
+              onToggleLead={toggleLead}
+            />
+          </>
+        )}
 
         {evalError && <p className="text-sm text-destructive">{evalError}</p>}
       </div>

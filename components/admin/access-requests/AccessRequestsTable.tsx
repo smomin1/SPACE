@@ -92,7 +92,7 @@ function ActionButtons({ request }: { request: AccessRequest }) {
           if (data.emailSent === false && data.tempPassword) {
             setTempPassword(data.tempPassword)
           } else {
-            toast.success(`Approved — temporary password emailed to ${request.email}`)
+            toast.success(`Approved: temporary password emailed to ${request.email}`)
           }
         } else {
           toast.success(`Rejected request from ${request.name}`)
@@ -109,11 +109,11 @@ function ActionButtons({ request }: { request: AccessRequest }) {
 
   return (
     <>
-      {/* Shown when email delivery fails — admin can copy and share manually */}
+      {/* Shown when email delivery fails; admin can copy and share manually */}
       <Dialog open={tempPassword !== null} onOpenChange={(open) => { if (!open) setTempPassword(null) }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Account created — email not sent</DialogTitle>
+            <DialogTitle>Account created, email not sent</DialogTitle>
             <DialogDescription>
               The account for <strong>{request.name}</strong> ({request.email}) was created but the welcome email could not be delivered. Share this temporary password with them directly.
             </DialogDescription>

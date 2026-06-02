@@ -46,6 +46,7 @@ export function StatusChip({
 const TYPE_META: Record<EvaluatorType, { tone: Tone; mark: string; label: string }> = {
   PEDAGOGY:  { tone: "emerald", mark: "P", label: "Pedagogy"  },
   TECHNICAL: { tone: "forest",  mark: "T", label: "Technical" },
+  VITAL:     { tone: "hollow",  mark: "V", label: "VITAL"     },
   BOTH:      { tone: "amber",   mark: "B", label: "Both"      },
 }
 

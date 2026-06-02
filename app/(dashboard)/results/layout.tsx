@@ -18,12 +18,13 @@ export default async function ResultsLayout({
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'view:results')) redirect('/dashboard')
 
-  const [contexts, platforms, categoryRows] = await Promise.all([
+  const [contexts, platforms, categoryRows, linkedVitalTools] = await Promise.all([
     prisma.context.findMany({
       orderBy: { name: 'asc' },
       select: { id: true, name: true },
     }),
     prisma.platform.findMany({
+      where: { track: { not: 'VITAL' } },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, status: true },
     }),
@@ -33,6 +34,8 @@ export default async function ResultsLayout({
       distinct: ['category'],
       orderBy: { category: 'asc' },
     }),
+    // Phase 6 scaffold: VITAL filters only render once ≥1 platform is linked.
+    prisma.vitalTool.count({ where: { platformId: { not: null } } }),
   ])
 
   const categories = categoryRows.map((r) => r.category!)
@@ -59,6 +62,7 @@ export default async function ResultsLayout({
                 contexts={contexts}
                 platforms={platforms}
                 categories={categories}
+                vitalEnabled={linkedVitalTools > 0}
               />
             </Suspense>
           </div>

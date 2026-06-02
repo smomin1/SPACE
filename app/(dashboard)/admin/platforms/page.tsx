@@ -17,6 +17,7 @@ export default async function PlatformsPage() {
       id: true,
       name: true,
       vendor: true,
+      track: true,
       licenceType: true,
       trialAvailable: true,
       evaluatorAssignments: {

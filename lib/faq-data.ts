@@ -335,6 +335,79 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     ],
   },
   {
+    id: 'vital',
+    title: 'VITAL Module',
+    description: 'Evaluate EdTech tools against the VITAL framework: pillars, skills, CEFR levels, and recommendations.',
+    items: [
+      {
+        question: 'What is the VITAL module?',
+        answer:
+          'VITAL is a standalone module for rating English-language EdTech tools against a school framework. VITAL stands for the five pillars it scores each tool on: Visible learning, Inclusive pedagogy, Technology (right tech), Assessment for learning, and Learner agency. Each tool is also mapped across six skills (Vocabulary, Listening, Speaking, Reading, Writing, Grammar) and a 22 point CEFR sub level scale. From this it produces tool recommendations per skill and level.',
+        keywords: ['vital', 'pillars', 'framework', 'edtech', 'overview', 'module'],
+      },
+      {
+        question: 'How is VITAL different from Tool Evaluator?',
+        answer:
+          'VITAL is its own section with its own data. It does not use the IN_PROGRESS, MERGED, FINALISED evaluation lifecycle, and it does not score against the shared requirement set. It is a separate catalogue of tools rated against the VITAL pillars, skills, and CEFR levels. A VITAL tool can optionally link to a Platform so its attributes can later filter the main Results dashboard.',
+        keywords: ['vital', 'difference', 'standalone', 'lifecycle', 'separate'],
+      },
+      {
+        question: 'Who can view and manage VITAL?',
+        answer:
+          'All signed in roles can view the VITAL dashboards. Managing the VITAL catalogue (tools, recommendations, levels, skills and workbook imports) is gated behind the manage:vital permission, held by Super Admin and Admin only. The VITAL Evaluator role fills VITAL profiles for its assigned platforms through the evaluations workspace; submitting a profile reruns the recommendation engine.',
+        keywords: ['vital', 'permissions', 'vital evaluator', 'role', 'access'],
+      },
+      {
+        question: 'What VITAL dashboards are available?',
+        answer:
+          'Recommendation Engine: pick a skill and CEFR level to see the best core and supplementary tool, combined pillar coverage, and a deployment note.\nLevel Stack: the full six skill stack for one level.\nFull Grid: the six skills by 22 levels matrix.\nCEFR Map: each tool mapped across the 22 levels.\nTool Landscape: per tool skill coverage, dependency, pillar ratings, and scores.\nAssessment Landscape: assessment tools with adaptive testing and level coverage.\nCatalogue: browse every tool and open its full profile.',
+        keywords: ['vital', 'dashboards', 'recommendation', 'grid', 'landscape', 'cefr'],
+      },
+      {
+        question: 'How is the VITAL / 10 score calculated?',
+        answer:
+          'VITAL / 10 is derived automatically from the five pillar ratings, not entered by hand. Each pillar rating contributes points: Y counts 2, P counts 1, N counts 0, so the five pillars sum to a score from 0 to 10. Assessment tools have no pillar profile, so their VITAL / 10 is left blank. In the tool form the score is shown read only and updates live as you change the pillar ratings.',
+        keywords: ['vital', 'score', '10', 'pillars', 'calculated', 'derived'],
+      },
+      {
+        question: 'What is the V2 / 50 score?',
+        answer:
+          'V2 / 50 is a separate rubric score carried over from the source workbooks. Unlike VITAL / 10 it is not derived from the pillar ratings, so it is entered and edited manually in the tool form.',
+        keywords: ['vital', 'v2', '50', 'rubric', 'manual'],
+      },
+      {
+        question: 'How are VITAL recommendations chosen?',
+        answer:
+          'For each skill and level, the core and supplementary tool are derived automatically from the catalogue. Only tools that cover both that skill and that level are eligible. Eligible tools are ranked by coverage strength first (Full beats Partial), then by highest VITAL / 10, then by lowest de facto risk. The core tool comes from the Core role pool and the supplementary tool from the Supplementary pool. Once the pair is set, the combined pillar coverage, compliance status, risk, and dependency are all recomputed from that pairing.',
+        keywords: ['vital', 'recommendation', 'derived', 'ranking', 'core', 'supplementary', 'eligibility'],
+      },
+      {
+        question: 'Can I override a derived recommendation?',
+        answer:
+          'Yes. Each tool slot has an Override toggle. Left off, the slot is auto picked from the catalogue. Turned on, you pin a specific tool of your choice and that choice is preserved through future recomputes. The downstream fields (pillar coverage, status, risk, dependency) still cascade from whichever tools are effective. The deployment note is always free text and is never derived. In the admin table a lock icon marks a pinned tool.',
+        keywords: ['vital', 'override', 'lock', 'pin', 'manual', 'recommendation'],
+      },
+      {
+        question: 'What does the Recompute button do?',
+        answer:
+          'On the Recommendations tab, Recompute re derives every recommendation from the current tool data while respecting locked slots. Pinned tools stay as they are, unlocked slots are auto picked again, and all downstream fields are refreshed. Use it after editing tools so the recommendations reflect the latest catalogue.',
+        keywords: ['vital', 'recompute', 'refresh', 'recommendation', 'derive'],
+      },
+      {
+        question: 'What do the order fields on VITAL skills and levels do?',
+        answer:
+          'Order is only a display sort key. It fixes the sequence skills and levels appear in across every dashboard and selector, for example Vocabulary first through Grammar last, and A0 through C1+. It does not define CEFR meaning: a level\'s band and status are held separately by its score band and CEFR status fields.',
+        keywords: ['vital', 'order', 'sort', 'skills', 'levels', 'sequence'],
+      },
+      {
+        question: 'How do I import VITAL data from a workbook?',
+        answer:
+          'From VITAL Admin, click Import and upload an XLSX workbook. The importer detects the workbook type, then shows a preview that lists new rows (auto selected) and changed rows as a before and after diff with per row checkboxes. Nothing is written until you confirm. Approved changes are applied in one step and recorded in the import history with created, updated, and skipped counts.',
+        keywords: ['vital', 'import', 'xlsx', 'workbook', 'diff', 'review'],
+      },
+    ],
+  },
+  {
     id: 'exports',
     title: 'Exports',
     description: 'Take SPACE data outside the application.',

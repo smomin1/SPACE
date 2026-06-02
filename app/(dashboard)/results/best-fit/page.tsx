@@ -12,7 +12,6 @@ import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 const WEIGHT_MAP: Record<WeightLevel, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 }
 const MAX_SCORE              = 4    // denominator used by scoring.ts
 const SATISFACTION_THRESHOLD = MAX_SCORE * 0.75  // = 3: requirement is "satisfied" at ≥75% of max
-const MARGINAL_THRESHOLD     = 2.0  // min % gain needed to add another platform to the set
 const MAX_SET_SIZE           = 5    // cap on combination size
 const GAP_CATEGORY_THRESHOLD = 75   // below this % in category = gap (matches 75% satisfaction rule)
 
@@ -138,44 +137,66 @@ function greedySetCover(
   bestPerReq: Map<string, { score: number; platformId: string }>
   marginalGains: Map<string, number>
 } {
-  // Total possible denominator (reqs that any platform has scored)
+  // Requirement IDs that any platform has scored (non-null)
   const scoredReqIds = new Set<string>()
   for (const scores of platformScores.values()) {
     for (const rid of scores.keys()) scoredReqIds.add(rid)
   }
-  const totalPossible = requirements
+  // Total weight of all scorable requirements, used to express each pick's
+  // marginal contribution as a % of requirement coverage.
+  const totalReqWeight = requirements
     .filter(r => scoredReqIds.has(r.id))
-    .reduce((sum, r) => sum + MAX_SCORE * WEIGHT_MAP[r.weight], 0)
+    .reduce((sum, r) => sum + WEIGHT_MAP[r.weight], 0)
 
   const selectedIds: string[] = []
   const bestPerReq = new Map<string, { score: number; platformId: string }>()
   const marginalGains = new Map<string, number>()
 
+  // Greedy set cover: at each step add the platform that *newly satisfies* the
+  // most (weight-prioritised) requirements. A requirement is satisfied once its
+  // best score reaches SATISFACTION_THRESHOLD. This maximises requirement
+  // coverage with the fewest platforms. Ties (and the first pick when nothing
+  // yet clears the bar) fall back to raw weighted-score improvement.
   for (let i = 0; i < MAX_SET_SIZE; i++) {
-    let bestGain = 0
     let bestId: string | null = null
+    let bestWeightedNew = 0   // weighted count of newly-satisfied requirements
+    let bestScoreGain = 0     // tiebreak / fallback: weighted score improvement
 
     for (const p of platforms) {
       if (selectedIds.includes(p.id)) continue
       const scores = platformScores.get(p.id)
       if (!scores) continue
 
-      let gain = 0
+      let weightedNew = 0
+      let scoreGain = 0
       for (const req of requirements) {
-        const newScore     = scores.get(req.id) ?? 0
-        const currentBest  = bestPerReq.get(req.id)?.score ?? 0
-        const improvement  = Math.max(0, newScore - currentBest)
-        gain += improvement * WEIGHT_MAP[req.weight]
+        const newScore    = scores.get(req.id) ?? 0
+        const currentBest = bestPerReq.get(req.id)?.score ?? 0
+        if (newScore > currentBest) {
+          scoreGain += (newScore - currentBest) * WEIGHT_MAP[req.weight]
+        }
+        if (currentBest < SATISFACTION_THRESHOLD && newScore >= SATISFACTION_THRESHOLD) {
+          weightedNew += WEIGHT_MAP[req.weight]
+        }
       }
-      if (gain > bestGain) { bestGain = gain; bestId = p.id }
+
+      if (
+        weightedNew > bestWeightedNew ||
+        (weightedNew === bestWeightedNew && scoreGain > bestScoreGain)
+      ) {
+        bestWeightedNew = weightedNew
+        bestScoreGain = scoreGain
+        bestId = p.id
+      }
     }
 
     if (!bestId) break
-    const gainPct = totalPossible > 0 ? (bestGain / totalPossible) * 100 : 0
-    if (i > 0 && gainPct < MARGINAL_THRESHOLD) break
+    // Stop once an extra platform satisfies no further requirements (the first
+    // pick always seeds the set, even if nothing clears the satisfaction bar).
+    if (i > 0 && bestWeightedNew === 0) break
 
     selectedIds.push(bestId)
-    marginalGains.set(bestId, gainPct)
+    marginalGains.set(bestId, totalReqWeight > 0 ? (bestWeightedNew / totalReqWeight) * 100 : 0)
 
     const scores = platformScores.get(bestId)!
     for (const req of requirements) {
@@ -418,6 +439,7 @@ export default async function BestFitPage({
     prisma.platform.findMany({
       where: {
         status: 'ACTIVE',
+        track: { not: 'VITAL' },
         ...(isSinglePlatform && { id: { in: platformIds } }),
       },
       orderBy: { name: 'asc' },
@@ -732,7 +754,7 @@ function SetMemberCard({
             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold text-white ${
               isPrimary ? 'bg-emerald-600' : 'bg-stone-500'
             }`}>
-              {isPrimary ? 'Primary' : `+${m.marginalGainPct.toFixed(1)}% gain`}
+              {isPrimary ? 'Primary' : `+${m.marginalGainPct.toFixed(1)}% coverage`}
             </span>
             <span className="text-[11px] text-stone-400 tabular-nums">#{rank}</span>
           </div>

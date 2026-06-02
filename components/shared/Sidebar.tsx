@@ -19,6 +19,8 @@ import {
   SparklesIcon,
   HelpCircleIcon,
   InboxIcon,
+  CompassIcon,
+  GraduationCapIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -45,7 +47,7 @@ const NAV_ITEMS: NavItem[] = [
     href: '/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboardIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/admin/users',
@@ -81,25 +83,37 @@ const NAV_ITEMS: NavItem[] = [
     href: '/tool-scanner',
     label: 'Tool Scanner',
     icon: SparklesIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/evaluations',
     label: 'Evaluations',
     icon: ClipboardCheckIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'],
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'],
+  },
+  {
+    href: '/vital',
+    label: 'VITAL Results',
+    icon: CompassIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
     href: '/results',
     label: 'Results',
     icon: BarChart2Icon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/admin/vital',
+    label: 'VITAL Admin',
+    icon: GraduationCapIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
     href: '/faq',
     label: 'FAQ',
     icon: HelpCircleIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER'],
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
 ]
 

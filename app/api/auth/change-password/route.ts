@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   }
 
   // When mustChangePassword is true the user is logging in for the first time with a
-  // temp password — verify the current (temp) password before allowing the change.
+  // temp password. Verify the current (temp) password before allowing the change.
   const match = await bcrypt.compare(currentPassword, user.passwordHash)
   if (!match) {
     return Response.json({ error: 'Current password is incorrect.', code: 'WRONG_PASSWORD' }, { status: 400 })

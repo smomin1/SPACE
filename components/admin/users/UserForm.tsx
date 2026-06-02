@@ -18,6 +18,7 @@ const ALL_ROLE_OPTIONS: { value: Role; label: string; description: string }[] = 
   { value: 'ADMIN',                label: 'Admin',                description: 'Full access to platforms, requirements, contexts, and evaluations. Cannot create accounts.' },
   { value: 'PEDAGOGY_EVALUATOR',   label: 'Pedagogy Evaluator',   description: 'Scores pedagogy requirements.' },
   { value: 'TECHNICAL_EVALUATOR',  label: 'Technical Evaluator',  description: 'Scores technical requirements.' },
+  { value: 'VITAL_EVALUATOR',      label: 'VITAL Evaluator',      description: 'Manages the VITAL evaluation module.' },
   { value: 'VIEWER',               label: 'Viewer',               description: 'Read-only access to results and dashboards.' },
 ]
 
@@ -108,7 +109,7 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
 
       toast.success(
         mode === 'create'
-          ? 'User created — a temporary password has been sent to their email'
+          ? 'User created: a temporary password has been sent to their email'
           : 'User updated',
       )
       router.push('/admin/users')

@@ -27,6 +27,7 @@ const ROLE_OPTIONS = [
   { value: 'ADMIN',               label: 'Admin',               description: 'Full platform management access' },
   { value: 'PEDAGOGY_EVALUATOR',  label: 'Pedagogy Evaluator',  description: 'Scores pedagogy requirements' },
   { value: 'TECHNICAL_EVALUATOR', label: 'Technical Evaluator', description: 'Scores technical requirements' },
+  { value: 'VITAL_EVALUATOR',     label: 'VITAL Evaluator',     description: 'Manages the VITAL evaluation module' },
   { value: 'VIEWER',              label: 'Viewer',              description: 'Read-only access to results' },
 ]
 

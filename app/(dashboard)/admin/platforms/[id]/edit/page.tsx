@@ -27,7 +27,7 @@ export default async function EditPlatformPage({ params }: Props) {
       },
     }),
     prisma.user.findMany({
-      where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR'] } },
+      where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'] } },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, email: true, role: true },
     }),
@@ -51,6 +51,7 @@ export default async function EditPlatformPage({ params }: Props) {
         defaultValues={{
           name: platform.name,
           vendor: platform.vendor,
+          track: platform.track,
           licenceType: platform.licenceType ?? undefined,
           trialAvailable: platform.trialAvailable,
         }}

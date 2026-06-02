@@ -1,6 +1,7 @@
 import { PrismaClient, Role, EvaluatorType, WeightLevel } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
+import { seedVital } from "./seed-vital";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -12,6 +13,7 @@ async function main() {
     { email: "pedagogy@eval.com",   name: "Pedagogy Evaluator",   role: Role.PEDAGOGY_EVALUATOR,  password: "Evaluator1234!" },
     { email: "technical@eval.com",  name: "Technical Evaluator",  role: Role.TECHNICAL_EVALUATOR, password: "Evaluator1234!" },
     { email: "viewer@eval.com",     name: "Viewer",               role: Role.VIEWER,              password: "Viewer1234!" },
+    { email: "vital@eval.com",      name: "VITAL Evaluator",      role: Role.VITAL_EVALUATOR,     password: "Evaluator1234!" },
   ];
 
   for (const u of testUsers) {
@@ -109,9 +111,13 @@ async function main() {
     },
   ];
 
-  // Wipe and repopulate so the seed stays idempotent without a unique key on title
-  await prisma.requirement.deleteMany({});
-  await prisma.requirement.createMany({ data: requirements });
+  // Seed sample requirements only on an empty DB. Re-running against a populated
+  // DB must not wipe requirements, since that would cascade into real Scores.
+  if ((await prisma.requirement.count()) === 0) {
+    await prisma.requirement.createMany({ data: requirements });
+  }
+
+  await seedVital(prisma);
 
   console.log("Seed complete.");
 }

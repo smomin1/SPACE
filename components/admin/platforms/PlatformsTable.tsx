@@ -76,6 +76,7 @@ type PlatformRow = {
   id: string
   name: string
   vendor: string
+  track: 'TOOL' | 'VITAL'
   licenceType: LicenceType | null
   trialAvailable: boolean
   evaluatorAssignments: { id: string; evaluatorType: string }[]
@@ -391,11 +392,25 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = React.useState('')
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'name', desc: false }])
+  const [activeTrack, setActiveTrack] = React.useState<'TOOL' | 'VITAL'>('TOOL')
 
   const columns = React.useMemo(buildColumns, [])
 
+  const trackCounts = React.useMemo(
+    () => ({
+      TOOL: initialData.filter((p) => (p.track ?? 'TOOL') === 'TOOL').length,
+      VITAL: initialData.filter((p) => p.track === 'VITAL').length,
+    }),
+    [initialData],
+  )
+
+  const data = React.useMemo(
+    () => initialData.filter((p) => (p.track ?? 'TOOL') === activeTrack),
+    [initialData, activeTrack],
+  )
+
   const table = useReactTable({
-    data: initialData,
+    data,
     columns,
     initialState: { pagination: { pageSize: PAGE_SIZE, pageIndex: 0 } },
     state: { columnFilters, globalFilter, sorting },
@@ -419,6 +434,35 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
 
   return (
     <div className="space-y-4">
+      <div className="inline-flex rounded-lg border border-stone-200/80 bg-white p-1">
+        {([
+          { key: 'TOOL', label: 'Tool Evaluator' },
+          { key: 'VITAL', label: 'VITAL' },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setActiveTrack(t.key)}
+            className={cn(
+              'rounded-md px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors',
+              activeTrack === t.key
+                ? 'bg-emerald-900 text-white'
+                : 'text-stone-600 hover:bg-stone-100',
+            )}
+          >
+            {t.label}
+            <span
+              className={cn(
+                'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[10px] font-semibold',
+                activeTrack === t.key ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500',
+              )}
+            >
+              {trackCounts[t.key]}
+            </span>
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-stone-400" />
@@ -459,7 +503,7 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
 
         <div className="ml-auto flex items-center gap-3">
           <span className="hidden text-[12px] text-stone-500 md:inline">
-            <span className="font-mono tabular-nums text-emerald-950">{initialData.length}</span> platforms
+            <span className="font-mono tabular-nums text-emerald-950">{data.length}</span> platforms
           </span>
           <Button size="sm" className="bg-emerald-800 hover:bg-emerald-900 text-white" asChild>
             <Link href="/admin/platforms/new">

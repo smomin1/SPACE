@@ -22,7 +22,7 @@ const createSchema = z.object({
     'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
   ], { message: 'Please select a team' }),
   requestedRole: z.enum([
-    'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VIEWER',
+    'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER',
   ], { message: 'Please select a role' }),
   notes: z.string().max(500, 'Notes must be under 500 characters').optional(),
 })

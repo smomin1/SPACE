@@ -10,6 +10,14 @@ import { Label } from '@/components/ui/label'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
 export default function ResetPasswordPage() {
+  return (
+    <React.Suspense>
+      <ResetPasswordForm />
+    </React.Suspense>
+  )
+}
+
+function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token') ?? ''
 

@@ -39,7 +39,7 @@ export default async function EvaluationWorkspacePage({
       id: true,
       state: true,
       lockedAt: true,
-      platform: { select: { id: true, name: true, vendor: true, status: true } },
+      platform: { select: { id: true, name: true, vendor: true, status: true, track: true } },
       assignments: {
         select: {
           userId: true,
@@ -53,6 +53,9 @@ export default async function EvaluationWorkspacePage({
   })
 
   if (!evaluation) notFound()
+
+  // VITAL evaluations have their own workspace — never render the Tool Evaluator views for them
+  if (evaluation.platform.track === 'VITAL') redirect(`/vital-evaluate/${evaluationId}`)
 
   const isEvaluator = canDo(role, 'access:evaluate')
   const isAdmin = canDo(role, 'lock:evaluation')

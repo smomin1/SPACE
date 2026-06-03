@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { EvaluationState, EvaluatorType, LicenceType, PlatformStatus } from '@prisma/client'
+import type { EvaluationState, EvaluatorType, EvaluationTrack, LicenceType, PlatformStatus } from '@prisma/client'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -19,6 +19,7 @@ type PlatformDetailData = {
   name: string
   vendor: string
   status: PlatformStatus
+  track: EvaluationTrack
   licenceType: LicenceType | null
   trialAvailable: boolean
   evaluatorAssignments: {
@@ -82,7 +83,7 @@ export function PlatformDetail({ platform }: PlatformDetailProps) {
             <EvalStateBadge value={latestEval?.state ?? null} />
             {latestEval && (
               <Link
-                href={`/evaluate/${latestEval.id}`}
+                href={platform.track === 'VITAL' ? `/vital-evaluate/${latestEval.id}` : `/evaluate/${latestEval.id}`}
                 className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:text-emerald-900 transition-colors"
               >
                 Open

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { vitalToolSchema } from "@/lib/vital/schema";
 import { vitalScore10FromPillars } from "@/lib/vital/compute";
 import { recomputeRecommendations } from "@/lib/vital/derive-server";
+import { transitionEvaluation } from "@/lib/evaluation-state";
 
 // A VITAL evaluator fills the platform's VitalTool profile and submits.
 // One VitalTool is linked to the platform (upsert by platformId). On submit we
@@ -132,6 +133,17 @@ export async function POST(
       );
     }
     return Response.json({ error: "Internal Server Error", code: "INTERNAL_ERROR" }, { status: 500 });
+  }
+
+  // VITAL evaluations have no conflict resolution phase. Once all evaluators
+  // have submitted (state just advanced to MERGED), immediately finalise.
+  // transitionEvaluation checks canTransitionTo which passes when there are
+  // zero open conflict threads — always true for VITAL evaluations.
+  const allSubmittedNow = evaluation.assignments.every(
+    (a) => a.id === assignment?.id || a.hasSubmitted
+  );
+  if (allSubmittedNow && evaluation.state === "IN_PROGRESS") {
+    await transitionEvaluation(evaluationId, "FINALISED", session.user.id);
   }
 
   // Catalogue changed → rebuild the recommendation matrix from it.

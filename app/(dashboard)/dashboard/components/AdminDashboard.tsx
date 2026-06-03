@@ -34,7 +34,7 @@ export async function AdminDashboard() {
           id: true,
           state: true,
           createdAt: true,
-          platform: { select: { id: true, name: true, vendor: true, status: true } },
+          platform: { select: { id: true, name: true, vendor: true, status: true, track: true } },
           assignments: {
             select: { userId: true, evaluatorType: true, hasSubmitted: true },
           },
@@ -67,7 +67,7 @@ export async function AdminDashboard() {
           submittedAt: true,
           evaluatorType: true,
           user: { select: { name: true } },
-          evaluation: { select: { id: true, platform: { select: { name: true } } } },
+          evaluation: { select: { id: true, platform: { select: { name: true, track: true } } } },
         },
       }),
       prisma.platform.count(),
@@ -82,6 +82,7 @@ export async function AdminDashboard() {
     evaluationId: string
     platformName: string
     vendor: string
+    track: string
     state: 'IN_PROGRESS' | 'MERGED' | 'FINALISED'
     pedagogyProgress: { submitted: number; total: number }
     technicalProgress: { submitted: number; total: number }
@@ -89,26 +90,30 @@ export async function AdminDashboard() {
     ageInDays: number
   }
 
-  const healthRows: HealthRow[] = activeEvaluations.map(e => {
-    const pedagogy  = e.assignments.filter(a => a.evaluatorType === 'PEDAGOGY')
-    const technical = e.assignments.filter(a => a.evaluatorType === 'TECHNICAL')
-    return {
-      evaluationId: e.id,
-      platformName: e.platform.name,
-      vendor: e.platform.vendor,
-      state: e.state,
-      pedagogyProgress: {
-        submitted: pedagogy.filter(a => a.hasSubmitted).length,
-        total: pedagogy.length,
-      },
-      technicalProgress: {
-        submitted: technical.filter(a => a.hasSubmitted).length,
-        total: technical.length,
-      },
-      openConflicts: e.conflictThreads.filter(t => !t.isClosed).length,
-      ageInDays: Math.floor((now - e.createdAt.getTime()) / 86_400_000),
-    }
-  })
+  const healthRows: HealthRow[] = activeEvaluations
+    // Keep Tool Evaluator evaluations only — VITAL has its own profile flow
+    .filter(e => (e.platform.track ?? 'TOOL') !== 'VITAL')
+    .map(e => {
+      const pedagogy  = e.assignments.filter(a => a.evaluatorType === 'PEDAGOGY')
+      const technical = e.assignments.filter(a => a.evaluatorType === 'TECHNICAL')
+      return {
+        evaluationId: e.id,
+        platformName: e.platform.name,
+        vendor: e.platform.vendor,
+        track: e.platform.track ?? 'TOOL',
+        state: e.state,
+        pedagogyProgress: {
+          submitted: pedagogy.filter(a => a.hasSubmitted).length,
+          total: pedagogy.length,
+        },
+        technicalProgress: {
+          submitted: technical.filter(a => a.hasSubmitted).length,
+          total: technical.length,
+        },
+        openConflicts: e.conflictThreads.filter(t => !t.isClosed).length,
+        ageInDays: Math.floor((now - e.createdAt.getTime()) / 86_400_000),
+      }
+    })
 
   const stalledEvaluations = healthRows.filter(
     r => r.state === 'MERGED' && r.openConflicts >= 1,
@@ -120,15 +125,18 @@ export async function AdminDashboard() {
     at: Date
     label: string
     evalId: string
+    track: 'TOOL' | 'VITAL'
   }
 
   const activityFeed: ActivityItem[] = [
+    // Conflict messages are always Tool Evaluator (VITAL has no conflicts)
     ...recentMessages.map(m => ({
       key: `msg-${m.id}`,
       type: 'message' as const,
       at: m.createdAt,
       label: `${m.author.name ?? 'Someone'} posted in ${m.thread.evaluation.platform.name}`,
       evalId: m.thread.evaluationId,
+      track: 'TOOL' as const,
     })),
     ...recentSubmissions
       .filter(s => s.submittedAt !== null)
@@ -136,8 +144,9 @@ export async function AdminDashboard() {
         key: `sub-${s.submittedAt!.toISOString()}-${s.user.name}`,
         type: 'submission' as const,
         at: s.submittedAt!,
-        label: `${s.user.name ?? 'Someone'} submitted ${s.evaluatorType === 'PEDAGOGY' ? 'Pedagogy' : 'Technical'} scores for ${s.evaluation.platform.name}`,
+        label: `${s.user.name ?? 'Someone'} submitted ${s.evaluatorType === 'VITAL' ? 'VITAL profile' : s.evaluatorType === 'PEDAGOGY' ? 'Pedagogy' : 'Technical'} scores for ${s.evaluation.platform.name}`,
         evalId: s.evaluation.id,
+        track: (s.evaluation.platform.track ?? 'TOOL') as 'TOOL' | 'VITAL',
       })),
   ]
     .sort((a, b) => b.at.getTime() - a.at.getTime())
@@ -317,7 +326,7 @@ export async function AdminDashboard() {
           ) : (
             <div className="space-y-3">
               {activityFeed.map(item => (
-                <Link key={item.key} href={`/evaluate/${item.evalId}`}>
+                <Link key={item.key} href={item.track === 'VITAL' ? `/vital-evaluate/${item.evalId}` : `/evaluate/${item.evalId}`}>
                   <div className="flex items-start gap-3 py-2 rounded-md hover:bg-stone-50 px-2 transition-colors">
                     <div className={cn(
                       'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full ring-1',

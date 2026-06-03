@@ -11,11 +11,19 @@ export default async function NewPlatformPage() {
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'manage:platform')) redirect('/dashboard')
 
-  const users = await prisma.user.findMany({
-    where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'] } },
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true, email: true, role: true },
-  })
+  const [users, vitalTools] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: { in: ['ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'] } },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, email: true, role: true },
+    }),
+    // Available VITAL apps to link: only those not yet linked to another platform
+    prisma.vitalTool.findMany({
+      where: { platformId: null, isAssessmentTool: false },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true },
+    }),
+  ])
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -30,7 +38,7 @@ export default async function NewPlatformPage() {
           </p>
         </div>
       </div>
-      <PlatformForm users={users} />
+      <PlatformForm users={users} vitalTools={vitalTools} />
     </div>
   )
 }

@@ -24,6 +24,12 @@ export default async function EditPlatformPage({ params }: Props) {
         evaluatorAssignments: {
           include: { user: { select: { id: true, name: true, email: true } } },
         },
+        // Include the currently linked VITAL tool (if any)
+        vitalTools: {
+          where: { isAssessmentTool: false },
+          select: { id: true, name: true },
+          take: 1,
+        },
       },
     }),
     prisma.user.findMany({
@@ -34,6 +40,21 @@ export default async function EditPlatformPage({ params }: Props) {
   ])
 
   if (!platform) notFound()
+
+  const linkedVitalTool = platform.vitalTools[0] ?? null
+
+  // Available VITAL apps: unlinked ones + the one already linked to this platform
+  const availableVitalTools = await prisma.vitalTool.findMany({
+    where: {
+      isAssessmentTool: false,
+      OR: [
+        { platformId: null },
+        { platformId: id },
+      ],
+    },
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true },
+  })
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -63,6 +84,8 @@ export default async function EditPlatformPage({ params }: Props) {
           isLead: a.isLead,
         }))}
         users={users}
+        vitalTools={availableVitalTools}
+        linkedVitalToolId={linkedVitalTool?.id ?? null}
       />
     </div>
   )

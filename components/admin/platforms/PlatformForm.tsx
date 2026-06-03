@@ -129,11 +129,17 @@ function EvaluatorSection({
 
 // ── Main form ─────────────────────────────────────────────────────────────────
 
+type VitalToolOption = { id: string; name: string }
+
 interface PlatformFormProps {
   defaultValues?: Partial<PlatformFormValues>
   platformId?: string
   initialEvaluators?: EvaluatorAssignment[]
   users: UserOption[]
+  /** Available VITAL apps to link (Tool track only, excludes assessment tools) */
+  vitalTools?: VitalToolOption[]
+  /** ID of the VITAL tool already linked to this platform (edit mode) */
+  linkedVitalToolId?: string | null
 }
 
 export function PlatformForm({
@@ -141,6 +147,8 @@ export function PlatformForm({
   platformId,
   initialEvaluators = [],
   users,
+  vitalTools = [],
+  linkedVitalToolId = null,
 }: PlatformFormProps) {
   const router = useRouter()
   const isEdit = !!platformId
@@ -166,6 +174,7 @@ export function PlatformForm({
   const [pedagogyOpen, setPedagogyOpen] = React.useState(false)
   const [technicalOpen, setTechnicalOpen] = React.useState(false)
   const [vitalOpen, setVitalOpen] = React.useState(false)
+  const [vitalToolId, setVitalToolId] = React.useState<string | null>(linkedVitalToolId)
 
   function addEvaluator(user: UserOption, type: EvaluatorType) {
     if (evaluators.some((e) => e.userId === user.id)) return
@@ -283,6 +292,15 @@ export function PlatformForm({
       })
     }
 
+    // Sync VITAL app link (Tool track only; field is only shown when vitalTools.length > 0)
+    if (!isVital && vitalTools.length > 0) {
+      await fetch(`/api/platforms/${pid}/vital-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vitalToolId }),
+      })
+    }
+
     router.push(isEdit ? '/admin/platforms' : '/evaluations')
     router.refresh()
   }
@@ -372,6 +390,30 @@ export function PlatformForm({
           />
           <Label htmlFor="trialAvailable">Trial available</Label>
         </div>
+
+        {/* VITAL app link — only for Tool Evaluator track and when VITAL tools exist */}
+        {!isVital && vitalTools.length > 0 && (
+          <div className="space-y-1.5">
+            <Label>Linked VITAL app</Label>
+            <Select
+              value={vitalToolId ?? '__none__'}
+              onValueChange={(v) => setVitalToolId(v === '__none__' ? null : v)}
+            >
+              <SelectTrigger className="w-full max-w-sm">
+                <SelectValue placeholder="None" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">None</SelectItem>
+                {vitalTools.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Link this platform to its VITAL catalogue entry so VITAL attributes appear in Results.
+            </p>
+          </div>
+        )}
       </div>
 
       <Separator />

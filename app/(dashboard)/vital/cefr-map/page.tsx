@@ -45,12 +45,7 @@ export default async function VitalCefrMapPage() {
               {levels.map((l) => (
                 <th
                   key={l.id}
-                  className={cn(
-                    "sticky top-0 z-10 border-b border-stone-200 bg-stone-50 px-2.5 py-3 text-center font-semibold",
-                    l.cefrStatus !== "Standard CEFR"
-                      ? "text-amber-600"
-                      : "text-stone-500"
-                  )}
+                  className="sticky top-0 z-10 border-b border-stone-200 bg-stone-50 px-2.5 py-3 text-center font-semibold text-stone-500"
                 >
                   {l.code}
                 </th>

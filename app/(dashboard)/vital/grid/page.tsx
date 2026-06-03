@@ -23,9 +23,7 @@ export default async function VitalGridPage() {
 
   const byCell = new Map(recs.map((r) => [`${r.skillId}:${r.levelId}`, r]));
 
-  function levelTone(cefrStatus: string, code: string) {
-    if (code === "A0") return "bg-stone-100 text-stone-500";
-    if (cefrStatus !== "Standard CEFR") return "bg-amber-50 text-amber-700";
+  function levelTone(_cefrStatus: string, _code: string) {
     return "bg-white text-stone-600";
   }
 
@@ -41,15 +39,6 @@ export default async function VitalGridPage() {
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-stone-500">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block size-3 rounded-sm bg-stone-100 ring-1 ring-inset ring-stone-200" />
-          A0 (pre-emergent)
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block size-3 rounded-sm bg-amber-50 ring-1 ring-inset ring-amber-200" />
-          Non-CEFR (school-defined)
-        </span>
-        <span className="h-3 w-px bg-stone-200" />
         <span className="inline-flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-emerald-500" /> Compliant
         </span>

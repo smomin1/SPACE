@@ -18,7 +18,7 @@ import { EvalStateBadge } from '@/components/admin/_shared/badges'
 
 function getNow() { return Date.now() }
 
-export async function AdminDashboard() {
+export async function AdminDashboard({ role }: { role: string }) {
   const now = getNow()
   const [stateCounts, activeEvaluations, recentMessages, recentSubmissions, platformCount, pendingAccessRequests] =
     await Promise.all([
@@ -188,8 +188,8 @@ export async function AdminDashboard() {
         />
       </div>
 
-      {/* Pending access requests callout */}
-      {pendingAccessRequests > 0 && (
+      {/* Pending access requests callout — Super Admin only */}
+      {role === 'SUPER_ADMIN' && pendingAccessRequests > 0 && (
         <Link href="/admin/access-requests">
           <div className="flex items-center gap-4 rounded-xl border border-amber-200 bg-amber-50/60 px-5 py-4 hover:bg-amber-50 transition-colors">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-100 ring-1 ring-amber-200">

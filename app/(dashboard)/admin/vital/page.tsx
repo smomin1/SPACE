@@ -47,7 +47,7 @@ export default async function VitalAdminPage() {
       <PageHeader
         icon={GraduationCapIcon}
         kicker="VITAL Administration"
-        title="VITAL Admin"
+        title="Manage VITAL"
         description="Manage tools, recommendations, levels and skills. Import workbooks with change review."
       />
       <main className="mx-auto max-w-7xl px-6 py-6">

@@ -99,13 +99,13 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/admin/vital',
-    label: 'VITAL Admin',
+    label: 'Manage VITAL',
     icon: GraduationCapIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
     href: '/vital',
-    label: 'VITAL Results',
+    label: 'VITAL Insights',
     icon: CompassIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },

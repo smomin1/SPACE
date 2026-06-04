@@ -112,6 +112,7 @@ export default function AccessRequestPage() {
     if (Object.values(fieldErrors).some(Boolean)) return
 
     setStatus('loading')
+    let succeeded = false
     try {
       const res = await fetch('/api/access-requests', {
         method: 'POST',
@@ -120,6 +121,7 @@ export default function AccessRequestPage() {
       })
 
       if (res.ok) {
+        succeeded = true
         setStatus('done')
         return
       }
@@ -137,7 +139,7 @@ export default function AccessRequestPage() {
     } catch {
       setErrors((prev) => ({ ...prev, email: 'Something went wrong. Please try again.' }))
     } finally {
-      if (status !== 'done') setStatus('idle')
+      if (!succeeded) setStatus('idle')
     }
   }
 

@@ -557,7 +557,7 @@ export function MergedView({
         <SheetContent
           side="right"
           showCloseButton
-          className="p-0 gap-0 flex flex-col sm:max-w-xl"
+          className="p-0 gap-0 flex flex-col sm:max-w-xl rounded-l-xl"
         >
           <SheetHeader className="px-6 py-4 border-b shrink-0">
             <div className="flex items-center gap-2 pr-8">

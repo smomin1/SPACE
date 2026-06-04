@@ -222,7 +222,7 @@ export function ConflictThread({
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden rounded-xl">
       {/* Submitted scores */}
       <div className="px-6 py-4 border-b bg-stone-50/60 shrink-0">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2.5">
@@ -369,16 +369,6 @@ export function ConflictThread({
             }}
           />
           <div className="flex items-center gap-2">
-            {canClose && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isPending}
-              >
-                Mark Resolved
-              </Button>
-            )}
             <Button
               size="sm"
               className="ml-auto"

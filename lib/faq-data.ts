@@ -50,6 +50,12 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         keywords: ['login', 'password', 'authentication'],
       },
       {
+        question: 'How do I request access to SPACE?',
+        answer:
+          'From the login page, click "Request access". Fill in your name, work email, team, and the role you need, then submit. A Super Admin will review your request and either approve or reject it. If approved, you will receive an email with a temporary password and must change it on first login.',
+        keywords: ['request access', 'sign up', 'account', 'register', 'new user'],
+      },
+      {
         question: 'Where do I find my profile settings?',
         answer:
           'Click your avatar or name at the bottom of the sidebar. From the Profile page you can update your name, change your email, or set a new password.',
@@ -148,10 +154,22 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         keywords: ['isolation', 'bias', 'hidden', 'cross-team'],
       },
       {
+        question: 'How do I assign evaluators to a platform?',
+        answer:
+          'Admins assign evaluators when registering or editing a platform. Go to Admin > Platforms, open the platform, and use the Evaluators section to add Pedagogy and Technical evaluators. At least one evaluator of each type is required before an evaluation can begin. One evaluator per team should be marked as Team Lead.',
+        keywords: ['assign', 'evaluators', 'platform', 'team', 'admin'],
+      },
+      {
         question: 'What is a Team Lead?',
         answer:
           'A Team Lead is the senior evaluator on a team. They co-ordinate the team\'s scoring and are the one who triggers the merge into the MERGED state once everyone on the team has submitted.',
         keywords: ['lead', 'team lead', 'merge', 'role'],
+      },
+      {
+        question: 'How does the evaluation move from IN_PROGRESS to MERGED?',
+        answer:
+          'Each evaluator submits their scores independently. Once every assigned evaluator on both teams has submitted, the Team Lead for each team clicks "Merge Team Scores". When both teams have merged, the evaluation advances to MERGED and cross-team scores become visible for the first time.',
+        keywords: ['merge', 'submit', 'in progress', 'team lead', 'transition'],
       },
       {
         question: 'Can a finalised evaluation be reopened?',
@@ -402,7 +420,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'How do I import VITAL data from a workbook?',
         answer:
-          'From VITAL Admin, click Import and upload an XLSX workbook. The importer detects the workbook type, then shows a preview that lists new rows (auto selected) and changed rows as a before and after diff with per row checkboxes. Nothing is written until you confirm. Approved changes are applied in one step and recorded in the import history with created, updated, and skipped counts.',
+          'From Manage VITAL, click Import and upload an XLSX workbook. The importer detects the workbook type, then shows a preview that lists new rows (auto selected) and changed rows as a before and after diff with per row checkboxes. Nothing is written until you confirm. Approved changes are applied in one step and recorded in the import history with created, updated, and skipped counts.',
         keywords: ['vital', 'import', 'xlsx', 'workbook', 'diff', 'review'],
       },
     ],

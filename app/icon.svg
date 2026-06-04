@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="SPACE dome mark">
+  <circle cx="24" cy="24" r="24" fill="#0F3D2E"/>
+  <g transform="translate(24, 24) scale(0.7) translate(-24, -24)">
+    <path d="M 10 44 L 10 22 Q 10 6 24 4 Q 38 6 38 22 L 38 44 Z" fill="none" stroke="#C9973A" stroke-width="1.1" stroke-linejoin="miter" stroke-linecap="square"/>
+    <rect x="5" y="45.4" width="38" height="1.4" fill="#C9973A"/>
+  </g>
+</svg>

@@ -15,7 +15,6 @@ import {
   parseVitalFilterFromSearchParams,
   matchesVitalFilter,
 } from '@/lib/vital/profile'
-import { hasAgeRangeConflict } from '@/lib/age-range'
 import ComparisonTable from './ComparisonTable'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -127,15 +126,20 @@ export default async function ComparisonPage({
         })
       : Promise.resolve([] as { requirementId: string; weightOverride: WeightLevel | null }[]),
 
-    // Fetch age ranges for agreed-range computation
+    // Fetch pedagogy age ranges for results filtering.
+    // Ordered by updatedAt desc so the most recent submission wins when grouped.
     prisma.platformAgeRange.findMany({
-      where: { evaluation: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } } },
+      where: {
+        evaluatorType: 'PEDAGOGY',
+        evaluation: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } },
+      },
       select: {
         evaluationId: true,
         ageMin: true,
         ageMax: true,
-        evaluation: { select: { platformId: true, ageRangeConflict: { select: { isClosed: true } } } },
+        evaluation: { select: { platformId: true } },
       },
+      orderBy: { updatedAt: 'desc' },
     }),
   ])
 
@@ -203,22 +207,13 @@ export default async function ComparisonPage({
     }
   }
 
-  // Compute agreed age range keyed by evaluationId (not platformId) so it aligns
-  // with the exact evaluation selected per platform above.
-  // Agreed = all pedagogy submissions in that evaluation match and no open conflict.
-  const rangesByEvalId = new Map<string, typeof allAgeRanges>()
+  // Most-recent pedagogy age range per platform (ordered desc, so first-seen wins).
+  const ageRangeByPlatform = new Map<string, { ageMin: number; ageMax: number }>()
   for (const r of allAgeRanges) {
-    const group = rangesByEvalId.get(r.evaluationId) ?? []
-    group.push(r)
-    rangesByEvalId.set(r.evaluationId, group)
-  }
-  const agreedAgeRangeByEvalId = new Map<string, { ageMin: number; ageMax: number }>()
-  for (const [evalId, ranges] of rangesByEvalId) {
-    if (ranges.length === 0) continue
-    const conflict = ranges[0].evaluation.ageRangeConflict
-    if (conflict != null && !conflict.isClosed) continue
-    if (hasAgeRangeConflict(ranges.map(r => ({ ageMin: r.ageMin, ageMax: r.ageMax })))) continue
-    agreedAgeRangeByEvalId.set(evalId, { ageMin: ranges[0].ageMin, ageMax: ranges[0].ageMax })
+    const platformId = r.evaluation.platformId
+    if (!ageRangeByPlatform.has(platformId)) {
+      ageRangeByPlatform.set(platformId, { ageMin: r.ageMin, ageMax: r.ageMax })
+    }
   }
 
   // ── Build rows ─────────────────────────────────────────────────────────────
@@ -231,7 +226,7 @@ export default async function ComparisonPage({
 
   const rows: PlatformRow[] = platforms.map(p => {
     const ev = evalByPlatform.get(p.id) ?? null
-    const agreedAgeRange = ev ? (agreedAgeRangeByEvalId.get(ev.id) ?? null) : null
+    const agreedAgeRange = ageRangeByPlatform.get(p.id) ?? null
 
     if (!ev) {
       return {

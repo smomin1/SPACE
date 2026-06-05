@@ -106,7 +106,7 @@ export default async function EvaluationWorkspacePage({
 
     if (!isEvaluator || !myAssignment) redirect('/evaluations')
 
-    const [requirements, ownScores] = await Promise.all([
+    const [requirements, ownScores, ownAgeRange] = await Promise.all([
       prisma.requirement.findMany({
         where: { evaluatorType: { in: [myAssignment.evaluatorType, 'BOTH'] } },
         select: REQUIREMENT_SELECT,
@@ -115,6 +115,10 @@ export default async function EvaluationWorkspacePage({
       prisma.score.findMany({
         where: { evaluationId, userId },
         select: { id: true, requirementId: true, value: true, evidenceType: true, comment: true },
+      }),
+      prisma.platformAgeRange.findUnique({
+        where: { evaluationId_userId: { evaluationId, userId } },
+        select: { ageMin: true, ageMax: true },
       }),
     ])
 
@@ -146,6 +150,8 @@ export default async function EvaluationWorkspacePage({
           assignment={{ userId: myAssignment.userId, evaluatorType: myAssignment.evaluatorType, hasSubmitted: myAssignment.hasSubmitted, isLead: myAssignment.isLead }}
           isAdmin={isAdmin}
           allMembers={allMembers}
+          initialAgeMin={ownAgeRange?.ageMin ?? null}
+          initialAgeMax={ownAgeRange?.ageMax ?? null}
         />
       </main>
     )
@@ -156,7 +162,7 @@ export default async function EvaluationWorkspacePage({
   if (evaluation.state === 'MERGED') {
     if (!isEvaluator) redirect('/dashboard')
 
-    const [requirements, allScores, threads, submissionEvents, auditEvents] = await Promise.all([
+    const [requirements, allScores, threads, submissionEvents, auditEvents, allAgeRanges, ageRangeConflict] = await Promise.all([
       prisma.requirement.findMany({
         select: REQUIREMENT_SELECT,
         orderBy: [{ category: 'asc' }, { order: 'asc' }],
@@ -203,6 +209,21 @@ export default async function EvaluationWorkspacePage({
         },
         orderBy: { changedAt: 'asc' },
         take: 50,
+      }),
+      prisma.platformAgeRange.findMany({
+        where: { evaluationId },
+        select: {
+          userId: true,
+          evaluatorType: true,
+          ageMin: true,
+          ageMax: true,
+          updatedAt: true,
+          user: { select: { name: true } },
+        },
+      }),
+      prisma.ageRangeConflict.findUnique({
+        where: { evaluationId },
+        select: { id: true, isClosed: true },
       }),
     ])
 
@@ -258,6 +279,8 @@ export default async function EvaluationWorkspacePage({
           isLead={myAssignment?.isLead ?? false}
           isAdmin={isAdmin}
           activityLog={activityLog}
+          ageRanges={allAgeRanges}
+          ageRangeConflict={ageRangeConflict}
         />
       </main>
     )

@@ -15,6 +15,7 @@ import {
   parseVitalFilterFromSearchParams,
   matchesVitalFilter,
 } from '@/lib/vital/profile'
+import { hasAgeRangeConflict } from '@/lib/age-range'
 import ComparisonTable from './ComparisonTable'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -34,6 +35,7 @@ export type PlatformRow = {
     score10: number | null
     risk: VitalRisk | null
   } | null
+  agreedAgeRange: { ageMin: number; ageMax: number } | null
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -76,10 +78,12 @@ export default async function ComparisonPage({
   const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
   const showDq      = sp.showDq === '1'
   const vitalFilter = parseVitalFilterFromSearchParams(sp)
+  const filterAgeMin = typeof sp.ageMin === 'string' && sp.ageMin ? Number(sp.ageMin) : null
+  const filterAgeMax = typeof sp.ageMax === 'string' && sp.ageMax ? Number(sp.ageMax) : null
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  const [rawRequirements, rawPlatforms, evaluations, contextOverrides] = await Promise.all([
+  const [rawRequirements, rawPlatforms, evaluations, contextOverrides, allAgeRanges] = await Promise.all([
     prisma.requirement.findMany({
       where: {
         ...(contextIds.length > 0 && { contexts: { some: { contextId: { in: contextIds } } } }),
@@ -123,6 +127,17 @@ export default async function ComparisonPage({
           select: { requirementId: true, weightOverride: true },
         })
       : Promise.resolve([] as { requirementId: string; weightOverride: WeightLevel | null }[]),
+
+    // Fetch age ranges for agreed-range computation
+    prisma.platformAgeRange.findMany({
+      where: { evaluation: { state: { in: statuses as ('FINALISED' | 'MERGED' | 'IN_PROGRESS')[] } } },
+      select: {
+        evaluationId: true,
+        ageMin: true,
+        ageMax: true,
+        evaluation: { select: { platformId: true, ageRangeConflict: { select: { isClosed: true } } } },
+      },
+    }),
   ])
 
   // ── VITAL profiles (opt-in link to the VITAL track) ────────────────────────
@@ -179,6 +194,25 @@ export default async function ComparisonPage({
     weightOverrideMap,
   )
 
+  // Compute agreed age range per platform.
+  // Agreed = all submissions in the same evaluation match (no open conflict).
+  const agreedAgeRangeByPlatform = new Map<string, { ageMin: number; ageMax: number }>()
+  const rangesByEvalId = new Map<string, typeof allAgeRanges>()
+  for (const r of allAgeRanges) {
+    const group = rangesByEvalId.get(r.evaluationId) ?? []
+    group.push(r)
+    rangesByEvalId.set(r.evaluationId, group)
+  }
+  for (const [, ranges] of rangesByEvalId) {
+    if (ranges.length === 0) continue
+    const conflict = ranges[0].evaluation.ageRangeConflict
+    const conflictOpen = conflict !== null && !conflict.isClosed
+    if (conflictOpen) continue
+    if (hasAgeRangeConflict(ranges.map(r => ({ ageMin: r.ageMin, ageMax: r.ageMax })))) continue
+    const platformId = ranges[0].evaluation.platformId
+    agreedAgeRangeByPlatform.set(platformId, { ageMin: ranges[0].ageMin, ageMax: ranges[0].ageMax })
+  }
+
   // Best evaluation per platform (prefer FINALISED over MERGED)
   const evalByPlatform = new Map<string, (typeof evaluations)[number]>()
   for (const ev of evaluations) {
@@ -199,6 +233,7 @@ export default async function ComparisonPage({
 
   const rows: PlatformRow[] = platforms.map(p => {
     const ev = evalByPlatform.get(p.id) ?? null
+    const agreedAgeRange = agreedAgeRangeByPlatform.get(p.id) ?? null
 
     if (!ev) {
       return {
@@ -209,6 +244,7 @@ export default async function ComparisonPage({
         overallPct: null,
         recommendation: null,
         vital: vitalOf(p.id),
+        agreedAgeRange,
       }
     }
 
@@ -247,12 +283,23 @@ export default async function ComparisonPage({
       overallPct,
       recommendation,
       vital: vitalOf(p.id),
+      agreedAgeRange,
     }
   })
 
+  // Apply age range filter: keep platforms whose agreed range overlaps [filterAgeMin, filterAgeMax]
+  const filteredRows = (filterAgeMin !== null || filterAgeMax !== null)
+    ? rows.filter(r => {
+        if (!r.agreedAgeRange) return false
+        const lo = filterAgeMin ?? r.agreedAgeRange.ageMin
+        const hi = filterAgeMax ?? r.agreedAgeRange.ageMax
+        return r.agreedAgeRange.ageMin <= hi && r.agreedAgeRange.ageMax >= lo
+      })
+    : rows
+
   // ── Empty state ─────────────────────────────────────────────────────────────
 
-  if (rows.length === 0) {
+  if (filteredRows.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="mb-3 text-3xl text-stone-300">-</div>
@@ -264,11 +311,11 @@ export default async function ComparisonPage({
     )
   }
 
-  const hasVital = rows.some(r => r.vital !== null)
+  const hasVital = filteredRows.some(r => r.vital !== null)
 
   return (
     <div className="space-y-5">
-      <ComparisonTable rows={rows} categories={categories} hasVital={hasVital} />
+      <ComparisonTable rows={filteredRows} categories={categories} hasVital={hasVital} />
     </div>
   )
 }

@@ -209,16 +209,19 @@ model User {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  assignments              EvaluatorAssignment[]
-  scores                   Score[]
-  scoreAuditLogs           ScoreAuditLog[]
-  conflictMessages         ConflictMessage[]
-  closedThreads            ConflictThread[]
-  platformAssignments      PlatformEvaluatorAssignment[]
-  teamMerges               EvaluationTeamMerge[]
-  searchEvaluations        SearchEvaluation[]
-  reviewedAccessRequests   AccessRequest[]
-  vitalImports             VitalImportLog[]
+  assignments                EvaluatorAssignment[]
+  scores                     Score[]
+  scoreAuditLogs             ScoreAuditLog[]
+  conflictMessages           ConflictMessage[]
+  closedThreads              ConflictThread[]
+  platformAssignments        PlatformEvaluatorAssignment[]
+  teamMerges                 EvaluationTeamMerge[]
+  searchEvaluations          SearchEvaluation[]
+  reviewedAccessRequests     AccessRequest[]
+  vitalImports               VitalImportLog[]
+  ageRanges                  PlatformAgeRange[]
+  closedAgeRangeConflicts    AgeRangeConflict[]          @relation("AgeRangeConflictClosedBy")
+  ageRangeConflictMessages   AgeRangeConflictMessage[]   @relation("AgeRangeConflictMessageAuthor")
 }
 
 model Platform {
@@ -248,11 +251,13 @@ model Evaluation {
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
-  platform        Platform              @relation(fields: [platformId], references: [id])
-  assignments     EvaluatorAssignment[]
-  scores          Score[]
-  conflictThreads ConflictThread[]
-  teamMerges      EvaluationTeamMerge[]
+  platform         Platform              @relation(fields: [platformId], references: [id])
+  assignments      EvaluatorAssignment[]
+  scores           Score[]
+  conflictThreads  ConflictThread[]
+  teamMerges       EvaluationTeamMerge[]
+  ageRanges        PlatformAgeRange[]
+  ageRangeConflict AgeRangeConflict?
 }
 
 // Links a User to an Evaluation with an explicit team role.
@@ -464,6 +469,51 @@ model EvaluationTeamMerge {
   mergedBy   User       @relation(fields: [mergedById], references: [id])
 
   @@unique([evaluationId, evaluatorType])
+}
+
+// ─── Age Range Assessment models ───────────────────────────────────────────────
+
+// One evaluator's target-age-range submission per evaluation.
+// ageMin / ageMax: 5–17 for specific school ages; 18 = "Adult (18+)".
+// Grade is derived client-side: Grade = Age − 5 (Kindergarten for age 5).
+model PlatformAgeRange {
+  id            String        @id @default(cuid())
+  evaluationId  String
+  evaluation    Evaluation    @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  evaluatorType EvaluatorType
+  ageMin        Int
+  ageMax        Int
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([evaluationId, userId])
+}
+
+// Created when evaluators' age-range submissions differ at MERGED transition.
+// Must be closed (isClosed = true) before the evaluation can be FINALISED.
+model AgeRangeConflict {
+  id           String                   @id @default(cuid())
+  evaluationId String                   @unique
+  evaluation   Evaluation               @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  isClosed     Boolean                  @default(false)
+  closedAt     DateTime?
+  closedById   String?
+  closedBy     User?                    @relation("AgeRangeConflictClosedBy", fields: [closedById], references: [id])
+  createdAt    DateTime                 @default(now())
+  messages     AgeRangeConflictMessage[]
+}
+
+// Discussion messages within an AgeRangeConflict. Append-only.
+model AgeRangeConflictMessage {
+  id         String           @id @default(cuid())
+  conflictId String
+  conflict   AgeRangeConflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User             @relation("AgeRangeConflictMessageAuthor", fields: [userId], references: [id])
+  body       String
+  createdAt  DateTime         @default(now())
 }
 
 // ─── VITAL module models ────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ProgressBar } from './ProgressBar'
+import { AgeRangePanel } from './AgeRangePanel'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -67,6 +68,8 @@ type Props = {
   assignment: Assignment
   isAdmin: boolean
   allMembers: Member[]
+  initialAgeMin: number | null
+  initialAgeMax: number | null
 }
 
 const EVIDENCE_LABELS: Record<string, string> = {
@@ -100,6 +103,8 @@ export function ScoringForm({
   assignment,
   isAdmin: _isAdmin,
   allMembers,
+  initialAgeMin,
+  initialAgeMax,
 }: Props) {
   const router = useRouter()
   const [scores, setScores] = useState<Map<string, Score>>(
@@ -107,10 +112,12 @@ export function ScoringForm({
   )
   const [savingId, setSavingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [ageMin, setAgeMin] = useState<number | null>(initialAgeMin)
+  const [ageMax, setAgeMax] = useState<number | null>(initialAgeMax)
 
   // A requirement is "answered" when a score record exists for it (value may be null = N/A)
   const answeredCount = requirements.filter(r => scores.has(r.id)).length
-  const allScored = answeredCount === requirements.length
+  const allScored = answeredCount === requirements.length && ageMin !== null && ageMax !== null
   // Show numeric progress only for non-N/A responses
   const scoredCount = [...scores.values()].filter(s => s.value !== null).length
 
@@ -195,6 +202,14 @@ export function ScoringForm({
         total={requirements.length}
         scored={answeredCount}
         hasSubmitted={assignment.hasSubmitted}
+      />
+
+      <AgeRangePanel
+        evaluationId={evaluationId}
+        initialAgeMin={ageMin}
+        initialAgeMax={ageMax}
+        disabled={assignment.hasSubmitted}
+        onSaved={(min, max) => { setAgeMin(min); setAgeMax(max) }}
       />
 
       {/* All evaluators panel - shown always */}
@@ -356,7 +371,16 @@ export function ScoringForm({
       })}
 
       {!assignment.hasSubmitted && (
-        <div className="sticky bottom-0 bg-[var(--color-neutral)] border-t border-stone-200/80 py-4 flex justify-end">
+        <div className="sticky bottom-0 bg-[var(--color-neutral)] border-t border-stone-200/80 py-4 flex items-center justify-between gap-4">
+          {!allScored && (
+            <p className="text-xs text-muted-foreground">
+              {answeredCount < requirements.length
+                ? `Score all ${requirements.length} requirements`
+                : 'Select a target age range'}{' '}
+              to submit.
+            </p>
+          )}
+          <div className="ml-auto">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button disabled={!allScored || isPending}>
@@ -367,8 +391,8 @@ export function ScoringForm({
               <AlertDialogHeader>
                 <AlertDialogTitle>Submit your scores?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Once submitted, your scores cannot be changed unless an admin reopens the
-                  evaluation. You have scored all {requirements.length} requirements.
+                  Once submitted, your scores and age range assessment cannot be changed unless
+                  an admin reopens the evaluation. You have scored all {requirements.length} requirements.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -377,6 +401,7 @@ export function ScoringForm({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
       )}
     </div>

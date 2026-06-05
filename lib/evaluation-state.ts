@@ -1,5 +1,6 @@
 import type { EvaluationState, EvaluatorType } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { hasAgeRangeConflict } from '@/lib/age-range'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,6 +35,7 @@ export interface EvaluationSnapshot {
   platformId: string
   assignments: { hasSubmitted: boolean }[]
   conflictThreads: { isClosed: boolean }[]
+  ageRangeConflict: { isClosed: boolean } | null
 }
 
 // Prisma transaction client (everything except the connection-management methods)
@@ -70,9 +72,11 @@ export function canTransitionTo(
 ): boolean {
   if (!VALID_TRANSITIONS[currentState].includes(newState)) return false
 
-  // MERGED → FINALISED: every conflict thread must be closed
+  // MERGED → FINALISED: every conflict thread AND age range conflict must be closed
   if (currentState === 'MERGED' && newState === 'FINALISED') {
-    return evaluation.conflictThreads.every(t => t.isClosed)
+    const threadsOk = evaluation.conflictThreads.every(t => t.isClosed)
+    const ageRangeOk = !evaluation.ageRangeConflict || evaluation.ageRangeConflict.isClosed
+    return threadsOk && ageRangeOk
   }
 
   return true
@@ -240,6 +244,7 @@ export async function transitionEvaluation(
       include: {
         assignments: { select: { userId: true, hasSubmitted: true, evaluatorType: true } },
         conflictThreads: { select: { isClosed: true, requirementId: true } },
+        ageRangeConflict: { select: { isClosed: true } },
       },
     })
 
@@ -249,11 +254,14 @@ export async function transitionEvaluation(
 
     if (!canTransitionTo(evaluation.state, newState, evaluation)) {
       if (evaluation.state === 'MERGED' && newState === 'FINALISED') {
-        const open = evaluation.conflictThreads.filter(t => !t.isClosed).length
+        const openThreads = evaluation.conflictThreads.filter(t => !t.isClosed).length
+        const openAgeRange =
+          evaluation.ageRangeConflict && !evaluation.ageRangeConflict.isClosed ? 1 : 0
+        const total = openThreads + openAgeRange
         return {
           ok: false,
           error: 'OPEN_THREADS' as const,
-          message: `${open} conflict thread(s) must be resolved before finalising`,
+          message: `${total} conflict(s) must be resolved before finalising`,
         }
       }
       return {
@@ -298,6 +306,19 @@ export async function transitionEvaluation(
             isClosed: false,
           })),
           skipDuplicates: true,
+        })
+      }
+
+      // Detect age range conflict: create an AgeRangeConflict if submissions differ
+      const allAgeRanges = await tx.platformAgeRange.findMany({
+        where: { evaluationId },
+        select: { ageMin: true, ageMax: true },
+      })
+      if (allAgeRanges.length >= 2 && hasAgeRangeConflict(allAgeRanges)) {
+        await tx.ageRangeConflict.upsert({
+          where: { evaluationId },
+          create: { evaluationId },
+          update: {},
         })
       }
 
@@ -355,6 +376,16 @@ export async function transitionEvaluation(
       if (staleThreadIds.length > 0) {
         await tx.conflictMessage.deleteMany({ where: { threadId: { in: staleThreadIds } } })
         await tx.conflictThread.deleteMany({ where: { evaluationId } })
+      }
+
+      // Delete stale age range conflict and its messages
+      const staleAgeConflict = await tx.ageRangeConflict.findUnique({
+        where: { evaluationId },
+        select: { id: true },
+      })
+      if (staleAgeConflict) {
+        await tx.ageRangeConflictMessage.deleteMany({ where: { conflictId: staleAgeConflict.id } })
+        await tx.ageRangeConflict.delete({ where: { id: staleAgeConflict.id } })
       }
 
       await tx.evaluation.update({

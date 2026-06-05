@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ChevronRight } from 'lucide-react'
 import { ConflictThread } from './ConflictThread'
+import { AgeRangeConflictSheet } from './AgeRangeConflictSheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ComplianceGateBadge, WeightTier } from '@/components/admin/_shared/badges'
@@ -14,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { ageLabel, gradeRangeLabel } from '@/lib/age-range'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,6 +74,15 @@ type SheetState = {
   myScore: { value: number | null; evidenceType: string | null; comment: string | null } | null
 }
 
+type AgeRangeEntry = {
+  userId: string
+  evaluatorType: string
+  ageMin: number
+  ageMax: number
+  updatedAt: Date | string
+  user: { name: string | null }
+}
+
 type Props = {
   evaluationId: string
   requirements: Requirement[]
@@ -84,6 +95,8 @@ type Props = {
   isLead: boolean
   isAdmin: boolean
   activityLog: ActivityEntry[]
+  ageRanges: AgeRangeEntry[]
+  ageRangeConflict: { id: string; isClosed: boolean } | null
 }
 
 function ScorePill({
@@ -127,12 +140,17 @@ export function MergedView({
   isLead,
   isAdmin,
   activityLog,
+  ageRanges: initialAgeRanges,
+  ageRangeConflict: initialAgeRangeConflict,
 }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [openThreadCount, setOpenThreadCount] = useState(initialOpenCount)
   const [localThreads, setLocalThreads] = useState(threads)
   const [sheetState, setSheetState] = useState<SheetState | null>(null)
+  const [ageRanges, setAgeRanges] = useState(initialAgeRanges)
+  const [ageRangeConflict, setAgeRangeConflict] = useState(initialAgeRangeConflict)
+  const [ageRangeSheetOpen, setAgeRangeSheetOpen] = useState(false)
 
   const scoresByReq = new Map<string, ScoreRow[]>()
   for (const s of allScores) {
@@ -142,7 +160,10 @@ export function MergedView({
   }
 
   const openLocalThreads = localThreads.filter(t => !t.isClosed)
-  const allConflictsResolved = localThreads.length > 0 && openLocalThreads.length === 0
+  const ageRangeConflictOpen = ageRangeConflict !== null && !ageRangeConflict.isClosed
+  const totalOpenConflicts = openLocalThreads.length + (ageRangeConflictOpen ? 1 : 0)
+  const hasAnyConflicts = localThreads.length > 0 || ageRangeConflict !== null
+  const allConflictsResolved = hasAnyConflicts && totalOpenConflicts === 0
 
   const categories = [...new Set(requirements.map(r => r.category ?? 'General'))].sort()
 
@@ -224,6 +245,10 @@ export function MergedView({
     ? openLocalThreads.map(t => requirements.find(r => r.id === t.requirementId)).filter((r): r is Requirement => Boolean(r))
     : null
 
+  const myAgeRange = ageRanges.find(r => r.userId === currentUserId)
+    ? { ageMin: ageRanges.find(r => r.userId === currentUserId)!.ageMin, ageMax: ageRanges.find(r => r.userId === currentUserId)!.ageMax }
+    : null
+
   // All requirements grouped by evaluatorType (for resolved/no-conflict state)
   const pedRequirements = requirements.filter(r => r.evaluatorType === 'PEDAGOGY')
   const techRequirements = requirements.filter(r => r.evaluatorType === 'TECHNICAL')
@@ -236,9 +261,9 @@ export function MergedView({
         {isAdmin && (
           <div className="flex items-center gap-3 rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3">
             <div className="flex-1 text-sm text-muted-foreground">
-              {openThreadCount > 0 ? (
+              {totalOpenConflicts > 0 ? (
                 <span className="text-amber-600 font-medium">
-                  {openThreadCount} open conflict{openThreadCount !== 1 ? 's' : ''} - resolve before finalising
+                  {totalOpenConflicts} open conflict{totalOpenConflicts !== 1 ? 's' : ''} - resolve before finalising
                 </span>
               ) : (
                 <span>All conflicts resolved - ready to finalise</span>
@@ -266,7 +291,7 @@ export function MergedView({
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="sm" disabled={openThreadCount > 0 || isPending}>
+                <Button size="sm" disabled={totalOpenConflicts > 0 || isPending}>
                   Finalise
                 </Button>
               </AlertDialogTrigger>
@@ -284,6 +309,51 @@ export function MergedView({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+        )}
+
+        {/* Age range summary */}
+        {ageRanges.length > 0 && (
+          <div className="rounded-xl border border-blue-200/80 bg-blue-50/40 overflow-hidden">
+            <div className="px-4 py-3.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700/80 mb-2">
+                Target age range assessments
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {ageRanges.map(r => (
+                  <span key={r.userId} className="inline-flex items-center gap-1.5 rounded-md ring-1 ring-inset ring-blue-200 bg-white px-2.5 py-1 text-[12px]">
+                    <span className="text-stone-500">{r.user.name ?? '?'}:</span>
+                    <span className="font-medium text-blue-700">
+                      {ageLabel(r.ageMin)}–{ageLabel(r.ageMax)}
+                    </span>
+                    <span className="text-stone-400">({gradeRangeLabel(r.ageMin, r.ageMax)})</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            {ageRangeConflict && (
+              <button
+                onClick={() => setAgeRangeSheetOpen(true)}
+                className={`w-full flex items-center gap-2 px-4 py-2.5 border-t text-[12.5px] font-medium tracking-tight transition-colors ${
+                  ageRangeConflict.isClosed
+                    ? 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80 border-emerald-100'
+                    : 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80 border-amber-100'
+                }`}
+              >
+                <ChevronRight className="size-3.5 shrink-0" />
+                {ageRangeConflict.isClosed ? 'View resolved age range discussion' : 'Resolve age range conflict'}
+                <Badge
+                  variant="outline"
+                  className={`ml-auto text-[10px] px-1.5 py-0 h-[18px] bg-transparent ${
+                    ageRangeConflict.isClosed
+                      ? 'border-emerald-200 text-emerald-600'
+                      : 'border-amber-200 text-amber-600'
+                  }`}
+                >
+                  {ageRangeConflict.isClosed ? 'Resolved' : 'Open'}
+                </Badge>
+              </button>
+            )}
           </div>
         )}
 
@@ -551,6 +621,62 @@ export function MergedView({
           </div>
         </div>
       </div>
+
+      {/* Age range conflict Sheet */}
+      {ageRangeConflict && (
+        <Sheet open={ageRangeSheetOpen} onOpenChange={setAgeRangeSheetOpen}>
+          <SheetContent
+            side="right"
+            showCloseButton
+            className="p-0 gap-0 flex flex-col sm:max-w-xl rounded-l-xl"
+          >
+            <SheetHeader className="px-6 py-4 border-b shrink-0">
+              <div className="flex items-center gap-2 pr-8">
+                <SheetTitle className="text-base leading-snug flex-1 text-left">
+                  Target age range conflict
+                </SheetTitle>
+                <Badge
+                  variant={ageRangeConflict.isClosed ? 'secondary' : 'destructive'}
+                  className="shrink-0"
+                >
+                  {ageRangeConflict.isClosed ? 'Resolved' : 'Conflict'}
+                </Badge>
+              </div>
+            </SheetHeader>
+            <AgeRangeConflictSheet
+              evaluationId={evaluationId}
+              isClosed={ageRangeConflict.isClosed}
+              currentUserId={currentUserId}
+              canClose={isAdmin || isLead}
+              ageRanges={ageRanges.map(r => ({
+                userId: r.userId,
+                userName: r.user.name,
+                evaluatorType: r.evaluatorType,
+                ageMin: r.ageMin,
+                ageMax: r.ageMax,
+                updatedAt: new Date(r.updatedAt).toISOString(),
+              }))}
+              myAgeRange={myAgeRange}
+              onClosed={() => {
+                setAgeRangeConflict(prev => prev ? { ...prev, isClosed: true } : null)
+                setAgeRangeSheetOpen(false)
+              }}
+              onRangeUpdated={(ageMin, ageMax, autoClosed) => {
+                setAgeRanges(prev =>
+                  prev.map(r =>
+                    r.userId === currentUserId ? { ...r, ageMin, ageMax } : r,
+                  ),
+                )
+                if (autoClosed) {
+                  setAgeRangeConflict(prev => prev ? { ...prev, isClosed: true } : null)
+                  setAgeRangeSheetOpen(false)
+                }
+                router.refresh()
+              }}
+            />
+          </SheetContent>
+        </Sheet>
+      )}
 
       {/* Conflict thread Sheet - slides in from the right */}
       <Sheet open={!!sheetState} onOpenChange={open => { if (!open) setSheetState(null) }}>

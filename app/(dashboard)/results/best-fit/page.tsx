@@ -380,9 +380,9 @@ function buildCombinedAnalysis(
     entry.total++
     const best = bestPerReq.get(req.id)
     const s    = best?.score ?? 0
-    if (!scoredReqIds.has(req.id) || s === 0) entry.uncovered++
-    else if (s >= SATISFACTION_THRESHOLD)      entry.satisfied++
-    else                                       entry.partial++
+    if (!scoredReqIds.has(req.id) || s === 0)        entry.uncovered++
+    else if (s >= satisfactionThresholdFor(req))     entry.satisfied++
+    else                                             entry.partial++
     catSatMap.set(cat, entry)
   }
   const categorySatisfaction = [...catSatMap.entries()]

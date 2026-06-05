@@ -115,9 +115,13 @@ export function ScoringForm({
   const [ageMin, setAgeMin] = useState<number | null>(initialAgeMin)
   const [ageMax, setAgeMax] = useState<number | null>(initialAgeMax)
 
+  const isPedagogy = assignment.evaluatorType === 'PEDAGOGY'
+
   // A requirement is "answered" when a score record exists for it (value may be null = N/A)
   const answeredCount = requirements.filter(r => scores.has(r.id)).length
-  const allScored = answeredCount === requirements.length && ageMin !== null && ageMax !== null
+  const allScored =
+    answeredCount === requirements.length &&
+    (!isPedagogy || (ageMin !== null && ageMax !== null))
   // Show numeric progress only for non-N/A responses
   const scoredCount = [...scores.values()].filter(s => s.value !== null).length
 
@@ -204,13 +208,15 @@ export function ScoringForm({
         hasSubmitted={assignment.hasSubmitted}
       />
 
-      <AgeRangePanel
-        evaluationId={evaluationId}
-        initialAgeMin={ageMin}
-        initialAgeMax={ageMax}
-        disabled={assignment.hasSubmitted}
-        onSaved={(min, max) => { setAgeMin(min); setAgeMax(max) }}
-      />
+      {isPedagogy && (
+        <AgeRangePanel
+          evaluationId={evaluationId}
+          initialAgeMin={ageMin}
+          initialAgeMax={ageMax}
+          disabled={assignment.hasSubmitted}
+          onSaved={(min, max) => { setAgeMin(min); setAgeMax(max) }}
+        />
+      )}
 
       {/* All evaluators panel - shown always */}
       <div className="rounded-xl border border-stone-200/80 bg-stone-50/60 px-4 py-3 space-y-3">
@@ -376,7 +382,9 @@ export function ScoringForm({
             <p className="text-xs text-muted-foreground">
               {answeredCount < requirements.length
                 ? `Score all ${requirements.length} requirements`
-                : 'Select a target age range'}{' '}
+                : isPedagogy
+                ? 'Select a target age range'
+                : ''}{' '}
               to submit.
             </p>
           )}

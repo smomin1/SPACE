@@ -309,9 +309,9 @@ export async function transitionEvaluation(
         })
       }
 
-      // Detect age range conflict: create an AgeRangeConflict if submissions differ
+      // Detect age range conflict: only pedagogy evaluators submit age ranges
       const allAgeRanges = await tx.platformAgeRange.findMany({
-        where: { evaluationId },
+        where: { evaluationId, evaluatorType: 'PEDAGOGY' },
         select: { ageMin: true, ageMax: true },
       })
       if (allAgeRanges.length >= 2 && hasAgeRangeConflict(allAgeRanges)) {

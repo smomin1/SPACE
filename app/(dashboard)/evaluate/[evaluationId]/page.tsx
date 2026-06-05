@@ -116,10 +116,12 @@ export default async function EvaluationWorkspacePage({
         where: { evaluationId, userId },
         select: { id: true, requirementId: true, value: true, evidenceType: true, comment: true },
       }),
-      prisma.platformAgeRange.findUnique({
-        where: { evaluationId_userId: { evaluationId, userId } },
-        select: { ageMin: true, ageMax: true },
-      }),
+      myAssignment.evaluatorType === 'PEDAGOGY'
+        ? prisma.platformAgeRange.findUnique({
+            where: { evaluationId_userId: { evaluationId, userId } },
+            select: { ageMin: true, ageMax: true },
+          })
+        : Promise.resolve(null),
     ])
 
     const allMembers = evaluation.assignments.map(a => ({

@@ -84,6 +84,9 @@ export async function POST(
   if (!evaluation) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (evaluation.lockedAt) return NextResponse.json({ error: 'Evaluation is locked' }, { status: 403 })
   if (!assignment) return NextResponse.json({ error: 'Not assigned to this evaluation' }, { status: 403 })
+  if (assignment.evaluatorType !== 'PEDAGOGY') {
+    return NextResponse.json({ error: 'Only pedagogy evaluators submit age range assessments' }, { status: 403 })
+  }
   if (assignment.hasSubmitted && evaluation.state === 'IN_PROGRESS') {
     return NextResponse.json({ error: 'Cannot change age range after submission' }, { status: 403 })
   }
@@ -102,7 +105,7 @@ export async function POST(
     !evaluation.ageRangeConflict.isClosed
   ) {
     const allRanges = await prisma.platformAgeRange.findMany({
-      where: { evaluationId },
+      where: { evaluationId, evaluatorType: 'PEDAGOGY' },
       select: { ageMin: true, ageMax: true },
     })
     if (!hasAgeRangeConflict(allRanges)) {

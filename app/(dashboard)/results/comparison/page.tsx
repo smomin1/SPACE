@@ -78,8 +78,7 @@ export default async function ComparisonPage({
   const statuses    = (typeof sp.status   === 'string' ? sp.status   : 'FINALISED').split(',').filter(Boolean)
   const showDq      = sp.showDq === '1'
   const vitalFilter = parseVitalFilterFromSearchParams(sp)
-  const filterAgeMin = typeof sp.ageMin === 'string' && sp.ageMin ? Number(sp.ageMin) : null
-  const filterAgeMax = typeof sp.ageMax === 'string' && sp.ageMax ? Number(sp.ageMax) : null
+  const filterAges = (typeof sp.age === 'string' ? sp.age : '').split(',').filter(Boolean).map(Number)
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
@@ -287,14 +286,12 @@ export default async function ComparisonPage({
     }
   })
 
-  // Apply age range filter: keep platforms whose agreed range overlaps [filterAgeMin, filterAgeMax]
-  const filteredRows = (filterAgeMin !== null || filterAgeMax !== null)
-    ? rows.filter(r => {
-        if (!r.agreedAgeRange) return false
-        const lo = filterAgeMin ?? r.agreedAgeRange.ageMin
-        const hi = filterAgeMax ?? r.agreedAgeRange.ageMax
-        return r.agreedAgeRange.ageMin <= hi && r.agreedAgeRange.ageMax >= lo
-      })
+  // Apply age filter: keep platforms whose agreed range contains at least one selected age
+  const filteredRows = filterAges.length > 0
+    ? rows.filter(r =>
+        r.agreedAgeRange !== null &&
+        filterAges.some(age => age >= r.agreedAgeRange!.ageMin && age <= r.agreedAgeRange!.ageMax),
+      )
     : rows
 
   // ── Empty state ─────────────────────────────────────────────────────────────

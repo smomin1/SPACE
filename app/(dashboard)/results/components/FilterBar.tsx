@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { XIcon, ChevronDownIcon, CheckIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { PlatformStatus } from '@prisma/client'
-import { AGE_OPTIONS, ageLabel } from '@/lib/age-range'
+import { AGE_OPTIONS, ageLabel, gradeLabel } from '@/lib/age-range'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -102,9 +102,8 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
   const minVital10Value   = params.get('minVital10') ?? ''
   const maxRiskValue      = params.get('maxRisk') ?? ''
 
-  // Age range filter state
-  const filterAgeMin = params.get('ageMin') ?? ''
-  const filterAgeMax = params.get('ageMax') ?? ''
+  // Age filter state (multi-select: comma-separated age values)
+  const selectedAges = parseMultiParam(params, 'age')
 
   // ── Update helpers ──────────────────────────────────────────────────────────
 
@@ -162,8 +161,7 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
     !!params.get('vitalVerdict'),
     !!params.get('minVital10'),
     !!params.get('maxRisk'),
-    !!filterAgeMin,
-    !!filterAgeMax,
+    selectedAges.length > 0,
   ].filter(Boolean).length
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -246,26 +244,16 @@ export function FilterBar({ contexts, platforms, categories, vitalEnabled }: Fil
         </>
       )}
 
-      {/* Age range: two single-selects for min/max age */}
-      <FilterSelect
-        placeholder="Min age"
-        value={filterAgeMin}
-        onChange={v => setSingle('ageMin', v)}
-      >
-        {AGE_OPTIONS.map(age => (
-          <SelectItem key={age} value={String(age)}>{ageLabel(age)}</SelectItem>
-        ))}
-      </FilterSelect>
-
-      <FilterSelect
-        placeholder="Max age"
-        value={filterAgeMax}
-        onChange={v => setSingle('ageMax', v)}
-      >
-        {AGE_OPTIONS.map(age => (
-          <SelectItem key={age} value={String(age)}>{ageLabel(age)}</SelectItem>
-        ))}
-      </FilterSelect>
+      {/* Age / grade: multi-select */}
+      <MultiSelect
+        placeholder="All ages"
+        selected={selectedAges}
+        options={AGE_OPTIONS.map(age => ({
+          value: String(age),
+          label: `${ageLabel(age)} · ${gradeLabel(age)}`,
+        }))}
+        onChange={vals => setMulti('age', vals)}
+      />
 
       {/* Status: multi-select, default = Finalised */}
       <MultiSelect

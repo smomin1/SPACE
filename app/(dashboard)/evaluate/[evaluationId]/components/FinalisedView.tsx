@@ -108,7 +108,20 @@ export function FinalisedView({
     return avg(all)
   }
 
-  // Weighted grand total: sum(avg × multiplier) / sum(multiplier for scored reqs)
+  // Weighted grand total percentage: sum(avg × m) / sum(maxScore × m) × 100
+  // Compliance gates use max=1 (Yes/No); regular requirements use max=4.
+  let weightedNum = 0
+  let weightedDen = 0
+  for (const req of requirements) {
+    const c = combinedAvg(req.id)
+    if (c === null) continue
+    const m = WEIGHT_MULTIPLIER[req.weight] ?? 1
+    const maxScore = req.isComplianceGate ? 1 : 4
+    weightedNum += c * m
+    weightedDen += maxScore * m
+  }
+  const grandTotalPct = weightedDen > 0 ? (weightedNum / weightedDen) * 100 : null
+  // Raw weighted avg (for display only, still out of 4 for non-gate reqs)
   let weightedSum = 0
   let weightedDenom = 0
   for (const req of requirements) {
@@ -208,8 +221,8 @@ export function FinalisedView({
               Weighted Score
             </p>
             <p className="text-3xl font-bold tabular-nums text-emerald-950">
-              {grandTotal !== null ? (grandTotal / 4 * 100).toFixed(1) : '-'}
-              {grandTotal !== null && (
+              {grandTotalPct !== null ? grandTotalPct.toFixed(1) : '-'}
+              {grandTotalPct !== null && (
                 <span className="text-sm font-normal text-stone-400 ml-1">/ 100</span>
               )}
             </p>
@@ -224,17 +237,18 @@ export function FinalisedView({
       {categories.map(category => {
         const catReqs = requirements.filter(r => (r.category ?? 'General') === category)
 
-        // Category subtotal
-        let catSum = 0
-        let catDenom = 0
+        // Category subtotal percentage: sum(avg × m) / sum(maxScore × m) × 100
+        let catNum = 0
+        let catDen = 0
         for (const req of catReqs) {
           const c = combinedAvg(req.id)
           if (c === null) continue
           const m = WEIGHT_MULTIPLIER[req.weight] ?? 1
-          catSum += c * m
-          catDenom += m
+          const maxScore = req.isComplianceGate ? 1 : 4
+          catNum += c * m
+          catDen += maxScore * m
         }
-        const catTotal = catDenom > 0 ? catSum / catDenom : null
+        const catTotal = catDen > 0 ? catNum / catDen : null
 
         return (
           <section key={category}>
@@ -244,7 +258,7 @@ export function FinalisedView({
               </h2>
               {catTotal !== null && (
                 <span className="text-xs text-muted-foreground">
-                  avg {fmt(catTotal)} / 4
+                  avg {(catTotal * 100).toFixed(0)}%
                 </span>
               )}
             </div>

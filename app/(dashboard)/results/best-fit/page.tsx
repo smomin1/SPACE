@@ -15,8 +15,16 @@ import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const WEIGHT_MAP: Record<WeightLevel, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 }
-const MAX_SCORE              = 4    // denominator used by scoring.ts
+const MAX_SCORE              = 4    // denominator for regular requirements
 const SATISFACTION_THRESHOLD = MAX_SCORE * 0.75  // = 3: requirement is "satisfied" at ≥75% of max
+
+// Compliance gates are binary (0 = No, 1 = Yes); max is 1, satisfied when score ≥ 1
+function maxScoreFor(req: { isComplianceGate: boolean }): number {
+  return req.isComplianceGate ? 1 : MAX_SCORE
+}
+function satisfactionThresholdFor(req: { isComplianceGate: boolean }): number {
+  return req.isComplianceGate ? 1 : SATISFACTION_THRESHOLD
+}
 const MAX_SET_SIZE           = 5    // cap on combination size
 const GAP_CATEGORY_THRESHOLD = 75   // below this % in category = gap (matches 75% satisfaction rule)
 
@@ -58,6 +66,7 @@ type SetMember = {
 
 type GapItem = {
   id: string; title: string; category: string; weight: WeightLevel
+  isComplianceGate: boolean
   type: 'uncovered' | 'weak'
   bestScore: number | null
   bestPlatformName: string | null
@@ -229,7 +238,7 @@ function buildCombinedAnalysis(
       if (s === undefined) continue
       const m = WEIGHT_MAP[req.weight]
       num += s * m
-      den += MAX_SCORE * m
+      den += maxScoreFor(req) * m
     }
     const overallPct = den > 0 ? (num / den) * 100 : null
 
@@ -242,7 +251,7 @@ function buildCombinedAnalysis(
       const m     = WEIGHT_MAP[req.weight]
       const entry = catScores.get(cat) ?? { sum: 0, den: 0 }
       entry.sum += best.score * m
-      entry.den += MAX_SCORE * m
+      entry.den += maxScoreFor(req) * m
       catScores.set(cat, entry)
     }
     const topCategories = [...catScores.entries()]
@@ -265,7 +274,7 @@ function buildCombinedAnalysis(
     if (!best) continue
     const m = WEIGHT_MAP[req.weight]
     num += best.score * m
-    den += MAX_SCORE * m
+    den += maxScoreFor(req) * m
   }
   const combinedPct = den > 0 ? (num / den) * 100 : 0
 
@@ -275,7 +284,8 @@ function buildCombinedAnalysis(
     for (const rid of scores.keys()) scoredReqIds.add(rid)
   }
 
-  // Satisfaction counts: a req is "satisfied" only if best set score >= 75% of MAX
+  // Satisfaction counts: a req is "satisfied" if best set score >= threshold
+  // Compliance gates: satisfied at score ≥ 1 (Yes). Regular: satisfied at ≥ 75% of 4.
   let satisfiedCount = 0
   let partialCount   = 0
   let uncoveredCount = 0
@@ -283,8 +293,8 @@ function buildCombinedAnalysis(
     const best = bestPerReq.get(req.id)
     const s    = best?.score ?? 0
     if (!scoredReqIds.has(req.id) || s === 0) { uncoveredCount++; continue }
-    if (s >= SATISFACTION_THRESHOLD) satisfiedCount++
-    else                              partialCount++
+    if (s >= satisfactionThresholdFor(req)) satisfiedCount++
+    else                                    partialCount++
   }
 
   // Gap analysis: gaps are reqs not yet satisfied (< SATISFACTION_THRESHOLD)
@@ -315,7 +325,7 @@ function buildCombinedAnalysis(
       gaps.push({
         id: req.id, title: req.title,
         category: req.category ?? 'General',
-        weight: req.weight, type: 'uncovered',
+        weight: req.weight, isComplianceGate: req.isComplianceGate, type: 'uncovered',
         bestScore: allBest || null,
         bestPlatformName: allBestPlatId ? (platformById.get(allBestPlatId)?.name ?? null) : null,
         helperPlatforms,
@@ -323,8 +333,8 @@ function buildCombinedAnalysis(
       continue
     }
 
-    if (setScore < SATISFACTION_THRESHOLD) {
-      // Scored but below the 75% satisfaction bar
+    if (setScore < satisfactionThresholdFor(req)) {
+      // Scored but below the satisfaction bar
       const helperPlatforms = [...platformScores.entries()]
         .filter(([pid]) => !selectedIds.includes(pid))
         .map(([pid, scores]) => {
@@ -338,7 +348,7 @@ function buildCombinedAnalysis(
       gaps.push({
         id: req.id, title: req.title,
         category: req.category ?? 'General',
-        weight: req.weight, type: 'weak',
+        weight: req.weight, isComplianceGate: req.isComplianceGate, type: 'weak',
         bestScore: setScore,
         bestPlatformName: best ? (platformById.get(best.platformId)?.name ?? null) : null,
         helperPlatforms,
@@ -970,7 +980,7 @@ function GapGroup({
                     Best in set: <span className="font-medium text-stone-600">{item.bestPlatformName}</span>
                     {' '}at{' '}
                     <span className="tabular-nums font-medium text-amber-600">
-                      {((item.bestScore / MAX_SCORE) * 100).toFixed(0)}%
+                      {((item.bestScore / (item.isComplianceGate ? 1 : MAX_SCORE)) * 100).toFixed(0)}%
                     </span>
                   </p>
                 )}

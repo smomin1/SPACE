@@ -117,18 +117,15 @@ describe('calculateWeightedPercentage()', () => {
 
   it('returns 100 for a perfect score on a single requirement', () => {
     const reqs = [req({ id: 'r1', weight: 'HIGH' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
-    // numerator=3×3=9, denominator=3×3=9 → 100%
+    const scores = [score({ requirementId: 'r1', value: 4 })]
+    // numerator=4×3=12, denominator=4×3=12 → 100%
     expect(calculateWeightedPercentage(scores, reqs)).toBe(100)
   })
 
-  it('returns 50 when avg score is 1.5 out of 3', () => {
+  it('returns 50 when score is 2 out of 4', () => {
     const reqs = [req({ id: 'r1', weight: 'MEDIUM' })]
-    const scores = [
-      score({ requirementId: 'r1', value: 1 }),
-      score({ requirementId: 'r1', value: 2 }),
-    ]
-    // avg=1.5, num=1.5×2=3, denom=3×2=6 → 50%
+    const scores = [score({ requirementId: 'r1', value: 2 })]
+    // num=2×2=4, denom=4×2=8 → 50%
     expect(calculateWeightedPercentage(scores, reqs)).toBe(50)
   })
 
@@ -138,29 +135,29 @@ describe('calculateWeightedPercentage()', () => {
       req({ id: 'r2', weight: 'HIGH' }),  // all N/A; should not drag score down
     ]
     const scores = [
-      score({ requirementId: 'r1', value: 3 }),
+      score({ requirementId: 'r1', value: 4 }),
       score({ requirementId: 'r2', value: null }),
     ]
-    // only r1 scored: num=9, denom=9 → 100%
+    // only r1 scored: num=12, denom=12 → 100%
     expect(calculateWeightedPercentage(scores, reqs)).toBe(100)
   })
 
   it('correctly weights HIGH more than LOW', () => {
     const reqs = [
-      req({ id: 'r1', weight: 'HIGH' }),  // avg=3, num=9, denom=9
-      req({ id: 'r2', weight: 'LOW' }),   // avg=1, num=1, denom=3
+      req({ id: 'r1', weight: 'HIGH' }),  // avg=3, num=9, denom=12
+      req({ id: 'r2', weight: 'LOW' }),   // avg=1, num=1, denom=4
     ]
     const scores = [
       score({ requirementId: 'r1', value: 3 }),
       score({ requirementId: 'r2', value: 1 }),
     ]
-    // num=10, denom=12 → 83.33...%
-    expect(calculateWeightedPercentage(scores, reqs)).toBeCloseTo(83.33, 1)
+    // num=10, denom=16 → 62.5%
+    expect(calculateWeightedPercentage(scores, reqs)).toBeCloseTo(62.5, 1)
   })
 
   it('matches the formula used in FinalisedView.tsx', () => {
-    // FinalisedView: (weightedSum / weightedDenom) / 3 * 100
-    // where weightedSum = sum(avg * mult), weightedDenom = sum(mult for scored reqs)
+    // FinalisedView: (weightedSum / weightedDenom) / 4 * 100
+    // where weightedSum = sum(avg * mult), weightedDenom = sum(4 * mult for scored reqs)
     const reqs = [
       req({ id: 'r1', weight: 'HIGH' }),
       req({ id: 'r2', weight: 'MEDIUM' }),
@@ -169,10 +166,22 @@ describe('calculateWeightedPercentage()', () => {
       score({ requirementId: 'r1', value: 2 }),
       score({ requirementId: 'r2', value: 3 }),
     ]
-    const weightedSum = 2 * 3 + 3 * 2   // 6 + 6 = 12
-    const weightedDenom = 3 + 2          // 5
-    const finalisedViewResult = (weightedSum / weightedDenom) / 3 * 100
-    expect(calculateWeightedPercentage(scores, reqs)).toBeCloseTo(finalisedViewResult, 10)
+    // num = 2*3 + 3*2 = 12, denom = 4*3 + 4*2 = 20 → 60%
+    expect(calculateWeightedPercentage(scores, reqs)).toBeCloseTo(60, 10)
+  })
+
+  it('returns 100% for a compliance gate scored Yes (1)', () => {
+    const reqs = [req({ id: 'r1', weight: 'HIGH', isComplianceGate: true })]
+    const scores = [score({ requirementId: 'r1', value: 1 })]
+    // compliance gate: num=1×3=3, denom=1×3=3 → 100%
+    expect(calculateWeightedPercentage(scores, reqs)).toBe(100)
+  })
+
+  it('returns 0% for a compliance gate scored No (0)', () => {
+    const reqs = [req({ id: 'r1', weight: 'HIGH', isComplianceGate: true })]
+    const scores = [score({ requirementId: 'r1', value: 0 })]
+    // compliance gate: num=0×3=0, denom=1×3=3 → 0%
+    expect(calculateWeightedPercentage(scores, reqs)).toBe(0)
   })
 })
 
@@ -232,9 +241,9 @@ describe('getRecommendedAction()', () => {
     expect(getRecommendedAction(60)).toBe('CONSIDER')
   })
 
-  it('returns DISQUALIFIED below 50', () => {
-    expect(getRecommendedAction(49.9)).toBe('DISQUALIFIED')
-    expect(getRecommendedAction(0)).toBe('DISQUALIFIED')
+  it('returns NOT_RECOMMENDED below 50', () => {
+    expect(getRecommendedAction(49.9)).toBe('NOT_RECOMMENDED')
+    expect(getRecommendedAction(0)).toBe('NOT_RECOMMENDED')
   })
 })
 
@@ -314,31 +323,31 @@ describe('calculateBuildReadinessScore()', () => {
 
   it('matches the "api" keyword (case-insensitive)', () => {
     const reqs = [req({ id: 'r1', category: 'API Gateway', weight: 'HIGH' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
+    const scores = [score({ requirementId: 'r1', value: 4 })]
     expect(calculateBuildReadinessScore(scores, reqs)).toBe(100)
   })
 
   it('matches the "lti" keyword', () => {
     const reqs = [req({ id: 'r1', category: 'LTI Integration', weight: 'HIGH' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
+    const scores = [score({ requirementId: 'r1', value: 4 })]
     expect(calculateBuildReadinessScore(scores, reqs)).toBe(100)
   })
 
   it('matches the "sso" keyword', () => {
     const reqs = [req({ id: 'r1', category: 'SSO / SAML', weight: 'MEDIUM' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
+    const scores = [score({ requirementId: 'r1', value: 4 })]
     expect(calculateBuildReadinessScore(scores, reqs)).toBe(100)
   })
 
   it('matches the "export" keyword', () => {
     const reqs = [req({ id: 'r1', category: 'Data Export Standards', weight: 'LOW' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
+    const scores = [score({ requirementId: 'r1', value: 4 })]
     expect(calculateBuildReadinessScore(scores, reqs)).toBe(100)
   })
 
   it('matches the "integration" keyword', () => {
     const reqs = [req({ id: 'r1', category: 'Third-Party Integration', weight: 'MEDIUM' })]
-    const scores = [score({ requirementId: 'r1', value: 3 })]
+    const scores = [score({ requirementId: 'r1', value: 4 })]
     expect(calculateBuildReadinessScore(scores, reqs)).toBe(100)
   })
 
@@ -348,7 +357,7 @@ describe('calculateBuildReadinessScore()', () => {
       req({ id: 'r2', category: 'Content Quality', weight: 'HIGH' }),
     ]
     const scores = [
-      score({ requirementId: 'r1', value: 3 }),
+      score({ requirementId: 'r1', value: 4 }),
       score({ requirementId: 'r2', value: 1 }),
     ]
     // Only r1 is build-readiness: 100%

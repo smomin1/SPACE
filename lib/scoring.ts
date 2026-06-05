@@ -80,8 +80,10 @@ export function calculateWeightedPercentage(scores: Score[], requirements: Requi
     const a = avg(vals ?? [])
     if (a === null) continue
     const m = WEIGHT_MULTIPLIER[req.weight]
+    // Compliance gates are scored 0 (No) or 1 (Yes), so max is 1, not 4
+    const maxScore = req.isComplianceGate ? 1 : 4
     numerator += a * m
-    denominator += 4 * m
+    denominator += maxScore * m
   }
   if (denominator === 0) return 0
   return (numerator / denominator) * 100

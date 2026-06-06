@@ -9,8 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { VitalParamSelect } from "@/components/vital/VitalParamSelect";
-import { StatusBadge, PillarRow } from "@/components/vital/VitalBadges";
-import { TOOL_DEP_LABEL } from "@/lib/vital/labels";
 
 export default async function VitalLevelStackPage({
   searchParams,
@@ -18,8 +16,8 @@ export default async function VitalLevelStackPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const [skills, levels] = await Promise.all([
-    prisma.vitalSkill.findMany({ orderBy: { order: "asc" } }),
+  const [stages, levels] = await Promise.all([
+    prisma.vitalStage.findMany({ orderBy: { order: "asc" } }),
     prisma.vitalLevel.findMany({
       where: { assessmentOnly: false },
       orderBy: { order: "asc" },
@@ -30,13 +28,10 @@ export default async function VitalLevelStackPage({
   const level = levels.find((l) => l.code === levelParam) ?? levels[0];
 
   const recs = level
-    ? await prisma.vitalRecommendation.findMany({
-        where: { levelId: level.id },
-        include: { coreTool: true, suppTool: true },
-      })
+    ? await prisma.vitalStageRecommendation.findMany({ where: { levelId: level.id } })
     : [];
 
-  const bySkill = new Map(recs.map((r) => [r.skillId, r]));
+  const byStage = new Map(recs.map((r) => [r.stageId, r]));
 
   return (
     <div className="space-y-6">
@@ -59,67 +54,39 @@ export default async function VitalLevelStackPage({
             Level stack · {level?.code}
           </h2>
           <p className="text-[13px] text-stone-500">
-            The full six-skill teaching stack for this CEFR level, with combined
-            VITAL coverage and deployment guidance per skill.
+            The full nine-stage teaching stack for one CEFR level, with the core
+            and supplementary tools and VITAL note for each period stage.
           </p>
         </div>
         <div className="overflow-x-auto rounded-lg border border-stone-200/80">
           <Table className="[&_td]:py-3 [&_td]:align-top [&_th]:h-12 [&_th]:text-[11px] [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-stone-500 [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-stone-50/40">
             <TableHeader>
               <TableRow>
-                <TableHead>Skill</TableHead>
+                <TableHead>Stage</TableHead>
+                <TableHead>Pillars</TableHead>
                 <TableHead>Core</TableHead>
                 <TableHead>Supplementary</TableHead>
-                <TableHead>VITAL coverage</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Teacher-design note</TableHead>
+                <TableHead>VITAL note</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {skills.map((s) => {
-                const r = bySkill.get(s.id);
+              {stages.map((s) => {
+                const r = byStage.get(s.id);
                 return (
                   <TableRow key={s.id}>
-                    <TableCell className="font-medium text-stone-700">
-                      {s.name}
+                    <TableCell className="font-medium text-stone-700">{s.key}</TableCell>
+                    <TableCell className="text-[12px] text-stone-500">
+                      {s.pillars.join("+")}
                     </TableCell>
-                    <TableCell>
-                      {r?.coreTool?.name ?? "-"}
-                      {r?.coreDependency && (
-                        <span className="ml-1 text-[11px] text-stone-400">
-                          ({TOOL_DEP_LABEL[r.coreDependency]})
-                        </span>
-                      )}
+                    <TableCell className="max-w-[220px] whitespace-normal break-words">
+                      {r?.coreText ?? "-"}
                     </TableCell>
-                    <TableCell>
-                      {r?.suppTool?.name ?? "-"}
-                      {r?.suppDependency && (
-                        <span className="ml-1 text-[11px] text-stone-400">
-                          ({TOOL_DEP_LABEL[r.suppDependency]})
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {r ? (
-                        <PillarRow
-                          pillars={[
-                            { key: "V", coverage: r.pillarV },
-                            { key: "I", coverage: r.pillarI },
-                            { key: "T", coverage: r.pillarT },
-                            { key: "A", coverage: r.pillarA },
-                            { key: "L", coverage: r.pillarL },
-                          ]}
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {r ? <StatusBadge value={r.status} compact /> : "-"}
+                    <TableCell className="max-w-[220px] whitespace-normal break-words italic text-stone-500">
+                      {r?.suppText ?? "-"}
                     </TableCell>
                     <TableCell>
                       <div className="max-w-[320px] whitespace-normal break-words text-[12px] leading-relaxed text-stone-500">
-                        {r?.deploymentNote ?? "-"}
+                        {r?.vitalNote ?? "-"}
                       </div>
                     </TableCell>
                   </TableRow>

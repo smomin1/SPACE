@@ -1,44 +1,21 @@
 import type { SearchParams } from "next/dist/server/request/search-params";
-import type { VitalCoverage, VitalToolDependency, VitalRisk } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalParamSelect } from "@/components/vital/VitalParamSelect";
-import {
-  StatusBadge,
-  RiskBadge,
-  PillarCoverage,
-} from "@/components/vital/VitalBadges";
-import { TOOL_DEP_LABEL } from "@/lib/vital/labels";
+import { PILLAR_LABELS, type PillarKey } from "@/lib/vital/constants";
 
-function depLabel(d: VitalToolDependency | null | undefined) {
-  return d ? TOOL_DEP_LABEL[d] : "-";
-}
-
-function ToolCard({
-  heading,
-  name,
-  dependency,
-  risk,
-}: {
-  heading: string;
-  name: string | null | undefined;
-  dependency: VitalToolDependency | null | undefined;
-  risk: VitalRisk | null | undefined;
-}) {
+function ToolCard({ heading, text }: { heading: string; text: string | null | undefined }) {
   return (
     <Card>
       <CardHeader className="pb-2">
         <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-stone-400">
           {heading}
         </p>
-        <CardTitle className="text-[17px] text-emerald-950">
-          {name ?? "None"}
+        <CardTitle className="text-[16px] leading-snug text-emerald-950">
+          {text && text.trim() ? text : "None"}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-wrap items-center gap-2 text-[13px] text-stone-600">
-        <span className="text-stone-500">{depLabel(dependency)}</span>
-        <RiskBadge value={risk} />
-      </CardContent>
+      <CardContent />
     </Card>
   );
 }
@@ -49,45 +26,34 @@ export default async function VitalRecommendationsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const [skills, levels] = await Promise.all([
-    prisma.vitalSkill.findMany({ orderBy: { order: "asc" } }),
+  const [stages, levels] = await Promise.all([
+    prisma.vitalStage.findMany({ orderBy: { order: "asc" } }),
     prisma.vitalLevel.findMany({
       where: { assessmentOnly: false },
       orderBy: { order: "asc" },
     }),
   ]);
 
-  const skillParam = typeof params.skill === "string" ? params.skill : "";
+  const stageParam = typeof params.stage === "string" ? params.stage : "";
   const levelParam = typeof params.level === "string" ? params.level : "";
 
-  const skill = skills.find((s) => s.name === skillParam) ?? skills[0];
+  const stage = stages.find((s) => s.key === stageParam) ?? stages[0];
   const level = levels.find((l) => l.code === levelParam) ?? levels[0];
 
   const rec =
-    skill && level
-      ? await prisma.vitalRecommendation.findUnique({
-          where: { skillId_levelId: { skillId: skill.id, levelId: level.id } },
-          include: { coreTool: true, suppTool: true },
+    stage && level
+      ? await prisma.vitalStageRecommendation.findUnique({
+          where: { stageId_levelId: { stageId: stage.id, levelId: level.id } },
         })
       : null;
-
-  const pillars: { key: string; coverage: VitalCoverage }[] = rec
-    ? [
-        { key: "V", coverage: rec.pillarV },
-        { key: "I", coverage: rec.pillarI },
-        { key: "T", coverage: rec.pillarT },
-        { key: "A", coverage: rec.pillarA },
-        { key: "L", coverage: rec.pillarL },
-      ]
-    : [];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
         <VitalParamSelect
-          param="skill"
-          placeholder="Skill"
-          options={skills.map((s) => ({ value: s.name, label: s.name }))}
+          param="stage"
+          placeholder="Stage"
+          options={stages.map((s) => ({ value: s.key, label: s.key }))}
         />
         <VitalParamSelect
           param="level"
@@ -107,42 +73,35 @@ export default async function VitalRecommendationsPage({
         </p>
       ) : (
         <div className="space-y-5">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-serif text-[20px] text-emerald-950">
-              {skill?.name} · {level?.code}
+              {stage?.key} · {level?.code}
             </h2>
-            <StatusBadge value={rec.status} />
+            <div className="flex flex-wrap gap-1.5">
+              {stage?.pillars.map((p) => (
+                <span
+                  key={p}
+                  className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-800 ring-1 ring-inset ring-emerald-200"
+                  title={PILLAR_LABELS[p as PillarKey]}
+                >
+                  {p} — {PILLAR_LABELS[p as PillarKey]}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <ToolCard
-              heading="Core tool"
-              name={rec.coreTool?.name}
-              dependency={rec.coreDependency}
-              risk={rec.coreRisk}
-            />
-            <ToolCard
-              heading="Supplementary tool"
-              name={rec.suppTool?.name}
-              dependency={rec.suppDependency}
-              risk={rec.suppRisk}
-            />
+            <ToolCard heading="Core tools" text={rec.coreText} />
+            <ToolCard heading="Supplementary tools" text={rec.suppText} />
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-stone-400">
-              Combined VITAL coverage
-            </p>
-            <PillarCoverage pillars={pillars} />
-          </div>
-
-          {rec.deploymentNote && (
+          {rec.vitalNote && (
             <div className="rounded-lg border border-stone-200/80 bg-stone-50/60 p-4">
               <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-stone-400">
-                Deployment note
+                VITAL note
               </p>
               <p className="mt-1 text-[13px] leading-relaxed text-stone-600">
-                {rec.deploymentNote}
+                {rec.vitalNote}
               </p>
             </div>
           )}

@@ -9,6 +9,7 @@ const TABS = [
   { href: "/vital/level-stack", label: "Level Stack" },
   { href: "/vital/grid", label: "Full Grid" },
   { href: "/vital/cefr-map", label: "CEFR Mapping" },
+  { href: "/vital/grade-band", label: "Grade Bands" },
   { href: "/vital/landscape", label: "Tool Landscape" },
   { href: "/vital/assessment", label: "Assessment" },
   { href: "/vital/tools", label: "Tools" },

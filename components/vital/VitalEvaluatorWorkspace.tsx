@@ -367,7 +367,7 @@ export function VitalEvaluatorWorkspace({
 
           {/* 25 questions grouped by pillar */}
           {PILLARS.map((p) => (
-            <Section key={p} title={`${p} — ${PILLAR_LABELS[p]}  ·  ${pillarScores[p].score}/${pillarScores[p].max || 10}`}>
+            <Section key={p} title={`${p} - ${PILLAR_LABELS[p]}  ·  ${pillarScores[p].score}/${pillarScores[p].max || 10}`}>
               <div className="space-y-3">
                 {questionsByPillar[p].map((q) => (
                   <div key={q.id} className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">

@@ -138,7 +138,7 @@ export default async function VitalRecommendationsPage({
                   className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-800 ring-1 ring-inset ring-emerald-200"
                   title={PILLAR_LABELS[p as PillarKey]}
                 >
-                  {p} — {PILLAR_LABELS[p as PillarKey]}
+                  {p} - {PILLAR_LABELS[p as PillarKey]}
                 </span>
               ))}
             </div>

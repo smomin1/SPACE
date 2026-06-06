@@ -18,12 +18,12 @@ function splitTools(text: string | null | undefined): ToolEntry[] {
 // Short column headers for the 9 period stages.
 const STAGE_SHORT: Record<string, string> = {
   "Entry & Warm-Up": "Entry",
-  "Core — Vocabulary": "Vocabulary",
-  "Core — Listening": "Listening",
-  "Core — Speaking": "Speaking",
-  "Core — Reading": "Reading",
-  "Core — Writing": "Writing",
-  "Core — Grammar": "Grammar",
+  "Core - Vocabulary": "Vocabulary",
+  "Core - Listening": "Listening",
+  "Core - Speaking": "Speaking",
+  "Core - Reading": "Reading",
+  "Core - Writing": "Writing",
+  "Core - Grammar": "Grammar",
   "Check for Understanding": "Check",
   "Exit & Reflection": "Exit",
 };

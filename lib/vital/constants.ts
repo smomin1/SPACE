@@ -29,12 +29,12 @@ export const PILLAR_LABELS: Record<PillarKey, string> = {
 // `pillars` = the stage's primary VITAL pillar(s). Order matches the workbook.
 export const STAGES: { key: string; order: number; pillars: PillarKey[] }[] = [
   { key: "Entry & Warm-Up", order: 1, pillars: ["V"] },
-  { key: "Core — Vocabulary", order: 2, pillars: ["T", "I"] },
-  { key: "Core — Listening", order: 3, pillars: ["T", "I"] },
-  { key: "Core — Speaking", order: 4, pillars: ["T", "L"] },
-  { key: "Core — Reading", order: 5, pillars: ["T", "I"] },
-  { key: "Core — Writing", order: 6, pillars: ["T", "L"] },
-  { key: "Core — Grammar", order: 7, pillars: ["T", "A"] },
+  { key: "Core - Vocabulary", order: 2, pillars: ["T", "I"] },
+  { key: "Core - Listening", order: 3, pillars: ["T", "I"] },
+  { key: "Core - Speaking", order: 4, pillars: ["T", "L"] },
+  { key: "Core - Reading", order: 5, pillars: ["T", "I"] },
+  { key: "Core - Writing", order: 6, pillars: ["T", "L"] },
+  { key: "Core - Grammar", order: 7, pillars: ["T", "A"] },
   { key: "Check for Understanding", order: 8, pillars: ["A"] },
   { key: "Exit & Reflection", order: 9, pillars: ["L"] },
 ];
@@ -128,7 +128,7 @@ export const ASSESSMENT_LEVEL_CODES = [ASSESSMENT_ONLY_LEVEL.code, ...CEFR_MAP_L
 export function normCoverage(raw: unknown): VitalCoverage | null {
   if (raw == null) return null;
   const v = String(raw).trim().toLowerCase();
-  if (v === "" || v === "—" || v === "-" || v === "n" || v === "no" || v === "none") return "NONE";
+  if (v === "" || v === "-" || v === "n" || v === "no" || v === "none") return "NONE";
   if (v === "y" || v === "yes" || v === "✓" || v === "full") return "FULL";
   if (v === "p" || v === "partial") return "PARTIAL";
   if (v === "n/a" || v === "na") return "NA";

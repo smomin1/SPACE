@@ -210,6 +210,9 @@ model User {
   name               String
   passwordHash       String
   role               Role
+  // Additive admin grant: full Admin capabilities on TOP of the base role,
+  // granted by a Super Admin. Ignored when role is already ADMIN/SUPER_ADMIN.
+  isAdmin            Boolean   @default(false)
   team               Team?
   isActive           Boolean   @default(true)
   mustChangePassword Boolean   @default(false)
@@ -454,6 +457,9 @@ model AccessRequest {
   name          String
   team          Team
   requestedRole Role
+  // Whether the requester is also asking for additive Admin access on top of
+  // their base role. Granted as User.isAdmin on approval.
+  requestAdmin  Boolean             @default(false)
   status        AccessRequestStatus @default(PENDING)
   notes         String?
   reviewedAt    DateTime?

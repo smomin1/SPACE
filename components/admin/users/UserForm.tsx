@@ -40,6 +40,7 @@ type UserData = {
   email: string
   name: string
   role: Role
+  isAdmin?: boolean
   team?: Team | null
   isActive: boolean
 }
@@ -56,6 +57,7 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
   const [name,     setName]     = React.useState(user?.name  ?? '')
   const [email,    setEmail]    = React.useState(user?.email ?? '')
   const [role,     setRole]     = React.useState<Role>(user?.role ?? 'PEDAGOGY_EVALUATOR')
+  const [isAdmin,  setIsAdmin]  = React.useState(user?.isAdmin ?? false)
   const [team,     setTeam]     = React.useState<Team | ''>((user?.team ?? '') as Team | '')
   const [isActive, setIsActive] = React.useState(user?.isActive ?? true)
   const [password, setPassword] = React.useState('')
@@ -86,10 +88,15 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
       const url    = mode === 'create' ? '/api/users' : `/api/users/${user!.id}`
       const method = mode === 'create' ? 'POST' : 'PATCH'
 
+      // Admin is its own base role / Super Admin; the additive grant only
+      // applies on top of the evaluator/viewer roles.
+      const adminGrantApplies = role !== 'ADMIN' && role !== 'SUPER_ADMIN'
+
       const body: Record<string, unknown> = {
         name: name.trim(),
         email: email.trim(),
         role,
+        isAdmin: adminGrantApplies ? isAdmin : false,
         team: team || null,
         isActive,
       }
@@ -184,6 +191,30 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
           <p className="text-[11px] text-amber-700">You cannot change your own role.</p>
         )}
       </div>
+
+      {/* Additive admin grant - only meaningful on top of a non-admin role */}
+      {role !== 'ADMIN' && role !== 'SUPER_ADMIN' && (
+        <div className={cn(
+          'flex items-center justify-between rounded-md border px-4 py-3 transition-colors',
+          isAdmin ? 'border-violet-200 bg-violet-50/60' : 'border-stone-200/80',
+        )}>
+          <div className="space-y-0.5">
+            <Label htmlFor="isAdmin" className={cn('text-sm font-medium', isAdmin ? 'text-violet-800' : 'text-stone-600')}>
+              Admin access
+            </Label>
+            <p className="text-[11px] text-stone-500">
+              Grants full platform management (platforms, requirements, contexts,
+              evaluations, VITAL) on top of this role. Does not include user management.
+            </p>
+          </div>
+          <Switch
+            id="isAdmin"
+            checked={isAdmin}
+            onCheckedChange={setIsAdmin}
+            disabled={isSelf && mode === 'edit'}
+          />
+        </div>
+      )}
 
       {mode === 'create' ? (
         <div className="rounded-md border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-[13px] text-emerald-800">

@@ -89,6 +89,7 @@ type UserRow = {
   email: string
   name: string
   role: Role
+  isAdmin: boolean
   team: Team | null
   isActive: boolean
   createdAt: Date
@@ -347,9 +348,16 @@ function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
       accessorKey: 'role',
       header: ({ column }) => <ColHeader column={column} title="Role" />,
       cell: ({ row }) => (
-        <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset', ROLE_BADGE[row.original.role])}>
-          {ROLE_LABELS[row.original.role]}
-        </span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset', ROLE_BADGE[row.original.role])}>
+            {ROLE_LABELS[row.original.role]}
+          </span>
+          {row.original.isAdmin && row.original.role !== 'ADMIN' && row.original.role !== 'SUPER_ADMIN' && (
+            <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10.5px] font-semibold text-violet-800 ring-1 ring-inset ring-violet-300/60">
+              + Admin
+            </span>
+          )}
+        </div>
       ),
       filterFn: (row, id, value: string[]) => {
         const v = row.getValue(id)

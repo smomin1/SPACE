@@ -8,6 +8,7 @@ const updateSchema = z.object({
   email:    z.string().email().max(200).optional(),
   name:     z.string().min(1).max(120).optional(),
   role:     z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER']).optional(),
+  isAdmin:  z.boolean().optional(),
   team:     z.enum([
     'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
     'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
@@ -27,7 +28,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true },
+    select: { id: true, email: true, name: true, role: true, isAdmin: true, isActive: true, createdAt: true, updatedAt: true },
   })
   if (!user) return Response.json({ error: 'Not found' }, { status: 404 })
   return Response.json({ user })
@@ -81,10 +82,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (isActive !== undefined) data.isActive = isActive
   if (password !== undefined) data.passwordHash = await bcrypt.hash(password, 10)
 
+  // Additive admin grant. Recompute whenever the grant or the role changes, and
+  // force it off when the (effective) role is already ADMIN/SUPER_ADMIN.
+  if (parsed.data.isAdmin !== undefined || role !== undefined) {
+    const effectiveRole = role ?? target.role
+    data.isAdmin =
+      effectiveRole === 'ADMIN' || effectiveRole === 'SUPER_ADMIN'
+        ? false
+        : parsed.data.isAdmin ?? target.isAdmin
+  }
+
   const user = await prisma.user.update({
     where: { id },
     data,
-    select: { id: true, email: true, name: true, role: true, isActive: true },
+    select: { id: true, email: true, name: true, role: true, isAdmin: true, isActive: true },
   })
 
   return Response.json({ user })

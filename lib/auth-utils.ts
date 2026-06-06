@@ -13,6 +13,7 @@ export async function authorizeCredentials(email: string, password: string) {
     email: user.email,
     name: user.name,
     role: user.role,
+    isAdmin: user.isAdmin,
     mustChangePassword: user.mustChangePassword,
   }
 }

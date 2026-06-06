@@ -40,6 +40,7 @@ type AccessRequest = {
   name: string
   team: string
   requestedRole: string
+  requestAdmin: boolean
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   notes: string | null
   createdAt: Date | string
@@ -64,6 +65,7 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN:               'Admin',
   PEDAGOGY_EVALUATOR:  'Pedagogy Evaluator',
   TECHNICAL_EVALUATOR: 'Technical Evaluator',
+  VITAL_EVALUATOR:     'VITAL Evaluator',
   VIEWER:              'Viewer',
 }
 
@@ -242,17 +244,26 @@ export function AccessRequestsTable({ initialData }: AccessRequestsTableProps) {
             {rows.length > 0 ? (
               rows.map((req) => (
                 <TableRow key={req.id} className="border-b border-stone-200/60 last:border-b-0 hover:bg-emerald-900/[0.025]">
-                  <TableCell className="py-2.5 font-medium text-emerald-950">
+                  <TableCell className="py-2.5 align-top font-medium text-emerald-950">
                     {req.name}
                     {req.notes && (
-                      <p className="text-[11px] text-stone-500 font-normal mt-0.5 max-w-xs truncate" title={req.notes}>
+                      <p className="mt-1 max-w-sm whitespace-pre-wrap break-words text-[11px] font-normal leading-relaxed text-stone-500">
                         {req.notes}
                       </p>
                     )}
                   </TableCell>
-                  <TableCell className="py-2.5 font-mono text-[12.5px] text-stone-600">{req.email}</TableCell>
-                  <TableCell className="py-2.5 text-[13px]">{TEAM_LABELS[req.team] ?? req.team}</TableCell>
-                  <TableCell className="py-2.5 text-[13px]">{ROLE_LABELS[req.requestedRole] ?? req.requestedRole}</TableCell>
+                  <TableCell className="py-2.5 align-top font-mono text-[12.5px] text-stone-600">{req.email}</TableCell>
+                  <TableCell className="py-2.5 align-top text-[13px]">{TEAM_LABELS[req.team] ?? req.team}</TableCell>
+                  <TableCell className="py-2.5 align-top text-[13px]">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span>{ROLE_LABELS[req.requestedRole] ?? req.requestedRole}</span>
+                      {req.requestAdmin && (
+                        <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10.5px] font-semibold text-violet-800 ring-1 ring-inset ring-violet-300/60">
+                          + Admin
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="py-2.5">
                     <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset', STATUS_BADGE[req.status])}>
                       {req.status === 'PENDING' && <ClockIcon className="size-3" />}

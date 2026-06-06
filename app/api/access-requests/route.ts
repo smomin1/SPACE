@@ -21,9 +21,11 @@ const createSchema = z.object({
     'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
     'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
   ], { message: 'Please select a team' }),
+  // Admin is no longer a base role here; it is requested additively below.
   requestedRole: z.enum([
-    'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER',
+    'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER',
   ], { message: 'Please select a role' }),
+  requestAdmin: z.boolean().optional().default(false),
   notes: z.string().max(500, 'Notes must be under 500 characters').optional(),
 })
 
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
     )
   }
 
-  const { email, name, team, requestedRole, notes } = parsed.data
+  const { email, name, team, requestedRole, requestAdmin, notes } = parsed.data
 
   // Check if an active account already exists for this email
   const existingUser = await prisma.user.findUnique({ where: { email } })
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
   }
 
   const request = await prisma.accessRequest.create({
-    data: { email, name, team, requestedRole, notes },
+    data: { email, name, team, requestedRole, requestAdmin, notes },
   })
 
   return Response.json({ request }, { status: 201 })

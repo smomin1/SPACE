@@ -10,6 +10,7 @@ const createSchema = z.object({
   email: z.string().email().max(200),
   name:  z.string().min(1).max(120),
   role:  z.enum(['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER']),
+  isAdmin: z.boolean().optional(),
   team:  z.enum([
     'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
     'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
@@ -17,6 +18,12 @@ const createSchema = z.object({
   ]).optional().nullable(),
   isActive: z.boolean().optional(),
 })
+
+// The additive grant only applies on top of a non-admin base role.
+function normalizeAdminGrant(role: string, isAdmin: boolean | undefined): boolean {
+  if (role === 'ADMIN' || role === 'SUPER_ADMIN') return false
+  return isAdmin ?? false
+}
 
 export async function GET() {
   const session = await auth()
@@ -28,7 +35,7 @@ export async function GET() {
   const users = await prisma.user.findMany({
     orderBy: [{ isActive: 'desc' }, { name: 'asc' }],
     select: {
-      id: true, email: true, name: true, role: true, team: true,
+      id: true, email: true, name: true, role: true, isAdmin: true, team: true,
       isActive: true, createdAt: true, updatedAt: true,
     },
   })
@@ -49,6 +56,7 @@ export async function POST(req: Request) {
   }
 
   const { email, name, role, team, isActive } = parsed.data
+  const isAdmin = normalizeAdminGrant(role, parsed.data.isAdmin)
 
   // Enforce single SUPER_ADMIN
   if (role === 'SUPER_ADMIN') {
@@ -71,12 +79,13 @@ export async function POST(req: Request) {
       email,
       name,
       role,
+      isAdmin,
       team: team ?? null,
       passwordHash,
       isActive: isActive ?? true,
       mustChangePassword: true,
     },
-    select: { id: true, email: true, name: true, role: true, team: true, isActive: true },
+    select: { id: true, email: true, name: true, role: true, isAdmin: true, team: true, isActive: true },
   })
 
   await sendTemporaryPassword(user.email, user.name, tempPassword).catch(console.error)

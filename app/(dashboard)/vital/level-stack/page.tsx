@@ -1,9 +1,18 @@
 import type { SearchParams } from "next/dist/server/request/search-params";
 import { prisma } from "@/lib/prisma";
 
-function splitTools(text: string | null | undefined): string[] {
+interface ToolEntry { name: string; qualifier: string | null }
+
+function splitTools(text: string | null | undefined): ToolEntry[] {
   if (!text?.trim()) return [];
-  return text.split(/[·•|,]/).map((t) => t.trim()).filter(Boolean);
+  return text
+    .split(/[·•]/)
+    .map((raw) => {
+      const t = raw.trim();
+      const m = t.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+      return m ? { name: m[1].trim(), qualifier: m[2].trim() } : { name: t, qualifier: null };
+    })
+    .filter((e) => e.name);
 }
 import {
   Table,
@@ -84,20 +93,22 @@ export default async function VitalLevelStackPage({
                       {s.pillars.join("+")}
                     </TableCell>
                     <TableCell className="max-w-[220px]">
-                      <div className="flex flex-wrap gap-1">
-                        {splitTools(r?.coreText).map((t) => (
-                          <span key={t} className="inline-flex items-center rounded-md border border-stone-200 bg-white px-2 py-0.5 text-[12px] font-medium text-stone-700">
-                            {t}
+                      <div className="flex flex-wrap gap-1.5">
+                        {splitTools(r?.coreText).map((e) => (
+                          <span key={e.name} className="inline-flex flex-col rounded-md border border-stone-200 bg-white px-2 py-1">
+                            <span className="text-[12px] font-medium text-stone-700">{e.name}</span>
+                            {e.qualifier && <span className="text-[10.5px] text-stone-400">{e.qualifier}</span>}
                           </span>
                         ))}
                         {!r?.coreText && <span className="text-stone-300">-</span>}
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[220px]">
-                      <div className="flex flex-wrap gap-1">
-                        {splitTools(r?.suppText).map((t) => (
-                          <span key={t} className="inline-flex items-center rounded-md border border-stone-100 bg-stone-50 px-2 py-0.5 text-[12px] italic text-stone-500">
-                            {t}
+                      <div className="flex flex-wrap gap-1.5">
+                        {splitTools(r?.suppText).map((e) => (
+                          <span key={e.name} className="inline-flex flex-col rounded-md border border-stone-100 bg-stone-50 px-2 py-1">
+                            <span className="text-[12px] italic text-stone-500">{e.name}</span>
+                            {e.qualifier && <span className="text-[10.5px] text-stone-400">{e.qualifier}</span>}
                           </span>
                         ))}
                         {!r?.suppText && <span className="text-stone-300">-</span>}

@@ -4,19 +4,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalParamSelect } from "@/components/vital/VitalParamSelect";
 import { PILLAR_LABELS, type PillarKey } from "@/lib/vital/constants";
 
-// Split a cell like "Starfall · ICT Games · PhonicsPlay" into clean tool names.
-function parseTools(text: string | null | undefined): string[] {
-  if (!text || !text.trim()) return [];
+// Split "Starfall · ICT Games · Seesaw (photo of work)" into structured entries.
+// Each entry has a `name` and an optional parenthetical `qualifier`.
+interface ToolEntry { name: string; qualifier: string | null }
+
+function parseTools(text: string | null | undefined): ToolEntry[] {
+  if (!text?.trim()) return [];
   return text
-    .split(/[·•|,]/)
-    .map((t) => t.trim())
-    .filter(Boolean);
+    .split(/[·•]/)
+    .map((raw) => {
+      const t = raw.trim();
+      const m = t.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+      return m
+        ? { name: m[1].trim(), qualifier: m[2].trim() }
+        : { name: t, qualifier: null };
+    })
+    .filter((e) => e.name);
 }
 
-function ToolChip({ name }: { name: string }) {
+function ToolChip({ entry }: { entry: ToolEntry }) {
   return (
-    <span className="inline-flex items-center rounded-md border border-stone-200 bg-white px-2.5 py-1 text-[12.5px] font-medium text-stone-700 shadow-sm">
-      {name}
+    <span className="inline-flex flex-col rounded-md border border-stone-200 bg-white px-2.5 py-1.5 shadow-sm">
+      <span className="text-[12.5px] font-medium text-stone-700">{entry.name}</span>
+      {entry.qualifier && (
+        <span className="text-[11px] text-stone-400">{entry.qualifier}</span>
+      )}
     </span>
   );
 }
@@ -28,7 +40,7 @@ function ToolCard({
 }: {
   heading: string;
   hint: string;
-  tools: string[];
+  tools: ToolEntry[];
 }) {
   return (
     <Card className="flex flex-col">
@@ -43,8 +55,8 @@ function ToolCard({
           <span className="text-[13px] text-stone-300">None specified</span>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {tools.map((t) => (
-              <ToolChip key={t} name={t} />
+            {tools.map((e) => (
+              <ToolChip key={e.name} entry={e} />
             ))}
           </div>
         )}

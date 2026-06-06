@@ -1,9 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
-function splitTools(text: string | null | undefined): string[] {
+interface ToolEntry { name: string; qualifier: string | null }
+
+function splitTools(text: string | null | undefined): ToolEntry[] {
   if (!text?.trim()) return [];
-  return text.split(/[·•|,]/).map((t) => t.trim()).filter(Boolean);
+  return text
+    .split(/[·•]/)
+    .map((raw) => {
+      const t = raw.trim();
+      const m = t.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+      return m ? { name: m[1].trim(), qualifier: m[2].trim() } : { name: t, qualifier: null };
+    })
+    .filter((e) => e.name);
 }
 
 // Short column headers for the 9 period stages.
@@ -77,11 +86,17 @@ export default async function VitalGridPage() {
                     >
                       {r && (r.coreText || r.suppText) ? (
                         <div className="space-y-1.5">
-                          {splitTools(r.coreText).map((t) => (
-                            <div key={t} className="font-medium text-stone-700">{t}</div>
+                          {splitTools(r.coreText).map((e) => (
+                            <div key={e.name}>
+                              <div className="font-medium text-stone-700">{e.name}</div>
+                              {e.qualifier && <div className="text-[10.5px] text-stone-400">{e.qualifier}</div>}
+                            </div>
                           ))}
-                          {splitTools(r.suppText).map((t) => (
-                            <div key={t} className="italic text-stone-400 text-[11.5px]">{t}</div>
+                          {splitTools(r.suppText).map((e) => (
+                            <div key={e.name}>
+                              <div className="italic text-stone-400 text-[11.5px]">{e.name}</div>
+                              {e.qualifier && <div className="text-[10px] text-stone-300">{e.qualifier}</div>}
+                            </div>
                           ))}
                         </div>
                       ) : (

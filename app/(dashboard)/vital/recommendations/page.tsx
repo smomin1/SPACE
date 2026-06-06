@@ -4,18 +4,51 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VitalParamSelect } from "@/components/vital/VitalParamSelect";
 import { PILLAR_LABELS, type PillarKey } from "@/lib/vital/constants";
 
-function ToolCard({ heading, text }: { heading: string; text: string | null | undefined }) {
+// Split a cell like "Starfall · ICT Games · PhonicsPlay" into clean tool names.
+function parseTools(text: string | null | undefined): string[] {
+  if (!text || !text.trim()) return [];
+  return text
+    .split(/[·•|,]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function ToolChip({ name }: { name: string }) {
   return (
-    <Card>
+    <span className="inline-flex items-center rounded-md border border-stone-200 bg-white px-2.5 py-1 text-[12.5px] font-medium text-stone-700 shadow-sm">
+      {name}
+    </span>
+  );
+}
+
+function ToolCard({
+  heading,
+  hint,
+  tools,
+}: {
+  heading: string;
+  hint: string;
+  tools: string[];
+}) {
+  return (
+    <Card className="flex flex-col">
       <CardHeader className="pb-2">
         <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-stone-400">
           {heading}
         </p>
-        <CardTitle className="text-[16px] leading-snug text-emerald-950">
-          {text && text.trim() ? text : "None"}
-        </CardTitle>
+        <CardTitle className="text-[13px] font-normal text-stone-400">{hint}</CardTitle>
       </CardHeader>
-      <CardContent />
+      <CardContent className="flex-1">
+        {tools.length === 0 ? (
+          <span className="text-[13px] text-stone-300">None specified</span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {tools.map((t) => (
+              <ToolChip key={t} name={t} />
+            ))}
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 }
@@ -47,6 +80,9 @@ export default async function VitalRecommendationsPage({
         })
       : null;
 
+  const coreTools = parseTools(rec?.coreText);
+  const suppTools = parseTools(rec?.suppText);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -73,10 +109,16 @@ export default async function VitalRecommendationsPage({
         </p>
       ) : (
         <div className="space-y-5">
+          {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-serif text-[20px] text-emerald-950">
-              {stage?.key} · {level?.code}
-            </h2>
+            <div>
+              <h2 className="font-serif text-[20px] text-emerald-950">
+                {stage?.key} · {level?.code}
+              </h2>
+              <p className="text-[12px] text-stone-400 mt-0.5">
+                Select the tool(s) that best fit your context for this stage and level.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {stage?.pillars.map((p) => (
                 <span
@@ -90,17 +132,27 @@ export default async function VitalRecommendationsPage({
             </div>
           </div>
 
+          {/* Tool cards */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <ToolCard heading="Core tools" text={rec.coreText} />
-            <ToolCard heading="Supplementary tools" text={rec.suppText} />
+            <ToolCard
+              heading="Core tools"
+              hint={coreTools.length > 1 ? "Choose one for this session" : "Recommended for this stage"}
+              tools={coreTools}
+            />
+            <ToolCard
+              heading="Supplementary tools"
+              hint={suppTools.length > 1 ? "Pair with core as needed" : "Optional support"}
+              tools={suppTools}
+            />
           </div>
 
+          {/* VITAL note */}
           {rec.vitalNote && (
-            <div className="rounded-lg border border-stone-200/80 bg-stone-50/60 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-stone-400">
+            <div className="rounded-lg border border-amber-200/70 bg-amber-50/50 p-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-amber-700 mb-1.5">
                 VITAL note
               </p>
-              <p className="mt-1 text-[13px] leading-relaxed text-stone-600">
+              <p className="text-[13px] leading-relaxed text-stone-700">
                 {rec.vitalNote}
               </p>
             </div>

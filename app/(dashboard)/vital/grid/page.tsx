@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
+function splitTools(text: string | null | undefined): string[] {
+  if (!text?.trim()) return [];
+  return text.split(/[·•|,]/).map((t) => t.trim()).filter(Boolean);
+}
+
 // Short column headers for the 9 period stages.
 const STAGE_SHORT: Record<string, string> = {
   "Entry & Warm-Up": "Entry",
@@ -71,15 +76,13 @@ export default async function VitalGridPage() {
                       title={r?.vitalNote ?? undefined}
                     >
                       {r && (r.coreText || r.suppText) ? (
-                        <div className="space-y-0.5">
-                          {r.coreText && (
-                            <div className={cn("font-semibold text-stone-700")}>
-                              {r.coreText}
-                            </div>
-                          )}
-                          {r.suppText && (
-                            <div className="italic text-stone-400">{r.suppText}</div>
-                          )}
+                        <div className="space-y-1.5">
+                          {splitTools(r.coreText).map((t) => (
+                            <div key={t} className="font-medium text-stone-700">{t}</div>
+                          ))}
+                          {splitTools(r.suppText).map((t) => (
+                            <div key={t} className="italic text-stone-400 text-[11.5px]">{t}</div>
+                          ))}
                         </div>
                       ) : (
                         <span className="text-stone-300">-</span>

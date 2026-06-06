@@ -1,5 +1,10 @@
 import type { SearchParams } from "next/dist/server/request/search-params";
 import { prisma } from "@/lib/prisma";
+
+function splitTools(text: string | null | undefined): string[] {
+  if (!text?.trim()) return [];
+  return text.split(/[·•|,]/).map((t) => t.trim()).filter(Boolean);
+}
 import {
   Table,
   TableBody,
@@ -78,11 +83,25 @@ export default async function VitalLevelStackPage({
                     <TableCell className="text-[12px] text-stone-500">
                       {s.pillars.join("+")}
                     </TableCell>
-                    <TableCell className="max-w-[220px] whitespace-normal break-words">
-                      {r?.coreText ?? "-"}
+                    <TableCell className="max-w-[220px]">
+                      <div className="flex flex-wrap gap-1">
+                        {splitTools(r?.coreText).map((t) => (
+                          <span key={t} className="inline-flex items-center rounded-md border border-stone-200 bg-white px-2 py-0.5 text-[12px] font-medium text-stone-700">
+                            {t}
+                          </span>
+                        ))}
+                        {!r?.coreText && <span className="text-stone-300">-</span>}
+                      </div>
                     </TableCell>
-                    <TableCell className="max-w-[220px] whitespace-normal break-words italic text-stone-500">
-                      {r?.suppText ?? "-"}
+                    <TableCell className="max-w-[220px]">
+                      <div className="flex flex-wrap gap-1">
+                        {splitTools(r?.suppText).map((t) => (
+                          <span key={t} className="inline-flex items-center rounded-md border border-stone-100 bg-stone-50 px-2 py-0.5 text-[12px] italic text-stone-500">
+                            {t}
+                          </span>
+                        ))}
+                        {!r?.suppText && <span className="text-stone-300">-</span>}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="max-w-[320px] whitespace-normal break-words text-[12px] leading-relaxed text-stone-500">

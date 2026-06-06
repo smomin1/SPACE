@@ -54,7 +54,7 @@ export default async function EvaluationWorkspacePage({
 
   if (!evaluation) notFound()
 
-  // VITAL evaluations have their own workspace — never render the Tool Evaluator views for them
+  // VITAL evaluations have their own workspace - never render the Tool Evaluator views for them
   if (evaluation.platform.track === 'VITAL') redirect(`/vital-evaluate/${evaluationId}`)
 
   const isEvaluator = canDo(role, 'access:evaluate')

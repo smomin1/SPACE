@@ -41,7 +41,7 @@ export function deriveFields(
 // Ensure a recommendation cell exists for every teaching skill × CEFR level
 // (assessment-only levels are excluded, matching the grid/level-stack views).
 // Missing cells are created with fully derived values so the recommendation
-// matrix is built straight from the evaluated tool catalogue — no seed or
+// matrix is built straight from the evaluated tool catalogue - no seed or
 // manual authoring required. Returns how many cells were created.
 export async function createMissingRecommendationCells(
   tools?: ToolForDerive[],
@@ -62,7 +62,7 @@ export async function createMissingRecommendationCells(
   for (const s of skills) {
     for (const l of levels) {
       if (have.has(`${s.id}:${l.id}`)) continue;
-      // New cells have no locks and no authored note — purely derived.
+      // New cells have no locks and no authored note - purely derived.
       const derived = deriveRecommendation({
         tools: loadedTools,
         skillId: s.id,
@@ -81,8 +81,8 @@ export async function createMissingRecommendationCells(
 // Recompute the whole recommendation matrix from the current catalogue. First
 // fills in any missing skill × level cells, then refreshes every existing cell
 // (keeping locked tool slots pinned and the authored deployment note intact,
-// auto-picking the rest). Used after the catalogue changes — the admin
-// "Recompute" button and, crucially, every VITAL evaluator submit — so a new
+// auto-picking the rest). Used after the catalogue changes - the admin
+// "Recompute" button and, crucially, every VITAL evaluator submit - so a new
 // evaluation flows straight into the recommendations. Returns how many rows
 // were created and how many existing rows changed.
 export async function recomputeRecommendations(): Promise<{

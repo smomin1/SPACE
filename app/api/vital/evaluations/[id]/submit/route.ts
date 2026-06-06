@@ -145,7 +145,7 @@ export async function POST(
   // VITAL evaluations have no conflict resolution phase. Once all evaluators
   // have submitted (state just advanced to MERGED), immediately finalise.
   // transitionEvaluation checks canTransitionTo which passes when there are
-  // zero open conflict threads — always true for VITAL evaluations.
+  // zero open conflict threads - always true for VITAL evaluations.
   const allSubmittedNow = evaluation.assignments.every(
     (a) => a.id === assignment?.id || a.hasSubmitted
   );

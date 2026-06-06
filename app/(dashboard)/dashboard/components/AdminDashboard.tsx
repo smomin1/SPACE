@@ -91,7 +91,7 @@ export async function AdminDashboard({ role }: { role: string }) {
   }
 
   const healthRows: HealthRow[] = activeEvaluations
-    // Keep Tool Evaluator evaluations only — VITAL has its own profile flow
+    // Keep Tool Evaluator evaluations only - VITAL has its own profile flow
     .filter(e => (e.platform.track ?? 'TOOL') !== 'VITAL')
     .map(e => {
       const pedagogy  = e.assignments.filter(a => a.evaluatorType === 'PEDAGOGY')
@@ -188,7 +188,7 @@ export async function AdminDashboard({ role }: { role: string }) {
         />
       </div>
 
-      {/* Pending access requests callout — Super Admin only */}
+      {/* Pending access requests callout - Super Admin only */}
       {role === 'SUPER_ADMIN' && pendingAccessRequests > 0 && (
         <Link href="/admin/access-requests">
           <div className="flex items-center gap-4 rounded-xl border border-amber-200 bg-amber-50/60 px-5 py-4 hover:bg-amber-50 transition-colors">

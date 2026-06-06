@@ -391,7 +391,7 @@ export function PlatformForm({
           <Label htmlFor="trialAvailable">Trial available</Label>
         </div>
 
-        {/* VITAL app link — only for Tool Evaluator track and when VITAL tools exist */}
+        {/* VITAL app link - only for Tool Evaluator track and when VITAL tools exist */}
         {!isVital && vitalTools.length > 0 && (
           <div className="space-y-1.5">
             <Label>Linked VITAL app</Label>

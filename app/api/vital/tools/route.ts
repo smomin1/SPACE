@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { canDo } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { vitalToolSchema } from "@/lib/vital/schema";
-import { vitalScore10FromPillars } from "@/lib/vital/compute";
+import { writeToolProfile } from "@/lib/vital/responses-server";
 
 export async function GET() {
   const session = await auth();
@@ -40,29 +40,42 @@ export async function POST(request: Request) {
     );
   }
 
-  const { pillarRatings, skillCoverage, levelMappings, ...scalar } = parsed.data;
-
-  // VITAL/10 is derived: sum of the 5 pillar ratings (Y=2, P=1, N=0). Assessment
-  // tools have no pillar profile, so their /10 stays null.
-  const vitalScore10 = scalar.isAssessmentTool
-    ? null
-    : vitalScore10FromPillars((pillarRatings ?? []).map((p) => p.rating));
+  // Score fields (vitalScore10/v2Score50/v2Percent/verdict) and pillar letters are
+  // derived from questionResponses; never trusted from the client. Children are
+  // written explicitly so the question-driven and legacy paths share one code path.
+  const {
+    pillarRatings,
+    pillarOverrides,
+    questionResponses,
+    skillCoverage,
+    levelMappings,
+    v2Score50,
+    verdict,
+    ...scalar
+  } = parsed.data;
 
   try {
-    const tool = await prisma.vitalTool.create({
-      data: {
-        ...scalar,
-        vitalScore10,
-        pillarRatings: pillarRatings?.length
-          ? { create: pillarRatings }
-          : undefined,
-        skillCoverage: skillCoverage?.length
-          ? { create: skillCoverage }
-          : undefined,
-        levelMappings: levelMappings?.length
-          ? { create: levelMappings }
-          : undefined,
-      },
+    const tool = await prisma.$transaction(async (tx) => {
+      const created = await tx.vitalTool.create({ data: scalar });
+      const scores = await writeToolProfile(tx, created.id, {
+        isAssessmentTool: scalar.isAssessmentTool,
+        questionResponses,
+        pillarOverrides,
+        pillarRatings,
+        v2Score50,
+        verdict,
+      });
+      if (skillCoverage?.length) {
+        await tx.vitalToolSkillCoverage.createMany({
+          data: skillCoverage.map((s) => ({ toolId: created.id, ...s })),
+        });
+      }
+      if (levelMappings?.length) {
+        await tx.vitalToolLevelMapping.createMany({
+          data: levelMappings.map((m) => ({ toolId: created.id, ...m })),
+        });
+      }
+      return tx.vitalTool.update({ where: { id: created.id }, data: scores });
     });
     return Response.json({ tool }, { status: 201 });
   } catch (err: unknown) {

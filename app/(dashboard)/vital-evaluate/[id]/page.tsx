@@ -30,13 +30,19 @@ export default async function VitalEvaluatePage({ params }: Props) {
   const isAdmin = canDo(session.user.role, "manage:vital");
   if (!myAssignment && !isAdmin) redirect("/evaluations");
 
-  const [tool, skills, levels] = await Promise.all([
+  const [tool, skills, levels, questions] = await Promise.all([
     prisma.vitalTool.findFirst({
       where: { platformId: evaluation.platformId },
-      include: { pillarRatings: true, skillCoverage: true, levelMappings: true },
+      include: {
+        pillarRatings: true,
+        skillCoverage: true,
+        levelMappings: true,
+        questionResponses: true,
+      },
     }),
     prisma.vitalSkill.findMany({ orderBy: { order: "asc" } }),
     prisma.vitalLevel.findMany({ orderBy: { order: "asc" } }),
+    prisma.vitalQuestion.findMany({ orderBy: { order: "asc" } }),
   ]);
 
   return (
@@ -63,6 +69,7 @@ export default async function VitalEvaluatePage({ params }: Props) {
         tool={tool}
         skills={skills}
         levels={levels}
+        questions={questions}
       />
     </div>
   );

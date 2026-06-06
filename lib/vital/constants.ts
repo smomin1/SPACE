@@ -3,6 +3,7 @@
 // consistent. The level codes use the U+2212 minus sign (−), NOT a hyphen.
 
 import type {
+  VitalAnswer,
   VitalCoverage,
   VitalDependency,
   VitalToolDependency,
@@ -15,6 +16,28 @@ import type {
 // ─── Pillars ────────────────────────────────────────────────────────────────
 export const PILLARS = ["V", "I", "T", "A", "L"] as const;
 export type PillarKey = (typeof PILLARS)[number];
+
+export const PILLAR_LABELS: Record<PillarKey, string> = {
+  V: "Visible Learning",
+  I: "Inclusive Pedagogy",
+  T: "Technology & Tools",
+  A: "Assessment & Data Use",
+  L: "Learner Agency",
+};
+
+// ─── Stages (CEFR × Stage × Tools matrix rows) ──────────────────────────────────
+// `pillars` = the stage's primary VITAL pillar(s). Order matches the workbook.
+export const STAGES: { key: string; order: number; pillars: PillarKey[] }[] = [
+  { key: "Entry & Warm-Up", order: 1, pillars: ["V"] },
+  { key: "Core — Vocabulary", order: 2, pillars: ["T", "I"] },
+  { key: "Core — Listening", order: 3, pillars: ["T", "I"] },
+  { key: "Core — Speaking", order: 4, pillars: ["T", "L"] },
+  { key: "Core — Reading", order: 5, pillars: ["T", "I"] },
+  { key: "Core — Writing", order: 6, pillars: ["T", "L"] },
+  { key: "Core — Grammar", order: 7, pillars: ["T", "A"] },
+  { key: "Check for Understanding", order: 8, pillars: ["A"] },
+  { key: "Exit & Reflection", order: 9, pillars: ["L"] },
+];
 
 // ─── Skills ───────────────────────────────────────────────────────────────────
 // Canonical full names + the abbreviations used in the Tool Landscape headers.
@@ -158,6 +181,17 @@ export function normRating(raw: unknown): VitalRating | null {
   if (v === "Y") return "Y";
   if (v === "P") return "P";
   if (v === "N") return "N";
+  return null;
+}
+
+// VITAL question answer: "Yes"/"Partial"/"No"/"N/A" → enum.
+export function normAnswer(raw: unknown): VitalAnswer | null {
+  if (raw == null) return null;
+  const v = String(raw).trim().toLowerCase();
+  if (v === "yes" || v === "y") return "YES";
+  if (v === "partial" || v === "p") return "PARTIAL";
+  if (v === "no" || v === "n") return "NO";
+  if (v === "n/a" || v === "na") return "NA";
   return null;
 }
 

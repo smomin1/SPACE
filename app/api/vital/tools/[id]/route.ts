@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { canDo } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { vitalToolSchema } from "@/lib/vital/schema";
-import { vitalScore10FromPillars } from "@/lib/vital/compute";
+import { writeToolProfile } from "@/lib/vital/responses-server";
 
 export async function PUT(
   request: Request,
@@ -33,29 +33,34 @@ export async function PUT(
     );
   }
 
-  const { pillarRatings, skillCoverage, levelMappings, ...scalar } = parsed.data;
+  const {
+    pillarRatings,
+    pillarOverrides,
+    questionResponses,
+    skillCoverage,
+    levelMappings,
+    v2Score50,
+    verdict,
+    ...scalar
+  } = parsed.data;
 
-  // VITAL/10 is derived from the pillar ratings (Y=2, P=1, N=0). Only recompute
-  // when the request carries pillar ratings; assessment tools keep a null /10.
-  const scalarData =
-    pillarRatings !== undefined
-      ? {
-          ...scalar,
-          vitalScore10: scalar.isAssessmentTool
-            ? null
-            : vitalScore10FromPillars(pillarRatings.map((p) => p.rating)),
-        }
-      : scalar;
+  // Rewrite the question/pillar profile (and derive scores) only when the request
+  // carries question responses or legacy pillar ratings; otherwise leave them.
+  const rewriteProfile = questionResponses !== undefined || pillarRatings !== undefined;
 
   try {
     const tool = await prisma.$transaction(async (tx) => {
-      await tx.vitalTool.update({ where: { id }, data: scalarData });
-      if (pillarRatings) {
-        await tx.vitalToolPillarRating.deleteMany({ where: { toolId: id } });
-        if (pillarRatings.length)
-          await tx.vitalToolPillarRating.createMany({
-            data: pillarRatings.map((p) => ({ ...p, toolId: id })),
-          });
+      await tx.vitalTool.update({ where: { id }, data: scalar });
+      if (rewriteProfile) {
+        const scores = await writeToolProfile(tx, id, {
+          isAssessmentTool: scalar.isAssessmentTool,
+          questionResponses,
+          pillarOverrides,
+          pillarRatings,
+          v2Score50,
+          verdict,
+        });
+        await tx.vitalTool.update({ where: { id }, data: scores });
       }
       if (skillCoverage) {
         await tx.vitalToolSkillCoverage.deleteMany({ where: { toolId: id } });

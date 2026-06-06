@@ -1,0 +1,1485 @@
+{
+ "stages": [
+  {
+   "key": "Entry & Warm-Up",
+   "order": 1,
+   "pillars": [
+    "V"
+   ]
+  },
+  {
+   "key": "Core — Vocabulary",
+   "order": 2,
+   "pillars": [
+    "T",
+    "I"
+   ]
+  },
+  {
+   "key": "Core — Listening",
+   "order": 3,
+   "pillars": [
+    "T",
+    "I"
+   ]
+  },
+  {
+   "key": "Core — Speaking",
+   "order": 4,
+   "pillars": [
+    "T",
+    "L"
+   ]
+  },
+  {
+   "key": "Core — Reading",
+   "order": 5,
+   "pillars": [
+    "T",
+    "I"
+   ]
+  },
+  {
+   "key": "Core — Writing",
+   "order": 6,
+   "pillars": [
+    "T",
+    "L"
+   ]
+  },
+  {
+   "key": "Core — Grammar",
+   "order": 7,
+   "pillars": [
+    "T",
+    "A"
+   ]
+  },
+  {
+   "key": "Check for Understanding",
+   "order": 8,
+   "pillars": [
+    "A"
+   ]
+  },
+  {
+   "key": "Exit & Reflection",
+   "order": 9,
+   "pillars": [
+    "L"
+   ]
+  }
+ ],
+ "levels": [
+  "A0",
+  "A1−",
+  "A1",
+  "A1+",
+  "A2−",
+  "A2",
+  "A2+",
+  "B1−",
+  "B1",
+  "B1+",
+  "B1.5−",
+  "B1.5",
+  "B1.5+",
+  "B2−",
+  "B2",
+  "B2+",
+  "B2.5−",
+  "B2.5",
+  "B2.5+",
+  "C1−",
+  "C1",
+  "C1+"
+ ],
+ "stageRecommendations": [
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A0",
+   "core": "Starfall · ICT Games · PhonicsPlay",
+   "supp": "Jolly Phonics (teacher-led song/action)",
+   "note": "V: Teacher observes manually — no digital visibility tool works at this level. Physical response / show-of-hands."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A1−",
+   "core": "Starfall · ICT Games · PhonicsPlay",
+   "supp": "Jolly Phonics (teacher-led song/action)",
+   "note": "V: Teacher observes manually — no digital visibility tool works reliably at this level. Physical response / show-of-hands. Continue with observation-based entry."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A1",
+   "core": "Nearpod (open question / poll) · Padlet (image + word)",
+   "supp": "Duolingo (5 min max) · ELSA Speak (1–2 quick pronunciation drills)",
+   "note": "V: Nearpod poll gives teacher immediate sight of all responses. First digital visibility tool at this level. ELSA Speak warm-up: 1–2 min only — teacher cannot see responses in real time, so use before a visibility tool (Nearpod/Padlet)."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A1+",
+   "core": "Nearpod (open question / poll) · Padlet (image + word)",
+   "supp": "Duolingo (5 min max) · ELSA Speak (1–2 quick pronunciation drills)",
+   "note": "V: Nearpod poll gives teacher immediate sight of all responses. First tool = visibility tool. ELSA Speak warm-up: 1–2 min only — teacher cannot see responses in real time, so use before a visibility tool (Nearpod/Padlet). Focus on simple yes/no or choice questions."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A2−",
+   "core": "Nearpod (open question / poll) · Padlet (image + word)",
+   "supp": "Duolingo (5 min max) · ELSA Speak (1–2 quick pronunciation drills)",
+   "note": "V: Nearpod poll gives teacher immediate sight of all responses. ELSA Speak warm-up: 1–2 min only — teacher cannot see responses in real time, so use before a visibility tool."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A2",
+   "core": "Nearpod (open question) · Quizlet Live (vocabulary review)",
+   "supp": "Duolingo (5 min) · ELSA Speak (minimal pair warm-up)",
+   "note": "V: Quizlet Live = real-time team progress on teacher screen. Nearpod open Q shows all responses. ELSA Speak: Best used after the visibility check as a quick pronunciation warm-up. Warm-up questions can now ask for opinions (\"What do you think is the best breakfast food?\") with simple justification"
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "A2+",
+   "core": "Nearpod (open question) · Quizlet Live (vocabulary review)",
+   "supp": "Duolingo (5 min) · ELSA Speak (target phoneme warm-up)",
+   "note": "V: Quizlet Live = real-time team progress on teacher screen. Nearpod open Q shows all responses. At this secure level, warm-up questions can ask for short justifications (2–3 sentences) and predictions about the lesson topic. ELSA Speak: Target phonemes connected to upcoming speaking task. Teacher can see all responses in real time and highlight 2–3 interesting answers before moving on."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1−",
+   "core": "Nearpod (open question) · Quizlet Live (vocabulary review)",
+   "supp": "Duolingo (5 min) · ELSA Speak (target phoneme warm-up)",
+   "note": "V: Quizlet Live = real-time team progress on teacher screen. Nearpod open Q shows all responses. At A2 (Low), warm-up questions ask for short opinions with simple reasons (2–3 sentences). Use hooks: \"What do you think? Why?\" \"Do you agree or disagree? Explain briefly.\" Teacher highlights 2–3 responses before moving on."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1",
+   "core": "Nearpod (open question) · Quizlet Live (vocabulary review)",
+   "supp": "Duolingo (5 min) · ELSA Speak (minimal pair warm-up)",
+   "note": "V: Quizlet Live = real-time team progress on teacher screen. Nearpod open Q shows all responses. ELSA Speak: Best used after the visibility check as a quick pronunciation warm-up."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1+",
+   "core": "Nearpod (open question) · Padlet (position statement)",
+   "supp": "Quizlet Live · ELSA Speak (target phoneme warm-up)",
+   "note": "V: Position statement: agree / disagree / it depends + one reason. Teacher groups by position for discussion. At A2+ (B1−), warm-up questions ask for structured opinions with justifications (2–3 sentences plus a reason). Use provocative questions that invite debate: \"Should students wear uniforms? Why or why not?\" \"Is social media good or bad? Explain.\" Teacher groups learners by position (agree/disagree/it depends) for pair discussion."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1.5−",
+   "core": "CommonLit (discussion question) · Padlet (position statement)",
+   "supp": "Nearpod (debate prompt) · ELSA Speak (connected speech warm-up)",
+   "note": "V: Position statement with evidence. Teacher groups by position for structured debate. At A2+ (Secure B1−), warm-up questions require a claim + one piece of evidence + a brief justification (3–4 sentences). Use authentic, debatable prompts: \"Should schools teach financial literacy? Why or why not? Provide one example.\" \"Is remote work better than working in an office? Give one reason with evidence.\" Teacher groups learners by position (agree/disagree/it depends) and assigns debate roles for the speaking section."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1.5",
+   "core": "CommonLit (discussion question) · Nearpod (open question)",
+   "supp": "Quizlet Live (vocabulary review) · ELSA Speak (connected speech warm-up)",
+   "note": "V: Discussion question on last session's theme. Nearpod shows all responses. Teacher highlights 2–3 responses and uses them to launch pair discussion. At B1 (Low), warm-up questions ask for opinions with reasons and brief examples (4–5 sentences). Use authentic, relevant prompts connected to learners' lives: \"What is the biggest challenge facing young people today? Explain with an example.\" \"How has technology changed the way we communicate? Give two specific examples.\" Teacher uses responses to form heterogeneous pairs for discussion."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B1.5+",
+   "core": "CommonLit (discussion question) · Nearpod (open question)",
+   "supp": "Quizlet Live · ELSA Speak (target phoneme warm-up)",
+   "note": "V: Discussion question on last session's theme. Nearpod shows all responses. Teacher highlights 2–3. ELSA Speak: Use target phonemes from upcoming speaking task."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2−",
+   "core": "CommonLit (discussion question) · Padlet (position statement)",
+   "supp": "Nearpod (debate prompt) · ELSA Speak (connected speech warm-up)",
+   "note": "V: Position statement with evidence and counter-acknowledgment. Teacher groups by position for structured debate. At B1+ (B2−), warm-up questions require a claim + evidence (data, expert opinion, or personal example) + acknowledgment of an opposing view (3–5 sentences). Use authentic, debatable prompts with abstract concepts: \"Should governments prioritise economic growth or environmental protection? Justify your position with evidence.\" \"Is artificial intelligence a threat to employment or an opportunity for innovation? Explain with at least one example and address a counter-argument.\" Teacher groups learners by position (agree/disagree/it depends) and assigns debate roles for the speaking section."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2",
+   "core": "CommonLit (discussion question) · Padlet (position statement)",
+   "supp": "Nearpod (debate prompt) · ELSA Speak (prosody warm-up)",
+   "note": "V: Position statement with evidence, counter-acknowledgment, and explicit use of hedging language. Teacher groups by position for structured academic debate. At B1+ (Secure B2−), warm-up questions require a claim + evidence (data, research citation, expert opinion, or detailed personal example) + acknowledgment of opposing view + hedging (e.g., \"may,\" \"might,\" \"suggests that,\" \"appears to be\" — 4–6 sentences). Use authentic, debatable prompts with abstract concepts requiring nuanced argumentation: \"To what extent should governments prioritise economic growth over environmental protection? Provide evidence and acknowledge the complexity of trade-offs.\" \"Is artificial intelligence a net positive or negative for society? Justify your position with specific examples and address a counter-argument using appropriate hedging language.\" Teacher groups learners by position (agree/disagree/it depends with nuance) and assigns debate roles (opening statement, rebuttal, closing statement) for the speaking section. Teacher identifies sophisticated hedging use vs basic claims."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2+",
+   "core": "CommonLit (critical question on complex text) · Padlet (argument seed)",
+   "supp": "Nearpod (nuanced opinion poll) · ELSA Speak (prosody for nuanced attitude)",
+   "note": "V: Genuinely contested question — no right answer. Learner positions visible. Teacher uses divergence to drive discussion. At B2+ (C1−), warm-up questions require a nuanced position with evidence, hedging, counter-acknowledgment, acknowledgment of complexity, and explicit framing of the issue (5–7 sentences). Use authentic, debatable prompts without clear answers: \"To what extent does technology fundamentally change what it means to be human? Justify your position with philosophical or empirical evidence, acknowledge complexity, and hedge appropriately.\" \"Is globalisation ultimately a force for cultural homogenisation or hybridisation? Provide evidence and acknowledge the limitations of your position.\" \"Does democracy require an educated citizenry to function effectively, or are there other equally important factors? Discuss with nuance.\" Teacher uses Padlet to display all positions, groups learners by similarity/difference of viewpoint for academic discussion, and assigns discussion roles (moderator, devil's advocate, synthesizer, evidence master). Teacher identifies who engages with complexity, uses hedging, acknowledges uncertainty, and references specific evidence vs who makes simplistic or unsupported claims."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2.5−",
+   "core": "CommonLit (discussion question) · Padlet (position statement)",
+   "supp": "Nearpod (debate prompt)",
+   "note": "V: Position statement: agree / disagree / it depends + one reason. Teacher groups by position."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2.5",
+   "core": "CommonLit (critical question on complex text) · Padlet (argument seed)",
+   "supp": "Nearpod (nuanced opinion poll) · ELSA Speak (prosody for rhetorical effect)",
+   "note": "V: Contested question with no right answer. Position requires evidence, hedging, counter-acknowledgment, complexity, and meta-cognitive framing (6–8 sentences). Teacher groups by viewpoint with rotating roles (facilitator, challenger, synthesizer, devil's advocate)."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "B2.5+",
+   "core": "CommonLit (critically contested extract) · Padlet (nuanced position)",
+   "supp": "Nearpod (divergent opinion poll) · ELSA Speak (prosody for rhetorical emphasis)",
+   "note": "V: Genuinely contested question — no right answer. Learner positions visible. Teacher uses divergence."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "C1−",
+   "core": "CommonLit (critically contested extract) · Padlet (nuanced position)",
+   "supp": "Nearpod (divergent opinion poll) · ELSA Speak (prosody for rhetorical register)",
+   "note": "V: Multi‑framed contested issue. Position requires explicit debate framing, epistemic‑self‑location, awareness of ideological assumptions, quantified hedging (7–10 sentences). Teacher forms teams for structured Oxford‑style debate with timed speeches and points of information. Roles: proposition/opposition leads, whip speakers, POI offerer."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "C1",
+   "core": "CommonLit (critically contested extract) · Padlet (nuanced position with ideological mapping)",
+   "supp": "Nearpod (divergent opinion poll) · ELSA Speak (prosody for rhetorical mastery)",
+   "note": "V: Complex, multi‑disciplinary issue with competing paradigms. Position requires explicit debate framing, epistemic self‑location, ideological mapping, quantified hedging calibrated to evidence strength (7–10 sentences). Teacher assigns Oxford‑style debate teams (proposition/opposition with 3 speakers each) plus independent adjudicators. Preparation time: 5 min research using provided source bank."
+  },
+  {
+   "stage": "Entry & Warm-Up",
+   "level": "C1+",
+   "core": "CommonLit (critically contested extract) · Padlet (nuanced position with ideological mapping)",
+   "supp": "Nearpod (divergent opinion poll) · ELSA Speak (prosody for rhetorical register)",
+   "note": "V: Multi‑framed contested issue with competing paradigms. Position requires explicit debate framing, epistemic self‑location, ideological assumption awareness, quantified hedging calibrated to evidence strength (7–10 sentences). Teacher assigns Oxford‑style debate teams (proposition/opposition with 3 speakers each) plus independent adjudicators."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A0",
+   "core": "Jolly Phonics · Starfall · ESL Kids Stuff (teacher-curated)",
+   "supp": "ICT Games",
+   "note": "T: Oral and pictorial only. No reading. Realia + audio + image. No text-based vocabulary tool appropriate at this level."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A1−",
+   "core": "Jolly Phonics · Starfall · ESL Kids Stuff (teacher-curated)",
+   "supp": "ICT Games",
+   "note": "T: Oral and pictorial only. Minimal reading. Realia + audio + image. Text-based vocabulary tools still not appropriate. Introduce very simple word-picture matching only with teacher support."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A1",
+   "core": "Quizlet (match + learn) · Blooket (vocab mode)",
+   "supp": "Duolingo (vocabulary strand only)",
+   "note": "T: Image + audio + sentence per word. Quizlet spaced repetition enabled. No text-only definitions. Blooket: Use for review, not initial instruction. Learners need visual and auditory support for every new word."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A1+",
+   "core": "Quizlet (match + learn) · Blooket (vocab mode)",
+   "supp": "Duolingo (vocabulary strand only)",
+   "note": "T: Image + audio + sentence per word. Quizlet spaced repetition enabled. No text-only definitions. Blooket: Use for review, not initial instruction. Introduce 6–8 new words per session maximum. Include high-frequency everyday vocabulary (family, home, food, daily routines)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A2−",
+   "core": "Quizlet (match + learn) · Blooket (vocab mode)",
+   "supp": "Duolingo (vocabulary strand only)",
+   "note": "T: Image + audio + sentence per word. Quizlet spaced repetition enabled. No text-only definitions. Blooket: Use for review, not initial instruction."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A2",
+   "core": "Quizlet (flashcard + match + test) · Gimkit (vocab mode)",
+   "supp": "WordWall (10 min max)",
+   "note": "T: Synonyms and antonyms introduced. Quizlet sets include sentence-level examples. Spaced repetition on. Gimkit: Use as fast-paced review after Quizlet study. Introduce 8–10 new words per session. Include collocations (e.g., \"make breakfast,\" \"do homework,\" \"take a shower\") and basic word families (e.g., \"happy/unhappy/happiness\")."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "A2+",
+   "core": "Quizlet (flashcard + match + test) · Gimkit (vocab mode)",
+   "supp": "WordWall · Blooket (independent)",
+   "note": "T: Synonyms, antonyms, and basic word families (e.g., \"happy/unhappy/happiness\"). Quizlet sets include sentence-level examples and collocations. Spaced repetition on. Gimkit: Fast-paced review. Introduce 10–12 new words per session. Learners can now create their own example sentences using target words. Focus on Tier 2 academic vocabulary (e.g., \"important,\" \"different,\" \"similar,\" \"compare,\" \"result\")."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1−",
+   "core": "Quizlet (flashcard + match + test) · Gimkit (vocab mode)",
+   "supp": "WordWall (10 min max) · Blooket (independent)",
+   "note": "T: Collocations and word families introduced (e.g., \"make a decision,\" \"take a break,\" \"happy/happily/happiness\"). Quizlet sets include sentence-level examples. Spaced repetition on. Gimkit: Fast-paced review. Introduce 10–12 new words per session. Learners create their own example sentences using target words in context. Focus on topic-based vocabulary clusters (e.g., travel, health, work, shopping, entertainment)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1",
+   "core": "Quizlet (flashcard + match + test) · Gimkit (vocab mode)",
+   "supp": "WordWall (10 min max)",
+   "note": "T: Synonyms and antonyms introduced. Quizlet sets include sentence-level examples. Spaced repetition on. Gimkit: Use as fast-paced review after Quizlet study."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1+",
+   "core": "Quizlet (connotation + register) · CommonLit (vocab in authentic texts)",
+   "supp": "Write & Improve (vocabulary in writing)",
+   "note": "T: Register, connotation, idiomatic expressions. Words encountered in authentic texts before explicit focus. Introduce 10–12 new words per session, but focus on depth (multiple meanings, formality levels, collocations, register). Examples: \"buy/purchase,\" \"start/commence,\" \"stop/cease\" (register); \"cheap/inexpensive/affordable\" (connotation). Learners encounter words first in CommonLit authentic texts, then explicit instruction follows. Quizlet sets include register labels (formal/informal/neutral) and connotation notes (positive/negative/neutral)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1.5−",
+   "core": "CommonLit (academic vocabulary) · Write & Improve (lexical sophistication feedback)",
+   "supp": "Quizlet (AWL – Academic Word List)",
+   "note": "T: Nominalisation, hedging, discourse markers, register variation (formal/informal/neutral). Words encountered in authentic texts before explicit focus. Introduce 10–12 words per session, focusing on Academic Word List (AWL) sublist 1 and 2. Examples: \"analyse,\" \"approach,\" \"area,\" \"assess,\" \"assume,\" \"available,\" \"benefit,\" \"concept,\" \"consistent,\" \"constitutional,\" \"context,\" \"contract,\" \"create,\" \"data,\" \"definition.\" Learners encounter words first in CommonLit authentic academic texts, then explicit instruction follows. Write & Improve provides lexical sophistication feedback on learners' writing (suggests more academic vocabulary)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1.5",
+   "core": "Quizlet (Tier 2 academic words) · Padlet (vocabulary in context sentences)",
+   "supp": "WordWall · Write & Improve (vocabulary in writing)",
+   "note": "T: Collocations, word families, and basic affixes (prefixes/suffixes) introduced. Quizlet sets include sentence-level examples and collocations. Spaced repetition on. Introduce 10–12 new words per session, focusing on Tier 2 academic vocabulary across multiple subjects. Examples: \"significant,\" \"consequence,\" \"method,\" \"structure,\" \"function,\" \"environment,\" \"tradition,\" \"generation,\" \"impact,\" \"contribute.\" Learners create own example sentences using target words in context, then post to Padlet for peer review. Write & Improve provides vocabulary feedback in writing submissions."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B1.5+",
+   "core": "Quizlet (Tier 2 academic words) · Padlet (vocab in context sentences)",
+   "supp": "Padlet (vocabulary in context sentences) · CommonLit (vocab in authentic texts)",
+   "note": "T: Collocations, word families, affixes (prefixes/suffixes), and basic register awareness (formal/informal/neutral). Quizlet sets include sentence-level examples, collocations, and register notes. Spaced repetition on. Introduce 10–12 new words per session, focusing on Tier 2 academic vocabulary across multiple subjects with attention to word families. Examples: \"consequence/consequent/consequently,\" \"tradition/traditional/traditionally,\" \"environment/environmental/environmentalist,\" \"impact/impactful/impacted,\" \"contribute/contribution/contributor.\" Learners create own example sentences using target words in context, then post to Padlet for peer review and register analysis (identify whether their sentence is formal, informal, or neutral). Write & Improve provides vocabulary feedback in writing submissions, including suggestions for more precise or academic alternatives."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2−",
+   "core": "CommonLit (academic vocabulary) · Write & Improve (lexical sophistication feedback)",
+   "supp": "Quizlet (AWL – Academic Word List sublist 3–4)",
+   "note": "T: Nominalisation (e.g., \"develop\" → \"development\"), hedging (e.g., \"may,\" \"might,\" \"could,\" \"appears to,\" \"suggests that\"), discourse markers (e.g., \"furthermore,\" \"nevertheless,\" \"consequently,\" \"in contrast\"), register variation (formal/informal/neutral). Words encountered in authentic academic texts before explicit focus. Introduce 10–12 words per session, focusing on Academic Word List (AWL) sublist 3 and 4. Examples: \"alternative,\" \"circumstance,\" \"comment,\" \"compensate,\" \"component,\" \"consent,\" \"considerable,\" \"constant,\" \"constrain,\" \"contribute,\" \"convene,\" \"coordinate,\" \"core,\" \"corporate,\" \"correspond.\" Learners encounter words first in CommonLit authentic academic texts, then explicit instruction follows. Write & Improve provides lexical sophistication feedback on learners' writing (suggests more academic vocabulary and nominalisation)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2",
+   "core": "CommonLit (academic vocabulary) · Write & Improve (lexical sophistication feedback)",
+   "supp": "Quizlet (AWL – Academic Word List sublist 5–6) · Academic corpus tools (COCA, BNC – optional)",
+   "note": "T: Nominalisation (advanced: \"the development of,\" \"the implementation of\"), hedging (extended: \"may/might/could/appears to/suggests that/it is possible that/it is likely that/tends to/typically/often\"), discourse markers (advanced: \"furthermore,\" \"nevertheless,\" \"consequently,\" \"in contrast,\" \"similarly,\" \"likewise,\" \"accordingly,\" \"hence,\" \"thus,\" \"thereby\"), register variation (formal/academic vs informal/conversational vs neutral/professional with ability to shift appropriately). Words encountered in authentic academic texts before explicit focus. Introduce 10–12 words per session, focusing on Academic Word List (AWL) sublist 5 and 6. Examples: \"accommodate,\" \"analogy,\" \"anticipate,\" \"assure,\" \"attain,\" \"bulk,\" \"cease,\" \"coherent,\" \"coincide,\" \"commission,\" \"commodity,\" \"compatible,\" \"compensate,\" \"compile,\" \"complement.\" Learners encounter words first in CommonLit authentic academic texts, then explicit instruction follows with attention to word families, collocations, register, and usage in academic writing. Write & Improve provides lexical sophistication feedback on learners' writing (suggests more academic vocabulary, nominalisation, and hedging alternatives)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2+",
+   "core": "CommonLit (stylistic + connotative vocabulary) · Write & Improve (register mastery feedback)",
+   "supp": "Academic corpus tools (COCA, BNC – if available) · Quizlet (AWL sublist 7–8)",
+   "note": "T: Stylistic variation (formal/academic vs informal/conversational vs neutral/professional vs literary/rhetorical – with ability to shift appropriately across contexts), connotation (positive/negative/neutral with cultural awareness – e.g., \"thrifty\" vs \"stingy,\" \"confident\" vs \"arrogant,\" \"youthful\" vs \"immature\"), irony and sarcasm (identification and appropriate use), register variation (advanced: ability to write in multiple registers and adapt for audience, purpose, and medium), lexical sophistication (low-frequency academic vocabulary, nuanced word choice, collocation precision, idiom use appropriate to register). Words encountered in authentic complex texts (literary, academic, journalistic) before explicit focus. Introduce 10–12 words per session, focusing on Academic Word List (AWL) sublist 7 and 8 with attention to connotation, register, and usage in multiple contexts. Examples: \"abandon,\" \"ambiguous,\" \"arbitrary,\" \"assert,\" \"coherent,\" \"contradiction,\" \"controversy,\" \"conventional,\" \"distinct,\" \"distinguish,\" \"domain,\" \"dynamics,\" \"eliminate,\" \"empirical,\" \"encounter,\" \"enforce,\" \"entity,\" \"environment,\" \"establish,\" \"evaluate.\" Learners encounter words first in CommonLit authentic complex texts (literary excerpts, academic journal abstracts, quality journalism), then explicit instruction follows with attention to: word families, collocations, register (academic vs conversational), connotation (positive/negative/neutral), antonyms/synonyms with nuanced differences, and usage in learners' own writing. Write & Improve provides register mastery feedback on learners' writing (suggests alternatives for register appropriateness, points out inappropriate register shifts, recommends more precise or sophisticated vocabulary)."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2.5−",
+   "core": "Quizlet (connotation + register) · CommonLit (vocab in authentic texts)",
+   "supp": "Write & Improve (vocab in writing)",
+   "note": "T: Register, connotation, idiomatic expressions. Words encountered in authentic texts before explicit focus"
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2.5",
+   "core": "CommonLit (stylistic + connotative vocabulary) · Write & Improve (register mastery feedback)",
+   "supp": "Academic corpus tools (COCA, BNC – if available) · Quizlet (AWL sublist 9–10) · Vocabulary.com (adaptive)",
+   "note": "T: Stylistic variation across registers, deep connotation awareness, irony, lexical precision, idiom mastery. AWL sublist 9–10. Words encountered in authentic complex texts. Write & Improve provides register feedback with nuanced alternatives."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "B2.5+",
+   "core": "CommonLit (academic vocabulary) · Write & Improve (lexical sophistication feedback)",
+   "supp": "Quizlet (AWL academic word list)",
+   "note": "T: Nominalisation, hedging, discourse markers, register variation. Met in text before standalone vocabulary work."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "C1−",
+   "core": "CommonLit (specialised & literary vocabulary) · Write & Improve (stylistic precision feedback)",
+   "supp": "COCA/BNC (frequency/collocation/register analysis) · Academic journals as corpus",
+   "note": "T: Field‑specialised and literary vocabulary; register mastery (seamless shifting among academic, professional, literary, conversational, technical, legal); connotation across dialects; irony/satire/parody recognition; lexical gaps filled via strategic circumlocution. Write & Improve flags overused lexis, suggests field‑specific alternatives, and checks register consistency."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "C1",
+   "core": "CommonLit (specialised, literary, and technical vocabulary) · Write & Improve (stylistic precision & voice feedback)",
+   "supp": "COCA/BNC (frequency, collocation, register, diachronic analysis) · Academic/corporate/literary corpora",
+   "note": "T: Field‑specialised, literary, technical, legal vocabulary across 6+ domains. Register mastery with seamless, stylistically appropriate shifting. Connotation across dialects, registers, historical periods. Irony, satire, parody, nuance recognition and production. Lexical gaps managed via advanced circumlocution and strategic approximation. Write & Improve flags overused lexis, suggests field‑specific and register‑appropriate alternatives, and checks stylistic voice consistency."
+  },
+  {
+   "stage": "Core — Vocabulary",
+   "level": "C1+",
+   "core": "CommonLit (specialised, literary, and technical vocabulary) · Write & Improve (stylistic precision & voice feedback)",
+   "supp": "COCA/BNC (frequency, collocation, register, diachronic analysis) · Academic/corporate/literary corpora",
+   "note": "T: Field‑specialised, literary, technical, legal vocabulary across 6+ domains. Register mastery with seamless, stylistically appropriate shifting. Connotation across dialects, registers, historical periods. Irony, satire, parody, nuance recognition and production. Lexical gaps managed via advanced circumlocution. Write & Improve flags overused lexis, suggests field‑specific and register‑appropriate alternatives, and checks stylistic voice consistency."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A0",
+   "core": "Starfall · Learning Upgrade (audio-visual clips)",
+   "supp": "SoundCloud (teacher-prepared audio)",
+   "note": "I: Audio must include visual support. No transcript required. Replay allowed. Slow, clear articulation."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A1−",
+   "core": "Starfall · Learning Upgrade (audio-visual clips)",
+   "supp": "SoundCloud (teacher-prepared audio)",
+   "note": "I: Audio must include visual support. No transcript required. Replay allowed. Slow, clear articulation. Visuals should be concrete and highly familiar (everyday objects, actions, people)."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A1",
+   "core": "Raz-Kids (audio read-along) · Edpuzzle (embedded Qs)",
+   "supp": "SoundCloud (teacher-prepared)",
+   "note": "I: Scripted, slow, clear. Visual support alongside audio. Replay permitted. Gist + specific detail only (e.g., \"What color is the ball?\"). No inference questions. Maximum 1–2 sentences per audio segment."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A1+",
+   "core": "Raz-Kids (audio read-along) · Edpuzzle (embedded Qs)",
+   "supp": "SoundCloud (teacher-prepared)",
+   "note": "I: Scripted, slow, clear. Visual support alongside audio. Replay permitted. Gist + specific detail only (e.g., \"Where is the cat?\" \"What color is the ball?\"). Maximum 3–4 sentences per audio segment. No inference questions."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A2−",
+   "core": "Raz-Kids (audio read-along) · Edpuzzle (embedded Qs)",
+   "supp": "SoundCloud (teacher-prepared)",
+   "note": "I: Scripted, slow, clear. Visual support alongside audio. Replay permitted. Gist + specific detail only."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A2",
+   "core": "Edpuzzle (near-authentic audio + Qs) · Raz-Kids (audio)",
+   "supp": "SoundCloud (teacher-prepared)",
+   "note": "I: Near-natural speed. 2 accents introduced (e.g., US + UK). One replay permitted. Gist + specific detail questions. Audio length: 30–60 seconds. Questions include: main idea, specific facts, and speaker's attitude (basic). Introduce very short authentic materials (e.g., 30-second news summary, podcast intro, public announcement)."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "A2+",
+   "core": "Edpuzzle (near-authentic audio + Qs) · Raz-Kids (audio)",
+   "supp": "BBC Learning English (6 Minute English - adapted)",
+   "note": "I: Near-natural to natural speed. 2–3 accents introduced (US, UK, Australia). One replay permitted. Gist → detail → simple inference questions (e.g., \"Why does the speaker say that?\" \"What is the speaker's attitude?\"). Audio length: 45–90 seconds. Introduce short authentic materials: simple news summaries, podcast intros, public announcements, short interviews."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1−",
+   "core": "Edpuzzle (authentic audio) · SoundCloud (podcast extract)",
+   "supp": "BBC Learning English (6 Minute English)",
+   "note": "I: Authentic or near-authentic. 2+ accents (US, UK, Australia, Canada). Gist → detail → inference → speaker attitude. Audio length: 1–2 minutes. Transcript available after 2nd listen. Questions include: main idea, specific facts, inference (\"Why does the speaker say that?\"), attitude (\"How does the speaker feel about...?\"). Introduce short authentic podcasts, news summaries, interviews, simple TED-style talks."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1",
+   "core": "Edpuzzle (near-authentic audio + Qs) · Raz-Kids (audio)",
+   "supp": "SoundCloud (teacher-prepared)",
+   "note": "I: Near-natural speed. 2 accents introduced. One replay. Gist + specific detail questions."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1+",
+   "core": "Edpuzzle (authentic lecture/debate) · YouTube (with captions)",
+   "supp": "TED-Ed · BBC Podcasts",
+   "note": "I: Authentic: debates, interviews, lectures, news reports. Multiple accents (3+). Implicit meaning + speaker attitude + rhetorical devices. Audio length: 2–4 minutes. Questions include: main idea, specific facts, inference, speaker attitude, purpose (\"Why does the speaker say that?\"), tone (serious/humorous/critical/supportive). Captions available but should be used after 1st listen. Transcript available. Introduce short TED Talks (3–5 minutes), news segments, debate clips, interview excerpts."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1.5−",
+   "core": "Edpuzzle (authentic lecture/debate) · YouTube (with captions)",
+   "supp": "TED-Ed · BBC Podcasts (The Inquiry, The Documentary)",
+   "note": "I: Authentic academic and professional content: lectures, panel discussions, parliamentary debates, news analysis, documentary excerpts. Multiple accents (4+ including non-native English speakers). Implicit meaning, speaker stance, rhetorical devices, logical fallacies (basic identification). Audio/video length: 4–6 minutes. Questions include: main idea, specific facts, inference, speaker attitude, purpose, tone, bias detection, rhetorical strategy identification (\"What technique does the speaker use to persuade the audience?\"). Captions available after 1st listen. Transcript available. Introduce TED Talks (6–8 minutes), BBC Inquiry episodes (excerpts), debate clips, lecture excerpts, news analysis segments."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1.5",
+   "core": "Edpuzzle (authentic audio B1) · YouTube (with captions)",
+   "supp": "BBC Learning English (6 Minute English) · SoundCloud (podcast extract)",
+   "note": "I: Authentic or near-authentic content: news reports, interviews, podcasts, short lectures. 2+ accents (US, UK, Australia, Canada). Gist → detail → inference → speaker attitude → purpose. Audio/video length: 2–4 minutes. Questions include: main idea, specific facts, inference (\"Why does the speaker say that?\"), attitude (\"How does the speaker feel about...?\"), purpose (\"What is the speaker's main goal?\"). Captions available but should be used after 1st listen. Transcript available. Introduce BBC 6 Minute English, short TED-Ed talks, news summaries (CNN 10, BBC News Review), podcast excerpts (This American Life (simplified), Stuff You Should Know)."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B1.5+",
+   "core": "Edpuzzle (authentic audio B1) · SoundCloud (podcast extract)",
+   "supp": "BBC Learning English",
+   "note": "I: Authentic or near-authentic. 2+ accents. Gist → detail → inference. Transcript after 2nd listen."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2−",
+   "core": "Edpuzzle (authentic lecture/debate) · YouTube (with captions)",
+   "supp": "TED Talks (full, 10–15 minutes) · BBC Podcasts (The Inquiry, The Documentary)",
+   "note": "I: Authentic academic and professional content: university lectures, panel discussions, parliamentary debates, news analysis, documentary excerpts, conference presentations. Multiple accents (4+ including non-native English speakers). Implicit meaning, speaker stance, rhetorical devices, logical fallacies (identification and critique), tone shifts, irony/sarcasm (basic identification). Audio/video length: 6–10 minutes. Questions include: main idea, specific facts, inference, speaker attitude, purpose, tone, bias detection, rhetorical strategy identification (\"What technique does the speaker use to persuade the audience? Is it effective?\"), logical fallacy identification (\"Does the speaker commit any logical fallacies? Identify one.\"). Captions available after 1st listen. Transcript available. Introduce full TED Talks (10–12 minutes), BBC Inquiry episodes (12–15 minutes excerpt), debate clips (8–10 minutes), university lecture excerpts (8–10 minutes), news analysis segments (10 minutes)."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2",
+   "core": "Edpuzzle (authentic lecture/debate) · YouTube (with captions)",
+   "supp": "TED Talks (full, 12–18 minutes) · BBC Podcasts (The Inquiry, The Documentary, The Forum) · Academic Earth",
+   "note": "I: Authentic academic and professional content: university lectures (full or extended excerpts), panel discussions with multiple experts, parliamentary or congressional debates, news analysis with pundits, documentary excerpts, conference presentations, academic interviews. Multiple accents (5+ including US, UK, Australia, Canada, Ireland, India, Singapore). Implicit meaning, speaker stance, rhetorical devices (full range), logical fallacies (identification and critique), tone shifts, irony/sarcasm (identification and interpretation), speaker credibility/bias (critical evaluation), persuasive strategies (ethos, pathos, logos – basic identification). Audio/video length: 8–15 minutes. Questions include: main idea, specific facts, inference, speaker attitude, purpose, tone, bias detection, rhetorical strategy identification and evaluation (\"What technique does the speaker use to persuade? Is it effective? Why or why not?\"), logical fallacy identification and critique (\"Identify a logical fallacy in the speaker's argument. Explain why it weakens their position.\"), speaker credibility assessment (\"Is the speaker credible? What evidence supports your assessment?\"), identification of persuasive appeals (ethos/pathos/logos). Captions available after 1st listen. Transcript available for detailed analysis. Introduce full TED Talks (12–15 minutes), BBC Inquiry episodes (15–20 minutes excerpt), debate clips (10–12 minutes), university lecture excerpts (10–15 minutes), news analysis segments (10–15 minutes), The Forum (BBC – discussions on ideas)."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2+",
+   "core": "Edpuzzle (unscripted authentic: documentary, lecture, debate) · YouTube (news analysis, panel discussions)",
+   "supp": "BBC Radio 4 (authentic broadcast) · NPR (fresh air, ted radio hour) · The Economist (audio)",
+   "note": "I: Fully authentic, unscripted content: academic lectures (full length or extended excerpts), panel discussions with audience questions, parliamentary or congressional hearings, press conferences, unscripted interviews, documentary full episodes, debate competitions (Oxford Union style), conference Q&A sessions, conversational podcasts with multiple speakers. Multiple accents (5+ including US, UK, Australia, Canada, Ireland, India, Singapore, South Africa). Complexity includes: implicit meaning, speaker stance, rhetorical devices (full range with stylistic analysis), logical fallacies (identification and critique with alternative framing), tone shifts (subtle), irony/sarcasm (identification and interpretation of intent and effect), speaker credibility/bias (critical evaluation with evidence), persuasive strategies (ethos, pathos, logos – analysis of effectiveness), discourse markers for organisation (listening for signposting language), rapid speech, colloquialisms, idioms, cultural references, humour, satire. Audio/video length: 10–20 minutes (with segments for focused analysis). Questions include: main idea(s), specific facts (usually 2–3), inference (multiple layers), speaker attitude and its evolution across the text, purpose (primary and secondary), tone (with identification of shifts and their significance), bias detection (explicit and implicit), rhetorical strategy identification and evaluation (\"What technique does the speaker use? Why is it effective or ineffective?\"), logical fallacy identification and critique (\"Identify a logical fallacy. Rewrite the argument without it.\"), speaker credibility assessment (\"What makes this speaker authoritative? Are there any credibility concerns?\"), identification of persuasive appeals (ethos, pathos, logos – with evaluation of balance and effectiveness), summarisation of argument (distill to 2-3 sentences), identification of unstated assumptions, prediction of counter-arguments the speaker would anticipate. Captions optional – recommended for verification after listening, not as a crutch. Full transcript available for detailed analysis. Introduce BBC Radio 4 (In Our Time, The Life Scientific), NPR (Fresh Air, TED Radio Hour, Hidden Brain), The Economist audio (full articles), documentary excerpts (Ken Burns, nature docs), academic lecture excerpts, debate competition recordings."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2.5−",
+   "core": "Edpuzzle (authentic lecture/debate) · YouTube (with captions)",
+   "supp": "TED-Ed · BBC Podcasts",
+   "note": "I: Authentic: debates, interviews, lectures. Multiple accents. Implicit meaning + speaker attitude required."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2.5",
+   "core": "Edpuzzle (unscripted authentic: documentary, lecture, debate) · YouTube (news analysis, panel discussions)",
+   "supp": "BBC Radio 4 (In Our Time, The Life Scientific, The Reith Lectures) · NPR (Fresh Air, TED Radio Hour, Hidden Brain, Throughline) · The Economist (audio) · Academic Earth · Podcasts (multiple genres)",
+   "note": "I: Fully authentic, unscripted (15–25 min). 6+ accents. Tasks: implicit meaning (multiple layers), stance evolution, rhetorical devices (schemes/tropes), logical fallacies (critique), tone shifts, irony/sarcasm, credibility/bias (structural), persuasive appeals (ethos/pathos/logos), unstated assumptions, synthesise multiple speakers. Transcript available after 2nd listen."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "B2.5+",
+   "core": "Edpuzzle (lecture / formal presentation) · TED Talk (with tasks)",
+   "supp": "BBC Radio 4 (authentic broadcast)",
+   "note": "I: Lectures, formal presentations at natural speed. Implicit meaning, speaker stance, rhetorical devices."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "C1−",
+   "core": "Edpuzzle (unscripted authentic: parliamentary debate, academic symposium, judicial hearing) · YouTube (leaked/authentic unscripted political/corporate exchanges)",
+   "supp": "BBC Radio 4 (In Our Time, Reith Lectures) · NPR (Fresh Air, Throughline) · Academic podcasts (Philosophy Bites, LSE Public Lectures)",
+   "note": "I: Fully authentic, unscripted (30–50 min). 6+ accents including rapid, overlapping, interruptive, non‑native proficient. Tasks: implicit, ironic, satirical meaning; stance evolution and contradiction detection; rhetorical device evaluation (effect, ethics, alternative); formal/informal fallacies with persuasive mechanism analysis; tone shifts with prosodic/lexical evidence; structural/ideological bias; credibility with funding/methodology audit; unstated assumptions (reconstruction & critique); missing perspectives (whose voice absent, institutional silencing). Transcript for post‑listening verification only."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "C1",
+   "core": "Edpuzzle (unscripted authentic: high‑level parliamentary debate, international arbitration, academic keynote, judicial hearing) · YouTube (leaked/authentic unscripted political/corporate exchanges, diplomatic negotiations)",
+   "supp": "BBC Radio 4 (In Our Time, Reith Lectures, Analysis) · NPR (Fresh Air, Throughline, Hidden Brain) · Academic podcasts (Philosophy Bites, LSE Public Lectures, Lawfare) · International news (Al Jazeera, France 24, DW, CGTN)",
+   "note": "I: Fully authentic, unscripted, high‑stakes (45–75 min). 8+ global accents including courtroom, diplomatic, parliamentary, corporate, academic. Tasks: implicit, ironic, satirical, and subtextual meaning identification; stance evolution and contradiction detection with evidentiary mapping; rhetorical device evaluation (effect, ethics, alternative, cultural specificity); formal/informal fallacies with persuasive mechanism and audience‑specific effectiveness analysis; tone shifts with prosodic/lexical/cultural evidence; structural/ideological/institutional bias detection; credibility with comprehensive audit (funding, institutional affiliation, publication history, conflicts of interest, ideological commitments, methodological orthodoxy); unstated assumptions (reconstruction, critique, alternative assumption exploration); missing perspectives (whose voice absent, why, what institutional silencing, what counter‑archive could recover it); intertextual reference mapping (unacknowledged debts). Transcript for verification only after multiple listens."
+  },
+  {
+   "stage": "Core — Listening",
+   "level": "C1+",
+   "core": "Edpuzzle (unscripted authentic: high‑level parliamentary debate, international arbitration, academic keynote, judicial hearing) · YouTube (leaked/authentic unscripted political/corporate exchanges, diplomatic negotiations)",
+   "supp": "BBC Radio 4 (In Our Time, Reith Lectures, Analysis) · NPR (Fresh Air, Throughline, Hidden Brain) · Academic podcasts (Philosophy Bites, LSE Public Lectures, Lawfare) · International news (Al Jazeera, France 24, DW, CGTN)",
+   "note": "I: Fully authentic, unscripted, high‑stakes (45–75 min). 8+ global accents including courtroom, diplomatic, parliamentary, corporate, academic. Tasks: implicit, ironic, satirical, and subtextual meaning; stance evolution and contradiction detection with evidentiary mapping; rhetorical device evaluation (effect, ethics, alternative, cultural specificity); formal/informal fallacies with persuasive mechanism and audience‑specific effectiveness analysis; tone shifts with prosodic/lexical/cultural evidence; structural/ideological/institutional bias detection; credibility with comprehensive audit (funding, institutional affiliation, publication history, conflicts of interest, ideological commitments, methodological orthodoxy); unstated assumptions (reconstruction, critique, alternative assumption exploration); missing perspectives (whose voice absent, why, what institutional silencing); intertextual reference mapping (unacknowledged debts). Transcript for verification only after multiple listens."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A0",
+   "core": "Jolly Phonics (oral response) · Flipgrid (echo model)",
+   "supp": "Vocaroo (voice record, no login)",
+   "note": "L: Echo, repetition, naming only. Teacher models first every time. No extended production expected."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A1−",
+   "core": "Jolly Phonics (oral response) · Flipgrid (echo model)",
+   "supp": "Vocaroo (voice record, no login)",
+   "note": "L: Echo, repetition, naming only. Teacher models first every time. Short phrases (2–3 words) may be introduced. No extended production expected. Learners can record single words or short phrases on Flipgrid/Vocaroo."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A1",
+   "core": "Flipgrid (30-sec voice record) · Nearpod (voice response) · ELSA Speak (A1 modules)",
+   "supp": "Vocaroo (quick record) · ELSA Speak (free version)",
+   "note": "L: Sentence frames essential. On-screen throughout. One practice run before submitting. ELSA Speak role: Pronunciation precision on key vocabulary from the speaking frame. Expected output: 1–2 short sentences with teacher-provided frame (e.g., \"I like ___.\" \"My name is ___.\")."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A1+",
+   "core": "Flipgrid (30-sec voice record) · Nearpod (voice response) · ELSA Speak (A1 modules)",
+   "supp": "Vocaroo (quick record) · ELSA Speak (free version)",
+   "note": "L: Sentence frames essential. On-screen throughout. One practice run before submitting. ELSA Speak role: Pronunciation precision on key vocabulary from the speaking frame. Expected output: 2–3 short sentences with teacher-provided frame (e.g., \"I like ___ because ___.\" \"My favorite ___ is ___.\")."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A2−",
+   "core": "Flipgrid (30-sec voice record) · Nearpod (voice response). ELSA Speak (A1 modules)",
+   "supp": "Vocaroo (quick record). ELSA Speak (free version)",
+   "note": "L: Sentence frames essential. On-screen throughout. One practice run before submitting. ELSA Speak role: Pronunciation precision on key vocabulary from the speaking frame."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A2",
+   "core": "Flipgrid (60-sec structured response) · Nearpod (pair prompt) · ELSA Speak (A2 modules)",
+   "supp": "Padlet (audio post) · ELSA Speak (target phoneme practice)",
+   "note": "L: Analysis frame: \"___ suggests ___ because ___.\" One practice run. Peer feedback via Flipgrid comment (structured rubric-based). ELSA Speak role: Stress, intonation, and connected speech practice. Expected output: 3–5 connected sentences with basic reasoning (e.g., \"I think we should go to the park because it's sunny and we can play football.\"). Peer feedback focuses on: clarity, completeness of reasoning, and one positive + one suggestion."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "A2+",
+   "core": "Flipgrid (60-sec structured response) · Nearpod (pair prompt) · ELSA Speak (A2+ modules)",
+   "supp": "Padlet (audio response) · ELSA Speak (connected speech practice)",
+   "note": "L: Analysis frame: \"In my opinion ___ because ___. For example, ___.\" One practice run. Peer feedback via Flipgrid comment using structured rubric (2 stars + 1 wish + 1 question). ELSA Speak role: Connected speech, sentence stress, thought groups. Expected output: 4–6 connected sentences with reasoning and example. Peer feedback focuses on: clarity, reasoning strength, example quality, pronunciation, and one question to extend thinking."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1−",
+   "core": "Flipgrid (2-min structured discussion) · Off2Class (speaking task) · ELSA Speak (B1 modules)",
+   "supp": "Padlet (audio response) · ELSA Speak (fluency practice)",
+   "note": "L: Extended speaking from A2 (Low). Analysis frame: \"In my opinion ___ because ___. For example, ___. Another reason is ___.\" Pair discussion before solo recording (1–2 minutes). ELSA Speak role: Fluency and accuracy on target phonemes, connected speech, sentence stress. Expected output: 6–8 connected sentences with multiple reasons and examples. Teacher can assign Off2Class speaking tasks for structured content. Peer feedback: 2 stars + 1 wish + 1 question."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1",
+   "core": "Flipgrid (60-sec structured response) · Nearpod (pair prompt) · ELSA Speak (A2 modules)",
+   "supp": "Padlet (audio post). ELSA Speak (target phoneme practice)",
+   "note": "L: Analysis frame: \"___ suggests ___ because ___.\" 1 practice run. Peer feedback via Flipgrid comment. ELSA Speak role: Stress, intonation, and connected speech practice."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1+",
+   "core": "Flipgrid (argument presentation) · Off2Class (discussion) · ELSA Speak (B2 modules)",
+   "supp": "Padlet (debate response thread) · ELSA Speak (connected speech advanced)",
+   "note": "L: Sustained speaking 3–5 minutes (or 2–3 minutes solo recording). Structured argument with evidence (claim + reason + evidence + counter-acknowledgment). Analysis frame: \"I believe ___ because ___. The evidence shows ___. Some might argue that ___, however, ___.\" Peer evaluation via CEFR rubric (fluency, coherence, lexical range, grammatical accuracy, pronunciation). ELSA Speak role: Advanced prosody (sentence stress, thought groups, intonation for attitude). Pair debate or small group discussion before solo recording. Off2Class provides structured discussion topics with CEFR-aligned prompts."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1.5−",
+   "core": "Flipgrid (5-min argument / presentation) · Off2Class (debate) · ELSA Speak (C1 modules - advanced prosody)",
+   "supp": "Padlet (structured peer critique) · ELSA Speak (intonation for attitude)",
+   "note": "L: Sustained speaking 4–6 minutes (or 3–4 minutes solo recording). Full argument structure: claim + reason + evidence (statistics, examples, expert opinion) + counter-acknowledgment + rebuttal + conclusion. Analysis frame (extended): \"I strongly believe that ___ because ___. The evidence for this includes ___. For example, ___. Some may argue that ___. However, this overlooks the fact that ___. Therefore, I maintain that ___.\" Peer evaluation using detailed CEFR rubric (fluency, coherence, lexical range, grammatical accuracy, pronunciation, strategic competence – repair strategies, circumlocution). ELSA Speak role: Advanced prosody for persuasive speaking (sentence stress, thought groups, intonation for attitude, pitch range for emphasis, pausing for effect). Off2Class provides structured debate topics with CEFR B1-aligned prompts and pro/con frameworks."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1.5",
+   "core": "Flipgrid (2-min structured discussion) · Off2Class (speaking task) · ELSA Speak (B1 modules)",
+   "supp": "Padlet (audio response) · ELSA Speak (fluency and connected speech)",
+   "note": "L: Extended speaking from B1 (Low). Analysis frame: \"In my opinion ___ because ___. For example, ___. Another reason is ___. This shows that ___.\" Pair or small group discussion before solo recording (2–3 minutes solo or 3–4 minutes paired discussion). ELSA Speak role: Connected speech, sentence stress, thought groups, and basic intonation for attitude . Expected output: 8–10 connected sentences with multiple reasons, examples, and a conclusion. Teacher can assign Off2Class speaking tasks for structured content and CEFR-aligned prompts. Peer feedback: 2 stars + 1 wish + 1 question using B1 CEFR peer rubric."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B1.5+",
+   "core": "Flipgrid (2-min structured discussion) · Off2Class (speaking task). ELSA Speak (B1 modules)",
+   "supp": "Padlet (audio response). ELSA Speak (fluency practice)",
+   "note": "L: Extended speaking from B1. Analysis frame + personal response. Pair discussion before solo record. ELSA Speak role: Fluency and accuracy on target phonemes. Teacher reviews dashboard scores."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2−",
+   "core": "Flipgrid (argument presentation) · Off2Class (structured discussion) · ELSA Speak (B2 modules)",
+   "supp": "Padlet (debate response thread) · ELSA Speak (intonation for nuanced meaning)",
+   "note": "L: Sustained speaking 5–8 minutes (paired discussion) or 3–5 minutes solo recording. Full argument structure: claim → reason → evidence (statistics, research, expert opinion, examples) → counter-acknowledgment → rebuttal → concession → conclusion. Analysis frame (extended): \"I contend that ___ because ___. The evidence for this includes ___, which demonstrates that ___. While it is true that ___, this perspective overlooks the fact that ___. Accordingly, I maintain that ___. Ultimately, ___.\" Peer evaluation using detailed CEFR B2 rubric (fluency, coherence, lexical range, grammatical accuracy, pronunciation, strategic competence – repair strategies, circumlocution, discourse management). ELSA Speak role: Intonation for nuanced meaning (sarcasm, doubt, certainty, surprise, hedging), sentence stress for contrastive emphasis, pausing for rhetorical effect. Off2Class provides structured discussion topics with CEFR B2-aligned prompts and pro/con frameworks with source materials."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2",
+   "core": "Flipgrid (5–7 min structured academic argument) · Off2Class (structured academic discussion) · ELSA Speak (C1 modules – advanced prosody)",
+   "supp": "Padlet (debate response thread) · ELSA Speak (intonation for rhetorical effect) · Zoom/Teams (live academic debate)",
+   "note": "L: Sustained speaking 6–10 minutes (paired / small group academic discussion) or 4–6 minutes solo recording (structured academic argument). Full academic argument structure: claim → qualification → reason → evidence (statistics, research citation, expert opinion, case study) → explanation of evidence → counter-acknowledgment → concession → rebuttal with evidence → reinforcement of claim → conclusion with implications. Analysis frame (extended academic register): \"I contend that ___ on the grounds that ___. This position is supported by ___, which indicates that ___. While it is undeniable that ___, this perspective is insufficient because ___. In light of this evidence, I maintain that ___. Consequently, it would be reasonable to conclude that ___.\" Peer evaluation using detailed CEFR B2+ rubric (fluency, coherence, lexical range including academic vocabulary, grammatical accuracy including complex structures, pronunciation including prosody for meaning, strategic competence – repair strategies, circumlocution, discourse management, turn-taking, topic nomination, and active listening signals). ELSA Speak role: Advanced prosody for rhetorical effect (sentence stress for emphasis, thought groups for clarity, intonation for attitude and nuance – certainty, doubt, surprise, sarcasm, contrastive emphasis, pausing for rhetorical effect, pitch range for engagement). Off2Class provides structured discussion topics with CEFR B2-aligned prompts, pro/con frameworks, and source materials (articles, data, expert quotes). Opportunity for live academic debate using video conferencing tools with structured roles and time limits."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2+",
+   "core": "Flipgrid (5–7 min impromptu / prepared academic presentation) · Off2Class (C1 academic discussion) · ELSA Speak (C1+ modules – prosody for register)",
+   "supp": "Padlet (structured peer critique with rubric) · Zoom/Teams (live academic seminar discussion)",
+   "note": "L: Spontaneous or semi-spontaneous extended discourse (5–7 minutes solo recording or 8–12 minutes paired/small group academic discussion). Responds to unexpected follow-up questions or interlocutor challenges. Full academic discussion structure: framing the issue (establish context, define key terms, state limitations) → claim with qualification → reason (explicit and implicit) → evidence (multiple sources, research citation, statistical data, case study, historical example, expert testimony) → analysis of evidence → counter-acknowledgment (generous, accurate representation of opposing view) → concession (explicit acknowledgment where opponent is correct) → rebuttal with evidence → reinforcement of original claim → conclusion with implications (theoretical and practical) → future directions / unanswered questions. Analysis frame (extended academic register for spontaneous discourse): \"In framing this issue, it is essential to acknowledge that ___ is complex and contested. While I am mindful that ___, I would argue that ___ on the basis that ___. This claim is supported by ___, which suggests that ___. Although it must be conceded that ___ has merit — particularly regarding ___ — this perspective is nevertheless insufficient because ___. Furthermore, the evidence from ___ indicates that ___. Consequently, I maintain that ___. This has significant implications for ___, and raises further questions about ___.\" Peer evaluation using detailed CEFR C1 rubric (fluency, coherence and cohesion, lexical range – including idiom, metaphor, nuanced vocabulary, grammatical accuracy – including complex structures with flexibility, pronunciation and prosody – including intonation for nuance, stress for contrastive emphasis, pausing for rhetorical effect, strategic competence – repair, circumlocution, hedging, discourse management, turn-taking, interrupting appropriately, signalling agreement/disagreement, topic nomination and shifting, active listening, synthesising others' contributions). ELSA Speak role: Prosody for register (formal academic vs conversational – ability to shift intonation, stress, pausing, pacing appropriately for context), intonation for nuanced attitude (certainty vs speculation, enthusiasm vs scepticism, agreement vs concession), sentence stress for contrastive and corrective emphasis, thought groups for complex sentences (//), pitch range for engagement and emphasis, pausing for rhetorical effect and listener processing. Off2Class provides structured discussion topics with CEFR C1-aligned prompts, source materials (multiple articles, data visualisations, expert quotes, case studies), and discussion protocols. Opportunity for live academic seminar discussion using video conferencing tools with structured roles (facilitator, challenger, evidence provider, summariser, notetaker)."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2.5−",
+   "core": "Flipgrid (argument presentation) · Off2Class (discussion). ELSA Speak (B2 modules)",
+   "supp": "Padlet (debate response thread). ELSA Speak (connected speech)",
+   "note": "L: Sustained speaking 3–5 min. Structured argument with evidence. Peer evaluation via CEFR rubric. ELSA Speak role: Advanced pronunciation (word stress, sentence stress, thought groups)."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2.5",
+   "core": "Flipgrid (7–10 min impromptu / prepared academic presentation with Q&A) · Off2Class (C1+ academic discussion) · ELSA Speak (C1+ modules – prosody for nuance and register)",
+   "supp": "Padlet (structured peer critique with narrative feedback) · Zoom/Teams (live academic seminar discussion with Q&A) · Otter.ai (transcription for self-analysis)",
+   "note": "L: Spontaneous extended discourse (7–10 min solo / 12–15 min seminar). Full structure: framing → qualified claim → evidence → counter-acknowledgment → concession → rebuttal → implications → future directions. Responds to unexpected follow-ups. CEFR C1 peer rubric (11 criteria). ELSA Speak: prosody for register, nuance (certainty vs doubt), pausing for effect."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "B2.5+",
+   "core": "Flipgrid (5-min argument / presentation) · Off2Class (debate). ELSA Speak (C1 modules)",
+   "supp": "Padlet (structured peer critique)",
+   "note": "L: Spontaneous extended discourse. Responds to unexpected follow-up questions. Peer evaluates with C1 rubric. ELSA Speak role: Sophisticated prosody (emphasis, pitch range, pacing)."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "C1−",
+   "core": "Flipgrid (Oxford‑style debate with timed speeches & POI) · Off2Class (C2 discussion) · ELSA Speak (prosody for adversarial & persuasive registers)",
+   "supp": "Padlet (structured critique with narrative justification) · Zoom/Teams (live panel with audience Q&A & POI) · Otter.ai (self‑transcription)",
+   "note": "L: Spontaneous extended adversarial discourse (15–20 min team debate with 8‑min speeches, 4‑min whip, points of information). Full debate structure: framing → case split → defined terms → claim → evidence (meta‑critiqued) → counter‑acknowledgment (cited) → concession (qualified) → rebuttal (evidence‑based, assumption critique) → summary regeneration → self‑critique → conclusion. Handles aggressive cross‑examination, dodges or concedes strategically. C2‑oriented peer rubric (17 criteria: adds POI handling, case split coherence, whip synthesis). ELSA Speak: adversarial prosody (intensity, sarcasm cues, concession intonation, authority/persuasiveness calibration)."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "C1",
+   "core": "Flipgrid (Oxford‑style debate with timed speeches, points of information, and whip summations) · Off2Class (C2 advanced discussion) · ELSA Speak (prosody for adversarial, persuasive, diplomatic, and literary registers)",
+   "supp": "Padlet (structured critique with narrative justification & peer grading) · Zoom/Teams (live panel with audience Q&A, POI, and adjudicator feedback) · Otter.ai (self‑transcription for stylistic analysis)",
+   "note": "L: Spontaneous extended adversarial discourse (20–25 min team debate with 8‑10 min constructive speeches, 5‑8 min rebuttals, 4‑5 min whip summations, multiple POI). Full C2 debate structure: framing → case split (defined terms, burden of proof allocation) → claim → evidence (meta‑critiqued: methodology, funding, replicability, ideological skew) → counter‑acknowledgment (cited, with concession where valid) → rebuttal (evidence‑based, assumption critique, reframing, alternative paradigm proposal) → summary regeneration → self‑critique (foregrounds weakness) → integration of opponent’s conceded points → regeneration of case after clash → conclusion with implications for multiple domains. Handles aggressive or evasive cross‑examination with composure, strategic concession, deflection, or reframing. C2‑oriented peer rubric (20+ criteria: adds case split coherence, burden of proof management, evidence meta‑critique depth, alternative paradigm articulation, concession regeneration, adjudicator‑calibrated scoring). ELSA Speak: adversarial, diplomatic, and literary prosody (intensity calibration for persuasion vs aggression, sarcasm/irony cues, concession intonation for credibility, cross‑examination persistence, pitch for authority vs solidarity vs irony, pacing for narrative effect)."
+  },
+  {
+   "stage": "Core — Speaking",
+   "level": "C1+",
+   "core": "Flipgrid (Oxford‑style debate with timed speeches, points of information, and whip summations) · Off2Class (C2 advanced discussion) · ELSA Speak (prosody for adversarial, persuasive, diplomatic, and literary registers)",
+   "supp": "Padlet (structured critique with narrative justification & peer grading) · Zoom/Teams (live panel with audience Q&A, POI, and adjudicator feedback) · Otter.ai (self‑transcription for stylistic analysis)",
+   "note": "L: Spontaneous extended adversarial discourse (20–25 min team debate with 8–10 min constructive speeches, 5–8 min rebuttals, 4–5 min whip summations, multiple POI). Full C2 debate structure: framing → case split (defined terms, burden of proof allocation) → claim → evidence (meta‑critiqued: methodology, funding, replicability, ideological skew) → counter‑acknowledgment (cited, with concession where valid) → rebuttal (evidence‑based, assumption critique, reframing, alternative paradigm proposal) → summary regeneration → self‑critique (foregrounds weakness) → integration of opponent’s conceded points → conclusion with implications for multiple domains. Handles aggressive or evasive cross‑examination with composure, strategic concession, deflection, or reframing. C2‑oriented peer rubric (20+ criteria). ELSA Speak: adversarial, diplomatic, and literary prosody (intensity calibration for persuasion vs aggression, sarcasm/irony cues, concession intonation for credibility, pitch for authority vs solidarity vs irony, pacing for narrative effect)."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A0",
+   "core": "Starfall (decodable only) · PhonicsPlay",
+   "supp": "Jolly Phonics (letter-sound)",
+   "note": "T: Decodable texts using taught phoneme-grapheme correspondences only. No authentic text. No picture-guessing."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A1−",
+   "core": "Starfall (decodable only) · PhonicsPlay",
+   "supp": "Jolly Phonics (letter-sound)",
+   "note": "T: Decodable texts using taught phoneme-grapheme correspondences only. Very simple CVC words (cat, dog, hat). No authentic texts. No picture-guessing. One word per page maximum."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A1",
+   "core": "Raz-Kids (levelled A1) · Nearpod (shared text + annotation)",
+   "supp": "CommonLit (simplest texts, teacher-selected)",
+   "note": "T: 1–3 sentences to 1 short paragraph. Literal comprehension only. No inference expected. Teacher reads aloud with learners (shared reading). Highlighting key words is the only annotation expected."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A1+",
+   "core": "Raz-Kids (levelled A1) · Nearpod (shared text + annotation)",
+   "supp": "CommonLit (simplest texts, teacher-selected)",
+   "note": "T: 1–3 sentences to 1 short paragraph. Literal comprehension only. No inference expected. Teacher reads aloud with learners (shared reading) or learners read independently with audio support. Highlighting key vocabulary is the primary annotation."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A2−",
+   "core": "Raz-Kids (levelled A1) · Nearpod (shared text + annotation)",
+   "supp": "CommonLit (simplest texts, teacher-selected)",
+   "note": "T: 1–3 sentences to 1 short paragraph. Literal comprehension only. No inference expected."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A2",
+   "core": "CommonLit (short A2 texts) · Raz-Kids (A2 level)",
+   "supp": "Nearpod (shared annotation)",
+   "note": "T: 1–2 paragraphs. Literal + simple inferential (e.g., \"How does she feel?\" \"What will happen next?\"). Learner highlights text evidence. Introduce short authentic texts (simple news headlines, short emails, social media posts, simple ads). Comprehension questions: 3–4 per text (2 literal, 1–2 inferential)."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "A2+",
+   "core": "CommonLit (short A2+ texts) · Write & Improve (paired reading-writing)",
+   "supp": "Raz-Kids (upper A2)",
+   "note": "T: 2–3 paragraphs. Literal + inferential + simple evaluative (e.g., \"Do you agree with the character's decision?\" \"What would you have done differently?\"). Learner highlights text evidence and writes brief margin notes. Introduce short authentic texts: simple news articles, short blog posts, simple instructions, short emails, social media threads. Comprehension questions: 4–5 per text (2 literal, 2 inferential, 1 evaluative)."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1−",
+   "core": "CommonLit (short A2 texts) · Raz-Kids (A2 level)",
+   "supp": "Nearpod (shared annotation)",
+   "note": "T: 1–2 paragraphs. All 3 comprehension levels: literal, inferential, evaluative (e.g., \"Do you agree with the author?\" \"What would you have done differently?\"). Learner highlights text evidence and writes margin notes (main idea, unknown words, questions). Introduce short authentic texts: news headlines, short articles, simple infographics with text, short stories, personal emails. Comprehension questions: 4–5 per text (1 literal, 2 inferential, 1–2 evaluative)."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1",
+   "core": "CommonLit (short A2 texts) · Raz-Kids (A2 level)",
+   "supp": "Nearpod (shared annotation)",
+   "note": "T: 1–2 paragraphs. Literal + simple inferential. Learner highlights text evidence."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1+",
+   "core": "CommonLit (B1 authentic texts) · Off2Class (reading units)",
+   "supp": "Raz-Kids (upper B1)",
+   "note": "T: 3–5 paragraphs. All 3 comprehension levels: literal, inferential, evaluative, plus author's purpose, tone, bias detection. Text evidence required for all answers. Introduce authentic text types: news articles, opinion pieces, short biographies, simple literary excerpts, advertisements, infographics with text. Comprehension questions: 5–6 per text (1 literal, 2 inferential, 2 evaluative, 1 author's purpose/tone). Learners write paragraph responses for evaluative questions."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1.5−",
+   "core": "CommonLit (B1+ authentic texts) · Off2Class (reading units)",
+   "supp": "Write & Improve (source integration)",
+   "note": "T: 4–5 paragraphs to 1–2 pages. All comprehension levels plus: author's purpose, tone, bias, rhetorical devices (analogy, metaphor, rhetorical question, repetition, rule of three), text structure identification (problem-solution, cause-effect, compare-contrast, chronological). Text evidence required with citation (paragraph number). Introduce extended authentic texts: opinion articles, short literary texts (fables, short stories), academic abstracts, reports (summaries), letters to the editor, advertisements for analysis. Comprehension questions: 6–7 per text (1 literal, 2 inferential, 2 evaluative, 1–2 rhetorical analysis). Learners write paragraph-length responses for evaluative and rhetorical analysis questions."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1.5",
+   "core": "CommonLit (B1 authentic texts) · Off2Class (reading units)",
+   "supp": "Raz-Kids (upper B1) · Write & Improve (paired reading-writing)",
+   "note": "T: 3–5 paragraphs. All 3 comprehension levels: literal, inferential, evaluative, plus author's purpose and basic tone identification. Text evidence required (cite paragraph number). Introduce extended authentic texts: news articles (adapted), short stories (simplified), blog posts (authentic), informational texts, simple opinion pieces, advertisements for analysis. Comprehension questions: 5–6 per text (1 literal, 2 inferential, 2 evaluative, 1 author's purpose/tone). Learners write 2–3 sentence responses for evaluative questions and short paragraph for author's purpose."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B1.5+",
+   "core": "CommonLit (B1 authentic texts) · Off2Class (reading units)",
+   "supp": "Raz-Kids (upper B1)",
+   "note": "T: 3–5 paragraphs. All 3 comprehension levels: literal, inferential, evaluative. Text evidence required."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2−",
+   "core": "CommonLit (B2 authentic texts) · Write & Improve (source integration)",
+   "supp": "Off2Class (reading units)",
+   "note": "T: 5–8 paragraphs to 2–3 pages. All comprehension levels plus: author's purpose, tone, bias, rhetorical devices (analogy, metaphor, rhetorical question, repetition, rule of three, parallelism, antithesis, hyperbole, understatement), logical fallacies (ad hominem, straw man, false dilemma, circular reasoning, hasty generalisation, slippery slope), text structure identification (problem-solution, cause-effect, compare-contrast, chronological, claim-counterclaim, general-specific), intertextuality (basic identification of references to other texts/events). Text evidence required with citation (paragraph number and line reference if applicable). Introduce extended authentic texts: academic journal abstracts, opinion articles from quality press (The Guardian, The Atlantic, The Economist simplifed), literary excerpts (short stories, novel openings), policy briefs, research summaries, historical documents (simplified), speeches (excerpts). Comprehension questions: 7–8 per text (1 literal, 2 inferential, 2 evaluative, 2 rhetorical/structural analysis). Learners write paragraph-length responses (50–80 words) for evaluative and rhetorical analysis questions, citing evidence with paragraph numbers."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2",
+   "core": "CommonLit (B2+ authentic texts) · Write & Improve (source integration and synthesis)",
+   "supp": "Off2Class (reading units) · JSTOR/Google Scholar (abstracts – teacher-selected excerpts)",
+   "note": "T: 6–10 paragraphs to 3–5 pages. All comprehension levels plus: author's purpose, tone (subtle shifts), bias detection (including implicit bias), rhetorical devices (analogy, metaphor, simile, rhetorical question, repetition, rule of three, parallelism, antithesis, hyperbole, understatement, irony, sarcasm, allusion, euphemism, dysphemism), logical fallacies (ad hominem, straw man, false dilemma, circular reasoning, hasty generalisation, slippery slope, appeal to authority, appeal to emotion, bandwagon, false cause, red herring, tu quoque), text structure identification (problem-solution, cause-effect, compare-contrast, chronological, claim-counterclaim, general-specific, thematic, argument-counterargument), intertextuality (identification of references to other texts, events, or ideas), critical evaluation of evidence quality (sample size, recency, source credibility, potential bias). Text evidence required with citation (paragraph number and line reference when possible). Introduce extended authentic texts: academic journal abstracts, research summaries, quality press opinion articles (The Guardian, The Atlantic, The Economist – unadapted or lightly simplified), literary excerpts (short stories – authentic, novel openings, poetry), policy briefs, historical documents (original or adapted), speeches (full texts – excerpts), academic book reviews, literary criticism (basic). Comprehension questions: 8–10 per text (1–2 literal, 2–3 inferential, 2–3 evaluative, 2 rhetorical/structural analysis, 1–2 logical fallacy identification). Learners write paragraph-length responses (80–100 words) for evaluative and rhetorical analysis questions, short essay responses (150–200 words) for synthesis across multiple texts, and citation-supported analysis of author's argument, evidence quality, and rhetorical effectiveness."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2+",
+   "core": "CommonLit (literary and academic C1) · Write & Improve (critical synthesis across sources)",
+   "supp": "Off2Class (C1 reading units) · JSTOR / Google Scholar (abstracts – teacher-selected) · Project Gutenberg (literary excerpts)",
+   "note": "T: 8–15 paragraphs to 5–10 pages. All comprehension levels plus: author's purpose (primary, secondary, implicit), tone (subtle shifts across the text, identification of how tone is achieved), bias detection (explicit, implicit, structural – e.g., what is omitted, what assumptions are made, what perspectives are absent), rhetorical devices (full range: analogy, metaphor, simile, metonymy, synecdoche, rhetorical question, repetition, rule of three, parallelism, antithesis, hyperbole, understatement, irony, sarcasm, allusion, euphemism, dysphemism, litotes, anaphora, epistrophe, chiasmus, zeugma), logical fallacies (full range with critique and alternative framing), text structure identification (multiple structures operating simultaneously – e.g., problem-solution within a chronological narrative, cause-effect within a compare-contrast framework), intertextuality (identification of references to other texts, events, ideas, cultural touchstones – with analysis of purpose and effect), critical evaluation of evidence quality (sample size, methodology, recency, source credibility, potential funding bias, alternative interpretations), identification of unstated assumptions (presuppositions, taken-for-granted beliefs – critique), analysis of perspective (whose voice is included/excluded, what world-view is privileged). Text evidence required with citation (paragraph number, line reference, and quotation with analysis). Introduce extended authentic texts: academic journal articles (excerpts – introduction, methodology, findings, discussion), research summaries (full), quality press long-form journalism (The Atlantic, The New Yorker, The Guardian long reads – 2000–4000 words), literary texts (short stories – authentic, novel chapters, poetry, drama excerpts), philosophical excerpts, policy documents (white papers, green papers), historical primary sources (with adaptation where necessary), speeches (complete), literary criticism (excerpts), film or book reviews (full). Comprehension questions: 10–12 per text (1–2 literal, 2–3 inferential, 2–3 evaluative, 2 rhetorical/structural analysis, 1–2 logical fallacy identification, 1 synthesis across text segments or with other texts). Learners write paragraph-length responses (100–150 words) for evaluative and rhetorical analysis questions, short essay responses (300–400 words) for synthesis across multiple texts or for thematic analysis, and extended critical analysis (500+ words) engaging with author's argument, evidence quality, rhetorical effectiveness, unstated assumptions, and alternative perspectives."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2.5−",
+   "core": "CommonLit (B2: opinion, argument, persuasive) · Write & Improve (paired reading-writing)",
+   "supp": "Off2Class (reading units)",
+   "note": "T: Persuasive and analytical texts. Rhetorical devices, implicit meaning, author purpose, bias detection."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2.5",
+   "core": "CommonLit (literary and academic C1+) · Write & Improve (critical synthesis across multiple sources)",
+   "supp": "Off2Class (C1 reading units – extended texts) · JSTOR / Google Scholar (full articles – teacher-selected excerpts or full text) · Project Gutenberg (literary works – public domain) · The New Yorker / The Atlantic / The Economist (long-form – teacher-selected)",
+   "note": "T: 10–20 pages. Advanced analysis: author's purpose (primary/secondary/implicit), tone shifts (5–6), bias (explicit/implicit/structural), rhetorical devices (full range), logical fallacies (formal/informal), intertextuality (purpose/effect), evidence quality (methodology, recency, credibility, bias), unstated assumptions, perspective power analysis. Text evidence with citation. Respond with 150–200w paragraphs, 400–500w short essays, 600–800w extended critical analysis."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "B2.5+",
+   "core": "CommonLit (C1: literary, academic, professional) · Write & Improve (source integration)",
+   "supp": "Off2Class (C1 reading)",
+   "note": "T: Literary texts, academic papers, professional reports. Critical evaluation of argument, evidence, and rhetoric."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "C1−",
+   "core": "CommonLit (advanced literary & academic C2 extracts) · Write & Improve (theoretical synthesis across 8+ sources)",
+   "supp": "JSTOR (complete articles) · Project Gutenberg (complete literary works) · London Review of Books · n+1 · Academic law reviews",
+   "note": "T: 25–40 pages (complete journal articles, book chapters, literary short stories). Advanced critique: author’s ideological/disciplinary positioning; tone (multiple shifts with prosodic inference); structural/institutional bias; rhetorical device evaluation (effect on intended audience, ethics, alternative); formal/informal fallacies; intertextuality (allusion/parody/refutation) and missing intertexts; evidence quality (methodology, replicability, funding, ideological skew); unstated assumptions (epistemic, ideological, cultural); perspective power analysis (who centred, who marginalised); genre/structural bias (conventions, framing, what is assumed/unstated). Text evidence with citation (paragraph, line, page, chapter). Respond with 300–400w analysis paragraphs, 800–1000w synthesis essays, 1500+ w extended theoretical critique."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "C1",
+   "core": "CommonLit (advanced literary, academic, legal, and technical C2 extracts) · Write & Improve (theoretical synthesis across 12+ sources with paradigm mapping)",
+   "supp": "JSTOR (complete articles across disciplines) · Project Gutenberg (complete literary works, philosophical treatises) · London Review of Books · n+1 · Academic law reviews · IMF/World Bank reports · UN documents",
+   "note": "T: 30–60 pages (complete journal articles, book chapters, legal briefs, literary short stories, philosophical excerpts, policy reports). Advanced C2 critique: author’s ideological/disciplinary/institutional positioning; tone (multiple shifts with prosodic and historical inference); structural/institutional/epistemic bias detection; rhetorical device evaluation (effect on target audience, ethics, cultural specificity, alternative device comparison); formal/informal fallacies (identification, persuasive mechanism, why fallacy works for that audience, ethical evaluation); intertextuality (allusion/parody/refutation/unacknowledged debt); missing intertexts (what author doesn’t cite but should); evidence quality (methodology, sample, replicability, funding, ideological skew, citation manipulation, selective reporting); unstated assumptions (epistemic, ideological, cultural, disciplinary, paradigmatic – reconstruction and critique); perspective power analysis (who centred/marginalised/silenced – relation to institutional power); genre/structural bias (conventions, framing, what is assumed unstated, what counter‑genre would reveal); paradigmatic assumptions (what cannot be thought within the frame); historical situatedness (how argument would differ in different era). Text evidence with citation (paragraph, line, page, chapter, section). Respond with 400–500w analysis paragraphs, 1000–1500w synthesis essays, 2000+ w extended theoretical critique with alternative paradigm exploration."
+  },
+  {
+   "stage": "Core — Reading",
+   "level": "C1+",
+   "core": "CommonLit (advanced literary, academic, legal, and technical C2 extracts) · Write & Improve (theoretical synthesis across 12+ sources with paradigm mapping)",
+   "supp": "JSTOR (complete articles across disciplines) · Project Gutenberg (complete literary works, philosophical treatises) · London Review of Books · n+1 · Academic law reviews · IMF/World Bank reports · UN documents",
+   "note": "T: 30–60 pages (complete journal articles, book chapters, legal briefs, literary short stories, philosophical excerpts, policy reports). Advanced C2 critique: author’s ideological/disciplinary/institutional positioning; tone with prosodic/historical inference; structural/institutional/epistemic bias; rhetorical device evaluation (effect on audience, ethics, cultural specificity); formal/informal fallacies (identification, persuasive mechanism, ethical evaluation); intertextuality (allusion/parody/refutation/unacknowledged debt); evidence quality critique (methodology, sample, replicability, funding, ideological skew, citation manipulation); unstated assumptions (epistemic, ideological, cultural, disciplinary, paradigmatic); perspective power analysis (who centred/marginalised/silenced – relation to institutional power); genre/structural bias (conventions, framing, what is assumed unstated). Text evidence with citation (paragraph, line, page, chapter, section). Respond with 400–500w analysis paragraphs, 1000–1500w synthesis essays, 2000+ w extended theoretical critique with alternative paradigm exploration."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A0",
+   "core": "Seesaw (drawing + scribble) · Book Creator (drawing journal)",
+   "supp": "Starfall (letter tracing)",
+   "note": "T: Letter formation, tracing, copying only. Stylus or touch required. No sentence production expected."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A1−",
+   "core": "Seesaw (drawing + scribble) · Book Creator (drawing journal)",
+   "supp": "Starfall (letter tracing)",
+   "note": "T: Letter formation, tracing, copying only. Stylus or touch required. Single letters and very simple CVC words for copying. No sentence production expected. Drawing remains primary mode of expression."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A1",
+   "core": "Seesaw (frame + typed response) · Google Docs (gap-fill)",
+   "supp": "Google Forms (sentence completion)",
+   "note": "T: Sentence completion and gap-fill only. Frame visible throughout. 1–2 sentences maximum. Google Forms: Set as quiz mode for auto-grading. Learners copy or complete very simple sentences (e.g., \"I am ___ years old.\")."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A1+",
+   "core": "Seesaw (frame + typed response) · Google Docs (gap-fill)",
+   "supp": "Google Forms (sentence completion)",
+   "note": "T: Sentence completion and gap-fill only. Frame visible throughout. 1–2 sentences maximum. Google Forms: Set as quiz mode for auto-grading. Learners copy, complete, or write very simple original sentences using a model (e.g., \"I have a ___.\" \"She is ___.\")."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A2−",
+   "core": "Seesaw (frame + typed response) · Google Docs (gap-fill)",
+   "supp": "Google Forms (sentence completion)",
+   "note": "T: Sentence completion and gap-fill only. Frame visible throughout. 1–2 sentences maximum. Google Forms: Set as quiz mode for auto-grading."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A2",
+   "core": "Google Docs (paragraph + frame) · Write & Improve (first use, A2 level)",
+   "supp": "Google Forms (gap-fill with instant feedback)",
+   "note": "T: First paragraph with scaffold: topic sentence + 2 supporting details + conclusion sentence. Peer review via Google Docs comment using 2-star-1-wish protocol. Write & Improve: First introduction at this level for A2 writing tasks. Expected output: 4–6 sentences on a familiar topic (e.g., \"Describe your favorite room,\" \"Write about your weekend activities\")."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "A2+",
+   "core": "Google Docs (paragraph + minimal frame) · Write & Improve (A2+ tasks)",
+   "supp": "CommonLit (discussion → writing)",
+   "note": "T: Paragraph with minimal scaffold (topic sentence reminder + transition word bank). Peer review via Google Docs comment using 2-star-1-wish-1-question protocol. Write & Improve: A2+ tasks with automated feedback on vocabulary, grammar, and structure. Expected output: 5–7 sentences on a familiar topic, with basic paragraph structure. Introduce simple linking words (first, then, next, finally, because, so, but, also)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1−",
+   "core": "Write & Improve (paragraph → essay) · Google Docs (process writing)",
+   "supp": "CommonLit (discussion → writing)",
+   "note": "T: Process writing: plan → draft → peer feedback → revise. Write & Improve provides instant CEFR-aligned feedback (A2 level). Expected output: 6–8 sentences or a short paragraph (80–100 words) on a familiar topic. Topic examples: \"Describe a place you like to visit,\" \"Write about a memorable day,\" \"Explain how to do something you know well.\" Introduce paragraph structure: topic sentence, 3–4 supporting sentences, conclusion sentence. Linking words: first, then, next, after that, finally, because, so, but, however, also."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1",
+   "core": "Google Docs (paragraph + frame) · Write & Improve (first use, A2 level)",
+   "supp": "Google Forms (gap-fill with instant feedback)",
+   "note": "T: First paragraph with scaffold: topic + 2 supporting + conclusion. Peer review via Google Docs comment."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1+",
+   "core": "Write & Improve (formal letter/report/essay) · Google Docs",
+   "supp": "CommonLit (discussion to essay)",
+   "note": "T: Formal genres introduced: formal letter (complaint, request, application), report (simple), opinion essay. Automated CEFR feedback on structure, cohesion, vocabulary, grammar via Write & Improve. Revision cycle required (draft → peer feedback → revise → resubmit → final). Expected output: 120–150 words. Paragraph structure with clear topic sentences, supporting evidence, transitional phrases (however, therefore, in contrast, consequently, on the other hand, furthermore). Introduce essay structure: introduction (hook + thesis), 2–3 body paragraphs (topic sentence + evidence + explanation), conclusion (restate thesis + final thought)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1.5−",
+   "core": "Write & Improve (academic essay / report) · Google Docs (collaborative editing)",
+   "supp": "CommonLit (source-based writing)",
+   "note": "T: Academic essay structure: Introduction (hook + background + thesis statement), 3–4 body paragraphs (topic sentence + evidence + explanation + linking to thesis), Conclusion (restate thesis + summarise key points + final thought/ call to action). Report writing: headings, subheadings, bullet points, data commentary. Automated CEFR feedback on structure, cohesion, vocabulary, grammar via Write & Improve (B1 level). Multiple revision cycles required (draft → peer feedback → revise → teacher feedback → resubmit → final). Collaborative editing via Google Docs (suggesting mode). Expected output: 180–220 words. Linking devices: advanced transitions (however, therefore, in contrast, consequently, furthermore, nevertheless, on the contrary, in addition, similarly, likewise, as a result, for instance)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1.5",
+   "core": "Write & Improve (paragraph → essay) · Google Docs (process writing)",
+   "supp": "CommonLit (discussion → writing) · Padlet (collaborative writing)",
+   "note": "T: Process writing: plan → draft → peer feedback → revise → teacher feedback → resubmit. Write & Improve provides instant CEFR-aligned feedback (B1 level). Expected output: 150–180 words. Paragraph to short essay transition: introduction (hook + background + thesis), 2–3 body paragraphs (topic sentence + evidence + explanation), conclusion (restate thesis + final thought). Introduce essay structure explicitly. Linking devices: basic transitions (first, then, next, after that, finally, because, so, but, however, also, in addition, for example, for instance, as a result, consequently). Learners write on familiar topics: \"Describe a tradition in your culture,\" \"Explain the advantages and disadvantages of social media,\" \"Write about a person who has influenced you.\""
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B1.5+",
+   "core": "Write & Improve (paragraph → essay) · Google Docs (process writing)",
+   "supp": "CommonLit (discussion → writing)",
+   "note": "T: Process writing: plan → draft → peer feedback → revise. Write & Improve = instant CEFR-aligned feedback."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2−",
+   "core": "Write & Improve (academic essay / report) · Google Docs (collaborative editing)",
+   "supp": "CommonLit (source-based writing)",
+   "note": "T: Academic essay structure (extended): Introduction (hook + background + problem statement + thesis statement with roadmap), 3–4 body paragraphs (topic sentence + evidence + explanation + linking to thesis + transition), Counter-argument paragraph (acknowledge opposing view + concede where valid + rebut with evidence), Conclusion (restate thesis + synthesise key points + implications + call to action + broader significance). Report writing: executive summary, headings/subheadings, data commentary (tables, charts), recommendations. Source integration: in-text citations (author, year) and reference list (basic). Automated CEFR feedback on structure, cohesion, vocabulary, grammar via Write & Improve (B2 level). Multiple revision cycles required (draft → peer feedback → revise → teacher feedback → resubmit → final → self-evaluation). Collaborative editing via Google Docs (suggesting mode with real-time chat). Expected output: 250–300 words. Linking devices: advanced transitions (however, therefore, in contrast, consequently, furthermore, nevertheless, on the contrary, in addition, similarly, likewise, as a result, for instance, in other words, that is to say, in fact, indeed, accordingly, hence, thus, moreover, subsequently), concession markers (admittedly, certainly, granted, to be sure, although, despite, in spite of, while it is true that)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2",
+   "core": "Write & Improve (academic essay with source synthesis) · Google Docs (collaborative editing with real-time chat)",
+   "supp": "CommonLit (source-based writing) · Google Scholar (citation practice – teacher-guided)",
+   "note": "T: Academic essay structure (extended for B2 transition): Introduction (hook + background + problem statement + thesis statement with roadmap + significance), 3–5 body paragraphs (topic sentence + evidence + explanation + analysis + link to thesis + transition), Counter-argument paragraph(s) (acknowledge opposing view(s) with concession where valid – multiple perspectives – rebuttal with evidence), Conclusion (restate thesis + synthesise key points + acknowledge limitations + implications + broader significance + call to action + future research directions). Report writing: executive summary, headings/subheadings, data commentary (tables, charts, figures with analysis), methodology (basic), findings, discussion, recommendations, reference list. Source integration: in-text citations (Author, year, page number for direct quotes), paraphrasing with citation, direct quotes (sparingly, with analysis), reference list (formatting consistently – APA or MLA). Synthesis across multiple sources (2–4 sources): compare and contrast perspectives, identify agreements/disagreements, evaluate evidence quality, formulate original argument drawing on multiple sources. Automated CEFR feedback on structure, cohesion, vocabulary, grammar, register, citation formatting via Write & Improve (B2 level). Multiple revision cycles required (draft → peer feedback → revise → teacher feedback → resubmit → final → self-evaluation → portfolio). Collaborative editing via Google Docs (suggesting mode with real-time chat and version history). Expected output: 350–450 words for single-source essay; 500–600 words for multi-source synthesis essay. Linking devices: advanced full range including concession markers (admittedly, certainly, granted, to be sure, although, despite, in spite of, while it is true that, it could be argued that, there is no doubt that, it is undeniable that, however, nevertheless, nonetheless, conversely, on the contrary, in contrast, by comparison, similarly, likewise, correspondingly, accordingly, consequently, hence, thus, therefore, as a result, for this reason, under these circumstances, furthermore, moreover, in addition, besides, also, not only... but also, in other words, that is to say, to put it differently, to illustrate, for instance, such as, namely, specifically, in particular, as an example, in conclusion, to summarise, ultimately, all things considered, on balance, in essence, at the core, fundamentally)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2+",
+   "core": "Write & Improve (advanced academic / research paper) · Google Docs (collaborative writing with version history)",
+   "supp": "CommonLit (source-based argument synthesis) · Google Scholar (citation management introduction) · Zotero/Mendeley (if available – citation management)",
+   "note": "T: Research paper / extended academic essay structure: Title (informative, engaging), Abstract (150–250 words – summary of purpose, methods, findings, implications), Introduction (hook + background + literature gap + research question + thesis statement + significance + roadmap), Literature Review (synthesis of 3–5 sources – summary, comparison, critique, identification of gap), Methodology (how evidence was gathered – text analysis, case study selection, theoretical framework), Findings / Analysis (detailed analysis with evidence integration – quotes, data, examples – paragraph-level topic sentences with evidence sandwich), Discussion (interpretation of findings, connection back to research question, comparison with literature, acknowledgment of limitations, implications), Conclusion (restate thesis + synthesise key findings + significance + limitations + future research + concluding thought), References (consistent citation style – APA, MLA, Chicago – depending on discipline). Process writing extended: topic selection → research (source gathering, note-taking, annotation) → outlining (detailed – thesis, paragraph topics, evidence selection) → first draft → peer review (structured protocol) → revision → teacher feedback → second draft → peer review #2 → final revision → editing (grammar, citation formatting) → proofreading → submission → self-evaluation → portfolio. Source integration advanced: in-text citations (Author, year, page number for direct quotes), paraphrasing with citation (substantive change not just word substitution), direct quotes (selective – only when phrasing is distinctive or authoritative), block quotes (for longer passages – 40+ words), synthesis across 4–6 sources (multiple perspectives, agreements/disagreements, identification of patterns, formulation of original argument drawing on sources), literature gap identification (what research hasn't done, what perspectives are missing). Automated CEFR feedback on structure, cohesion, vocabulary, grammar, register, citation formatting, argument strength via Write & Improve (C1 level). Multiple revision cycles required (at least 3 drafts). Collaborative writing via Google Docs (suggesting mode, real-time chat, version history for tracking changes). Expected output: 800–1200 words for research paper / extended academic essay; 500–700 words for timed in-class essay. Linking devices: full advanced range including concession markers (admittedly, certainly, granted, to be sure, although, despite, in spite of, while it is true that, it could be argued that, there is no doubt that, it is undeniable that, however, nevertheless, nonetheless, conversely, on the contrary, in contrast, by comparison, similarly, likewise, correspondingly, accordingly, consequently, hence, thus, therefore, as a result, for this reason, under these circumstances, these circumstances explain why, stemming from this, arising from this, furthermore, moreover, in addition, besides, also, not only... but also, in other words, that is to say, to put it differently, to rephrase, to illustrate, for instance, such as, namely, specifically, in particular, as an example, consider X, a case in point is, in conclusion, to summarise, ultimately, all things considered, on balance, in essence, at the core, fundamentally, the overarching theme is)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2.5−",
+   "core": "Write & Improve (formal letter/report/essay) · Google Docs",
+   "supp": "CommonLit (discussion to essay)",
+   "note": "T: Formal genres (letter, report, essay). Automated CEFR feedback on structure, cohesion, vocabulary, grammar. Revision cycle required."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2.5",
+   "core": "Write & Improve (advanced academic / research paper / critical review) · Google Docs (collaborative writing with version history, comments, and real-time chat)",
+   "supp": "CommonLit (source-based argument synthesis across 4–6 sources) · Google Scholar (citation management – introduction to Zotero/Mendeley) · Grammarly (advanced style – for final polish, not first drafts)",
+   "note": "T: Research paper (1500–2500 words): title, abstract, introduction, literature review (6–10 sources), theoretical framework, methodology, findings (3–5 pages), discussion, conclusion, references. Synthesis across sources, gap identification, original argument. 3+ substantive drafts. Citation style (APA/MLA/Chicago). Advanced linking devices (concession, contrast, cause-effect, addition, emphasis, summary)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "B2.5+",
+   "core": "Write & Improve (academic essay/report) · Google Docs (collaborative editing)",
+   "supp": "CommonLit (source-based writing)",
+   "note": "T: Academic writing conventions (hedging, citation awareness, argument structure). Automated feedback + teacher moderation."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "C1−",
+   "core": "Write & Improve (publishable‑quality research article / extended dissertation chapter) · Google Docs (collaborative writing with revision memos & version tracking)",
+   "supp": "CommonLit (theoretical synthesis across 12–15 sources) · Zotero/Mendeley (advanced citation management)",
+   "note": "T: Publishable article / dissertation chapter (3000–5000 words). Full structure: title, abstract (350–400 words), keywords, introduction (problem–gap–proposal–positionality–roadmap), literature review (15–20 sources, critical evaluation, gap articulation), theoretical framework (multiple candidate theories, selection justification), methodology (design, limitations, positionality, ethical considerations), findings/analysis (multiple data segments, counter‑evidence, alternative interpretations), discussion (synthesis, literature comparison, unexpected findings, limitations), conclusion (thesis restated, implications, future research design suggestions), references (40–60 sources), appendices. Process: proposal → ethics review → theoretical positioning → full draft → structural peer review (argument/evidence/organisation) → revision → supervisor/editor feedback → line‑level peer review (style/grammar/register/citation formatting) → revision → external reader → final proofreading → submission. Write & Improve provides C2‑oriented feedback (argument sophistication, evidence strength, theoretical coherence, disciplinary register, citation formatting)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "C1",
+   "core": "Write & Improve (publishable‑quality research article / dissertation chapter / policy brief / literary analysis) · Google Docs (collaborative writing with revision memos, version tracking, and commenting)",
+   "supp": "CommonLit (theoretical synthesis across 15–20 sources) · Zotero/Mendeley (advanced citation management, collaborative annotation) · Overleaf/LaTeX (for advanced formatting, optional)",
+   "note": "T: Publishable article / dissertation chapter / policy brief / literary analysis (4000–7000 words). Full C2 academic/comprehensive structure: title (informative, engaging, precise, provocative within convention); abstract (400–500 words: purpose, theoretical framework, methodology, findings, implications, keywords); introduction (problem–gap–proposal–positionality–epistemic assumptions–roadmap); literature review (18–25 sources, critical evaluation, paradigm mapping, gap articulation with field significance); theoretical framework (multiple candidate theories, selection justification with limitation acknowledgment, alternative framework comparison, epistemological assumptions); methodology (design, data sources, analytical approach, positionality statement, ethical considerations, limitations, delimitations); findings/analysis (multiple data segments, counter‑evidence with honest treatment, alternative interpretations with evidence, unexpected findings with speculation); discussion (synthesis across findings, literature comparison, theoretical implications, methodological reflexivity, ethical implications, policy/practice recommendations, limitations (candid, structural, epistemic), delimitations (justified)); conclusion (thesis restated in fresh language, findings synthesised (not summarised), implications for multiple domains, future research (specific, justified, design suggestions including alternative paradigms), final synthesis (elegant, memorable, field‑advancing, provocatively open), coda (optional: personal, poetic, field‑reflexive)); references (60–100 sources), appendices (full data, extended methodologies, alternative analyses). Process extended: proposal → ethics review → positionality statement drafting → theoretical framework positioning → methodology design with limitations pre‑analysis → full first draft → structural peer review argument (coherence, evidence, counter‑argument handling, paradigm awareness) → revision → supervisor/editor feedback → line‑level peer review (sentence style, register consistency, citation formatting, voice) → revision → external reader → final proofreading → formatting for target publication → submission with cover letter. Write & Improve provides C2‑oriented feedback (argument sophistication, evidence meta‑critique, paradigm awareness, theoretical coherence, disciplinary register, citation formatting, voice consistency)."
+  },
+  {
+   "stage": "Core — Writing",
+   "level": "C1+",
+   "core": "Write & Improve (publishable‑quality research article / dissertation chapter / policy brief / literary analysis) · Google Docs (collaborative writing with revision memos, version tracking, and commenting)",
+   "supp": "CommonLit (theoretical synthesis across 15–20 sources) · Zotero/Mendeley (advanced citation management, collaborative annotation) · Overleaf/LaTeX (for advanced formatting, optional)",
+   "note": "T: Publishable article / dissertation chapter / policy brief / literary analysis (4000–7000 words). Full C2 structure: title, abstract (400–500 words), keywords, introduction (problem–gap–proposal–positionality–epistemic assumptions–roadmap), literature review (18–25 sources, paradigm mapping, gap articulation), theoretical framework (multiple candidate theories, selection justification, alternative framework comparison), methodology (design, positionality, ethical considerations, limitations), findings/analysis (multiple data segments, counter‑evidence, alternative interpretations), discussion (synthesis, literature comparison, theoretical/methodological reflexivity, limitations), conclusion (thesis restated, findings synthesised, implications for multiple domains, future research with alternative paradigm suggestions), references (60–100 sources), appendices. Process: proposal → ethics review → positionality → theoretical framework → full draft → structural peer review → revision → supervisor/editor feedback → line‑level peer review → external reader → final proofreading → submission cover letter. Write & Improve provides C2‑oriented feedback (argument sophistication, evidence meta‑critique, paradigm awareness, theoretical coherence, disciplinary register, citation formatting, voice consistency)."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A0",
+   "core": "Not applicable — oral pattern practice only",
+   "supp": "Jolly Phonics (action sentences)",
+   "note": "T: No explicit grammar at Below A0. Basic patterns acquired through oral repetition and physical response only."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A1−",
+   "core": "Not applicable — oral pattern practice only",
+   "supp": "Jolly Phonics (action sentences)",
+   "note": "T: No explicit grammar at Pre-A1 Emergent. Basic patterns (e.g., \"I like ___\", \"This is a ___\") acquired through oral repetition and physical response only. No written grammar exercises."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A1",
+   "core": "Blooket (grammar mode) · Nearpod (grammar sort)",
+   "supp": "Off2Class (A1 grammar units)",
+   "note": "A: Grammar from listening/reading text. Blooket: Use for gamified practice after explicit instruction. Auto-graded = immediate error data for teacher. Grammar focus: basic word order (subject-verb-object), simple present tense of \"to be,\" singular/plural nouns."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A1+",
+   "core": "Blooket (grammar mode) · Nearpod (grammar sort)",
+   "supp": "Off2Class (A1 grammar units)",
+   "note": "A: Grammar from listening/reading text. Blooket: Use for gamified practice after explicit instruction. Auto-graded = immediate error data for teacher. Grammar focus: simple present tense (positive/negative/questions), present continuous for now, basic prepositions (in/on/at/under), demonstratives (this/that/these/those), simple possessive adjectives (my/your/his/her)."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A2−",
+   "core": "Blooket (grammar mode) · Nearpod (grammar sort)",
+   "supp": "Off2Class (A1 grammar units)",
+   "note": "A: Grammar from listening/reading text. Blooket: Use for gamified practice after explicit instruction. Auto-graded = immediate error data."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A2",
+   "core": "Gimkit (grammar mode) · Quizziz (sentence transform)",
+   "supp": "Khan Academy (grammar basics) · Blooket (independent)",
+   "note": "A: Past tense (regular and common irregular), comparatives and superlatives, prepositions of time (in/on/at), present continuous for future arrangements, basic modals (can/can't, must/mustn't, should/shouldn't), countable/uncountable nouns. Taught in context. Gimkit/Quizziz: Fast-paced transformation practice with instant feedback (e.g., change present to past, add comparative, make negative)."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "A2+",
+   "core": "Gimkit (grammar mode) · Quizziz (sentence transform)",
+   "supp": "Off2Class (A2 grammar) · Khan Academy (grammar basics)",
+   "note": "A: Past tense (regular + all common irregular), comparatives and superlatives (including irregular: good/better/best), prepositions of time and place (in/on/at/for/since), present continuous for future arrangements (solid), basic modals (can/can't, must/mustn't, should/shouldn't, could/couldn't), countable/uncountable nouns (including quantifiers: some/any/much/many/a lot of), going to for future (solid), present perfect for experiences (basic, with ever/never). Taught in context. Gimkit/Quizziz: Fast-paced transformation practice with instant error data."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1−",
+   "core": "Off2Class (A2 grammar) · Gimkit (grammar mode) · Quizziz (sentence transform)",
+   "supp": "Khan Academy (grammar basics) · Blooket (independent)",
+   "note": "A: Past tense (all common irregular — full set), present perfect (with for/since, just/already/yet), future forms (will, going to, present continuous), comparatives and superlatives (all forms including irregular), modals (can/could/may/might/should/must/have to), first conditional (if + present, will + infinitive), present continuous for future (consolidated), passive voice (simple present and past — basic introduction), reported speech (simple statements). Taught in context — extracted from listening or reading text. Gimkit/Quizziz: Fast-paced transformation practice with instant error data. Off2Class: Structured A2 grammar units."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1",
+   "core": "Gimkit (grammar mode) · Quizziz (sentence transform)",
+   "supp": "Khan Academy (grammar basics). Blooket (independent)",
+   "note": "A: Past tense, comparatives, prepositions taught in context. Gimkit/Quizziz: Fast-paced transformation practice with instant feedback."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1+",
+   "core": "Off2Class (B1: perfect tenses, conditionals) · Gimkit (error correction game)",
+   "supp": "Quizziz (sentence transform) · Khan Academy (grammar)",
+   "note": "A: Perfect tenses (present perfect continuous, past perfect — basic), conditionals (first and second), modal verbs (advanced: may/might/could/must/have to/need to/should/ought to), passive voice (all tenses — basic), relative clauses (defining and non-defining — basic), reported speech (questions and commands). Taught in context — extracted from listening or reading text. Gimkit error correction game: Teacher creates game based on class error patterns from writing submissions. Auto-graded with immediate error data."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1.5−",
+   "core": "Off2Class (B1: perfect tenses, conditionals) · Write & Improve (grammar via writing feedback)",
+   "supp": "Gimkit (error correction game) · Khan Academy (grammar)",
+   "note": "A: Perfect tenses (present perfect continuous, past perfect – consolidated), conditionals (first, second, third – basic introduction), modal verbs (advanced: may/might/could/should/must/have to/need to/ought to – nuanced use), passive voice (all tenses – consolidated), relative clauses (defining and non-defining – consolidated), reported speech (questions, commands, statements – consolidated), third conditional (basic introduction), wish/if only (present and past – basic). Taught in context – extracted from listening or reading text. Write & Improve provides grammar feedback embedded in writing tasks (no isolated drills). Gimkit error correction game based on class error patterns from writing submissions."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1.5",
+   "core": "Off2Class (B1: perfect tenses, conditionals) · Write & Improve (grammar via writing feedback)",
+   "supp": "Gimkit (error correction game) · Khan Academy (grammar)",
+   "note": "A: Perfect tenses (present perfect simple and continuous, past perfect – basic), conditionals (first and second – consolidated, third – basic introduction), modal verbs (can/could/may/might/should/must/have to/need to – all uses), passive voice (simple present and past – consolidated; present perfect and future – basic), relative clauses (defining and non-defining – basic), reported speech (statements and questions – consolidated), future forms (will, going to, present continuous – nuanced differences). Taught in context – extracted from listening or reading text. Write & Improve provides grammar feedback embedded in writing tasks. Gimkit error correction game: Teacher creates game based on class error patterns from writing submissions."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B1.5+",
+   "core": "Off2Class (B1: perfect tenses, conditionals) · Blooket (error correction game)",
+   "supp": "Khan Academy (grammar)",
+   "note": "A: Perfect tenses, modal verbs, conditional type 1. Extracted from reading text. Blooket: Error correction game on class error patterns."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2−",
+   "core": "Off2Class (B2: advanced structures) · Write & Improve (grammar via writing feedback)",
+   "supp": "Gimkit (error correction game) · Khan Academy (grammar)",
+   "note": "A: Perfect tenses (present perfect continuous, past perfect – consolidated), conditionals (first, second, third – consolidated; mixed conditionals – basic introduction), modal verbs (advanced nuanced uses: may/might/could/must/have to/need to/ought to – with degrees of certainty and obligation), passive voice (all tenses – consolidated, including continuous and perfect forms), relative clauses (defining and non-defining – consolidated, with prepositions), reported speech (questions, commands, statements – consolidated; with tense changes and modal shifts), third conditional (consolidated), wish/if only (present, past, and future wishes), gerunds and infinitives (advanced: verbs followed by gerund/infinitive with meaning change – remember, forget, stop, try, regret), causative structures (have/get something done), future perfect and future continuous (basic introduction), inversion (basic: negative adverbials – never, rarely, only then). Taught in context – extracted from listening or reading text. Write & Improve provides grammar feedback embedded in writing tasks (no isolated drills). Gimkit error correction game based on class error patterns from writing submissions."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2",
+   "core": "Off2Class (B2: advanced structures) · Write & Improve (grammar via writing feedback)",
+   "supp": "Gimkit (error correction game) · Khan Academy (grammar – advanced)",
+   "note": "A: Perfect tenses (present perfect simple and continuous – consolidated; past perfect – consolidated; future perfect – consolidated), conditionals (first, second, third – consolidated; mixed conditionals – consolidated; inverted conditionals – basic introduction for formal writing), modal verbs (advanced nuanced uses: may/might/could/should/must/have to/need to/ought to – with degrees of certainty, obligation, recommendation, ability, permission, prohibition – nuanced distinctions between similar modals: may vs might vs could for possibility; should vs ought to vs had better for advice; must vs have to vs need to for obligation), passive voice (all tenses – consolidated, including continuous and perfect forms, with and without agent, impersonal passive – basic: \"It is believed that...\", \"It has been reported that...\"), relative clauses (defining and non-defining – consolidated; with prepositions – consolidated; reduced relative clauses – introduction: \"The man sitting there is my uncle\"), reported speech (statements, questions, commands – consolidated; with tense changes, modal shifts, pronoun changes, time/place adjustments; with reporting verbs beyond say/tell: state, claim, argue, suggest, recommend, advise, warn, promise, offer, agree, refuse), third conditional (consolidated), wish/if only (present, past, future wishes – consolidated; with would for irritation/polite requests – advanced), gerunds and infinitives (advanced: verbs followed by gerund/infinitive with meaning change – consolidated; passive gerunds/infinitives – \"being loved,\" \"to be loved\"; perfect gerunds/infinitives – \"having finished,\" \"to have finished\"), causative structures (have/get something done – consolidated; active causative: \"I had him repair my car\" – introduction), future perfect and future continuous (consolidated), inversion (full range: negative adverbials – never, rarely, seldom, hardly, scarcely, no sooner, not only, only then, only after, only by, under no circumstances, on no account; conditional inversion – \"Had I known, I would have acted\" – consolidated; after 'so'/'such' – \"So difficult was the exam that...\" – introduction), cleft sentences (basic introduction: \"What I need is more time.\" \"It was the manager who made the decision\"). Taught in context – extracted from listening or reading text and reinforced through writing. Write & Improve provides grammar feedback embedded in writing tasks with specific error coding. Gimkit error correction game based on class error patterns from writing submissions with targeted practice on persistent errors."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2+",
+   "core": "Write & Improve (implicit grammar via writing feedback) · Off2Class (C2 stylistic features – selected)",
+   "supp": "Academic corpus tools (COCA, BNC – for grammatical pattern analysis) · Teacher-annotated authentic text",
+   "note": "A: Stylistic register variation (rhetorical grammar – ability to shift grammatical structures for stylistic effect: passive vs active for emphasis and focus, fronting and inversion for prominence, cleft sentences for focus, ellipsis for concision), rhetorical grammar (parallelism for balance, antithesis for contrast, anaphora for emphasis, periodic sentences for suspense), inversion (full range: negative adverbials, conditional inversion, after 'so/such', comparative inversion – \"had I known,\" \"were she to apply,\" \"so difficult was the exam,\" \"in no way did he agree\"), reduced relative clauses (fully consolidated – academic writing preference for concision), nominalisation (advanced – dense academic prose, ability to both use and unpack), participle clauses (present, past, perfect – for concision and textual cohesion), gerunds and infinitives (advanced – with nuanced meaning differences, passive and perfect forms consolidated), conditionals (full range: zero, first, second, third, mixed, inverted – with analysis of subtle meaning differences and stylistic appropriateness for context), subjunctive (formal written English: \"I suggest that he go,\" \"It is essential that she be present,\" \"If I were you\"), advanced modal nuances (epistemic vs deontic, degrees of certainty, past modals for counterfactuals, future modals for prediction, modals in reported speech with backshifting), discourse markers for cohesion (beyond simple transitions – ability to use signposting language for extended discourse: \"turning now to,\" \"having established that,\" \"this raises the question of,\" \"a related issue concerns,\" \"the preceding discussion suggests that,\" \"to return to an earlier point,\" \"by way of contrast,\" \"in a similar vein,\" \"to put it another way\"). Taught in context – extracted from reading texts (authentic literary, academic, journalistic) and reinforced through writing with explicit instruction on stylistic choices and their effects. Write & Improve provides grammar feedback embedded in writing tasks with specific error coding and suggestions for stylistic alternatives. Teacher-annotated authentic text: provide texts (e.g., The Economist, The New Yorker, academic journals) with grammatical features highlighted and analysed; learners identify patterns and practice reproducing them. Academic corpus tools (COCA – Corpus of Contemporary American English, BNC – British National Corpus) for advanced learners to investigate grammatical patterns and frequency."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2.5−",
+   "core": "Off2Class (B2: all conditionals, passive, reported speech) · Khan Academy",
+   "supp": "Write & Improve (grammar in writing feedback)",
+   "note": "A: All conditionals, complex passive, reported speech, relative clauses. Feedback embedded in writing tasks — no isolated drills."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2.5",
+   "core": "Write & Improve (implicit grammar via writing feedback with stylistic analysis) · Off2Class (C2 stylistic features – selected for C1 transition)",
+   "supp": "Academic corpus tools (COCA, BNC – for grammatical pattern analysis and frequency) · Teacher-annotated authentic text (advanced – literary and academic)",
+   "note": "A: Rhetorical grammar for effect: inversion (full range), cleft sentences (it/wh/pseudo), ellipsis, apposition, parenthesis, parallelism, antithesis, anaphora, chiasmus, asyndeton, polysyndeton. Subjunctive, advanced modal nuances (epistemic/deontic ordering), reduced relative clauses, advanced nominalisation (strategic), discourse markers for extended signposting. Corpus-based pattern awareness."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "B2.5+",
+   "core": "Write & Improve (grammar via writing feedback) · Off2Class (C1: inversion, nominalisation)",
+   "supp": "Khan Academy (advanced grammar)",
+   "note": "A: Inversion, advanced modal meanings, nominalisation, hedging. Assessed through writing production only, not isolated exercises."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "C1−",
+   "core": "Write & Improve (stylistic mastery & voice development) · Off2Class (C2 stylistic features)",
+   "supp": "COCA/BNC (advanced pattern frequency, register distribution, historical change) · Published writing as corpus (author‑specific style analysis)",
+   "note": "A: Stylistic mastery for publication and authorial voice: rhetorical grammar for deliberate effect, register shifting for purpose (including meta‑discursive, illustrative, parenthetical), sentence rhythm variety (loose–periodic–balanced–cumulative), inversion (all types, choice justified), cleft sentences (all types), ellipsis (contextual, textual, situational), apposition (multiple types, punctuation justified), parenthesis (metadiscursive asides), parallelism (macro/micro), antithesis, chiasmus, anaphora, epistrophe, asyndeton/polysyndeton, subjunctive (formal, formulaic, literary, mandative), advanced modal nuance (epistemic ordering, deontic calibration, dynamic characteristic), corpus‑informed preposition/collocation choice, field‑specific discourse conventions (citation distribution, hedging density). Learners articulate grammatical choices in meta‑comments referencing effect on reader/listener. Write & Improve compares learner grammar to published writing in same genre."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "C1",
+   "core": "Write & Improve (stylistic mastery, voice development, publication‑readiness) · Off2Class (C2 advanced stylistic features and rhetorical grammar)",
+   "supp": "COCA/BNC (advanced pattern frequency, register distribution, diachronic change, author‑specific analysis) · Published writing as corpus (author‑specific style: Didion, Hitchens, Pinker, West, Butler)",
+   "note": "A: Stylistic mastery for publication, authorial voice, and genre‑specific conventions. Rhetorical grammar for deliberate effect (not correctness). Register shifting for purpose: formal argument → meta‑discursive commentary → illustrative example → parenthetical aside. Sentence rhythm variety: loose (cumulative), periodic, balanced, inverted. Inversion: all types with choice justified for rhetorical effect. Cleft sentences: it, wh, pseudo, reversed wh. Ellipsis: contextual, textual, situational with easy recoverability. Apposition: multiple types, punctuation choice justified (comma for flow, dash for emphasis, colon for formality). Parenthesis: metadiscursive asides, register shifts, humour, irony. Parallelism: macro‑structure (paragraph) and micro‑structure (clause/phrase). Antithesis, chiasmus, anaphora, epistrophe. Asyndeton (speed, urgency) and polysyndeton (weight, accumulation). Subjunctive: formal, formulaic, literary, mandative. Advanced modal nuance: epistemic ordering (certainty continuum from might to must), deontic calibration (advisability to obligation), dynamic characteristic, evaluation of alternatives. Corpus‑informed preposition and collocation choice. Field‑specific discourse conventions: hedging density, citation distribution (integral vs non‑integral), first‑person pronoun frequency, stance markers. Learners articulate grammatical choices in meta‑comments referencing effect on reader/listener and alternative options considered. Write & Improve provides comparative analysis against published writing in same genre and publication venue."
+  },
+  {
+   "stage": "Core — Grammar",
+   "level": "C1+",
+   "core": "Write & Improve (stylistic mastery, voice development, publication‑readiness) · Off2Class (C2 advanced stylistic features and rhetorical grammar)",
+   "supp": "COCA/BNC (advanced pattern frequency, register distribution, diachronic change, author‑specific analysis) · Published writing as corpus (author‑specific style: Didion, Hitchens, Pinker, West, Butler)",
+   "note": "A: Stylistic mastery for publication, authorial voice, and genre‑specific conventions. Rhetorical grammar for deliberate effect. Register shifting for purpose: formal argument → meta‑discursive commentary → illustrative example → parenthetical aside. Sentence rhythm variety: loose (cumulative), periodic, balanced, inverted. Inversion: all types with choice justified for rhetorical effect. Cleft sentences: it, wh, pseudo, reversed wh. Ellipsis: contextual, textual, situational. Apposition: multiple types, punctuation choice justified (comma for flow, dash for emphasis, colon for formality). Parenthesis: metadiscursive asides, register shifts, humour, irony. Parallelism: macro and micro. Antithesis, chiasmus, anaphora, epistrophe. Asyndeton (speed, urgency) and polysyndeton (weight, accumulation). Subjunctive: formal, formulaic, literary, mandative. Advanced modal nuance: epistemic ordering, deontic calibration, dynamic characteristic. Corpus‑informed preposition and collocation choice. Field‑specific discourse conventions: hedging density, citation distribution. Learners articulate grammatical choices in meta‑comments referencing effect on reader/listener. Write & Improve provides comparative analysis against published writing in same genre."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A0",
+   "core": "Teacher observation · Seesaw (photo of work)",
+   "supp": "PhonicsPlay (in-game feedback)",
+   "note": "A: No digital AfL tool is reliable at this level. The teacher circulates. Seesaw photo = record of evidence for portfolio."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A1−",
+   "core": "Teacher observation · Seesaw (photo of work)",
+   "supp": "PhonicsPlay (in-game feedback)",
+   "note": "A: No digital AfL tool is fully reliable at this level. The teacher circulates and observes. Seesaw photo = record of evidence for portfolio. Very simple 1-question oral checks (e.g., \"Point to the cat\") are appropriate."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A1",
+   "core": "Google Forms (2 Qs, quiz mode) · Nearpod (live poll)",
+   "supp": "Padlet (quick poll) · ELSA Speak (quick pronunciation check — teacher listens individually)",
+   "note": "A: 2 questions maximum (gist + detail). Auto-graded. The teacher sees results NOW and re-teaches any item <60% correct. ELSA Speak: Teacher can ask learners to repeat 1–2 words from the lesson and listen individually (cannot access recordings in dashboard)."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A1+",
+   "core": "CommonLit (short A2 texts — teacher-selected) · Raz-Kids (A2 level)",
+   "supp": "Nearpod (shared annotation)",
+   "note": "For stronger A1 (Low) learners: T: 1–2 paragraphs. Literal + simple inferential (e.g., \"How does she feel?\" with text evidence). Learner highlights text evidence. Introduce very simple authentic texts (menus, schedules, short emails)."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A2−",
+   "core": "Google Forms (2 Qs, quiz mode)  · Nearpod (live poll)",
+   "supp": "Padlet (quick poll). ELSA Speak (quick pronunciation check — teacher listens)",
+   "note": "A: 2 questions maximum (gist + detail). Auto-graded. The teacher sees results NOW and re-teaches any item <60% correct. ELSA Speak: Teacher can ask learners to repeat 1–2 words from the lesson and listen individually"
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A2",
+   "core": "Google Forms (3 Qs, quiz mode) · Nearpod (comprehension check)",
+   "supp": "Blooket (independent review) · ELSA Speak (accuracy score check on target sounds)",
+   "note": "A: Gist + detail + one inference question. Teacher re-teaches any item <60% correct before moving to next stage. ELSA Speak: Use dashboard to check which phonemes the class struggled with most. 3 questions maximum. Include one simple inference question. Auto-graded MC for gist/detail; teacher reviews short answers for inference."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "A2+",
+   "core": "Google Forms (3–4 Qs, quiz mode) · Nearpod (comprehension check)",
+   "supp": "Blooket (independent review) · ELSA Speak (accuracy and fluency score check)",
+   "note": "A: 3–4 questions maximum: 1 gist, 1–2 detail, 1 inference. Teacher re-teaches any item <70% correct (higher threshold at secure level). ELSA Speak: Use dashboard to check fluency scores (not just accuracy) on target phonemes and connected speech. Include one short answer question for inference. Auto-graded MC for gist/detail; teacher reviews short answers for inference before next session."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1−",
+   "core": "Google Forms (5 Qs: MC + short answer) · CommonLit (guided Qs)",
+   "supp": "Nearpod (live poll) · ELSA Speak (fluency score check)",
+   "note": "A: Gist + detail + inference + vocabulary + one short answer. Teacher re-teaches any item <70% correct before moving to next stage. ELSA Speak: Check class average fluency scores on target phonemes and connected speech. 5 questions maximum (4 auto-graded MC + 1 teacher-reviewed short answer). Include vocabulary question from current session. Short answer requires 1–2 sentences. Teacher reviews short answers before next period to inform planning."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1",
+   "core": "Google Forms (3 Qs, quiz mode) · Nearpod (comprehension check)",
+   "supp": "Blooket (independent review). ELSA Speak (accuracy score check on target sounds)",
+   "note": "A: Gist + detail + one inference question. The teacher re-teaches any item <60% correct before moving to the next stage. ELSA Speak: Use dashboard to check which phonemes the class struggled with mo"
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1+",
+   "core": "Write & Improve (timed writing task) · Google Forms (extended response with rubric)",
+   "supp": "CommonLit (text analysis question) · ELSA Speak (learner shares recording with teacher)",
+   "note": "A: 100–150 word extended response (timed, 10–15 minutes). Instant Write & Improve feedback. Teacher reviews for CEFR level moderation (B1 threshold). Can be writing or speaking (Flipgrid recording). Include rubric with 4 criteria: task achievement, coherence/cohesion, lexical range, grammatical accuracy. ELSA Speak: Learner can share recording with teacher for moderation (platform limitation: teacher cannot access recordings otherwise). For speaking CfU, use Flipgrid instead where teacher can access all recordings."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1.5−",
+   "core": "Write & Improve (200-word timed essay) · Google Forms (extended analysis task)",
+   "supp": "CommonLit (critical response) · ELSA Speak (learner shares recording with teacher)",
+   "note": "A: 180–220 word timed essay (15–20 minutes). Prompt requires argument with counter-acknowledgment. Instant Write & Improve feedback plus teacher moderation against CEFR B1 threshold (solid). Rubric with 5 criteria: task achievement, coherence/cohesion, lexical range, grammatical accuracy, register appropriacy. For speaking CfU: Flipgrid (teacher can access all recordings). ELSA Speak: Learner can share recording with teacher for moderation, but Flipgrid preferred for whole-class speaking assessment. CommonLit: Critical response paragraph (150 words) analysing author's argument, evidence, and rhetorical strategies."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1.5",
+   "core": "Write & Improve (timed writing task) · Google Forms (extended response with rubric)",
+   "supp": "CommonLit (guided questions) · ELSA Speak (fluency score check)",
+   "note": "A: 150–180 word extended writing task (timed, 12–15 minutes) or 2–3 minute speaking task (Flipgrid). Prompt requires opinion with reasons, examples, and a counter-acknowledgment or concession. Instant Write & Improve feedback. Teacher reviews for CEFR level moderation (B1 threshold). Rubric with 4 criteria: task achievement, coherence/cohesion, lexical range, grammatical accuracy. For speaking CfU, use Flipgrid (teacher can access all recordings). Include self-assessment after task using same rubric."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B1.5+",
+   "core": "Google Forms (5 Qs: MC + short answer · CommonLit (guided Qs)",
+   "supp": "Nearpod (live poll). ELSA Speak (fluency score check)",
+   "note": "A: Auto-graded MC + teacher-marked short answer. The teacher reviews short answers before the next period to inform planning. ELSA Speak: Check class average on target phonemes from the speaking task."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2−",
+   "core": "Write & Improve (timed essay with source integration) · Google Forms (extended analysis task with rubric)",
+   "supp": "CommonLit (critical response) · Flipgrid (extended speaking response)",
+   "note": "A: 250–300 word timed essay (20–25 minutes) OR 3–5 minute timed speaking response (Flipgrid). Prompt requires argument with evidence, counter-acknowledgment, rebuttal, concession, and source integration (minimally: \"according to the reading...\" or \"research suggests that...\"). Instant Write & Improve feedback plus teacher moderation against CEFR B2 threshold. Rubric with 6 criteria (B2 level): task achievement, coherence/cohesion, lexical range (including hedging and nominalisation), grammatical accuracy (including complex structures), register appropriacy (formal academic tone), source integration (citation and referencing basics). For speaking CfU: Flipgrid (teacher can access all recordings). Include self-assessment after task using same rubric. CommonLit: Critical response paragraph (150–200 words) analysing author's argument, evidence, rhetorical strategies, and potential logical fallacies."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2",
+   "core": "Write & Improve (timed synthesis essay with source integration) · Google Forms (extended analysis task with B2 rubric)",
+   "supp": "CommonLit (multiple text synthesis) · Flipgrid (extended academic speaking response) · ELSA Speak (recording for teacher moderation)",
+   "note": "A: 350–450 word timed synthesis essay (30–35 minutes) OR 4–6 minute timed academic speaking response (Flipgrid). Prompt requires argument drawing on 2–3 provided sources (short excerpts, data visualisations, expert quotes) with evidence integration, counter-acknowledgment, concession with nuance, rebuttal with evidence, hedging language, and explicit synthesis across sources. Instant Write & Improve feedback plus teacher moderation against CEFR B2 threshold (solid). Rubric with 7 criteria (B2 level): task achievement (including synthesis across sources), coherence/cohesion (including advanced discourse markers), lexical range (including academic vocabulary, nominalisation, hedging), grammatical accuracy (including complex structures: mixed conditionals, inversion, reduced relative clauses), register appropriacy (consistent formal academic tone), source integration (citation, paraphrasing, direct quotes with analysis, synthesis across sources), critical analysis (evaluation of evidence quality, identification of assumptions). For speaking CfU: Flipgrid (teacher can access all recordings). Include self-assessment after task using same rubric with detailed written reflection (\"What did I do well? What specific aspect needs improvement? What will I do differently next time?\"). CommonLit: Multi-text synthesis response (250–300 words) analysing similarities and differences in authors' arguments, evaluating evidence quality, and presenting original position."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2+",
+   "core": "Write & Improve (extended timed academic task) · Google Forms (critical synthesis with rubric)",
+   "supp": "CommonLit (critical response) · Flipgrid (extended academic speaking response with follow-up questions)",
+   "note": "A: 600–800 word timed academic essay (50–60 minutes) OR 6–8 minute timed academic speaking response (Flipgrid – including response to an unexpected follow-up question). Prompt requires critical engagement with 2–3 provided sources (excerpts from academic articles, data visualisations, expert opinions, policy documents) with: argument synthesis across sources, identification of agreements/disagreements among sources, evaluation of evidence quality (source credibility, methodology, sample size, recency, potential bias), original thesis that is not simply a summary of sources, integration of counter-arguments with generous and accurate representation, concession where valid, rebuttal with evidence from sources and/or logic, hedging language appropriate to degree of certainty, acknowledgment of complexity and nuance, acknowledgment of limitations (what the argument does not address, what evidence is missing), implications (theoretical and practical), future research directions. Instant Write & Improve feedback plus teacher moderation against CEFR C1 threshold (solid). Rubric with 8 criteria (C1 level): task achievement – including synthesis and critical engagement, coherence and cohesion – including signposting and discourse markers for extended discourse, lexical range – including academic vocabulary, idiom, metaphor, nuanced word choice, grammatical accuracy – including complex structures (inversion, reduced clauses, subjunctive, advanced nominalisation) used flexibly, register appropriacy – consistently appropriate for academic context with stylistic variation where effective, source integration – citation, paraphrasing, direct quotes with analysis, synthesis across sources, critical analysis – evaluation of evidence, identification of unstated assumptions, acknowledgment of complexity and limitations, hedging and nuance – appropriate expression of certainty/uncertainty, concession language. For speaking CfU: Flipgrid (teacher can access all recordings) – additional criterion for ability to respond to unexpected follow-up question spontaneously with coherence and fluency. Self-assessment after task using same rubric with extended written reflection (\"What did I do well? What specific aspect needs improvement? What will I do differently next time? What question does this raise for me about the topic? What would I research next?\"). CommonLit: Multi-source critical synthesis response (400–500 words) analysing how multiple authors approach the same issue, identifying agreements, disagreements, and gaps, and offering original synthesis."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2.5−",
+   "core": "Write & Improve (timed writing task) · Google Forms (extended response with rubric)",
+   "supp": "CommonLit (text analysis question). ELSA Speak (learner shares recording with teacher)",
+   "note": "A: 100–150 word extended response. Instant Write & Improve feedback. Teacher reviews for CEFR level moderation. ELSA Speak: Teacher cannot access recordings — use Flipgrid instead for speaking checks."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2.5",
+   "core": "Google Forms (mastery self-assessment against CEFR C1 descriptors) · Padlet (reflection on language choices with metalanguage)",
+   "supp": "Google Forms (peer + self evaluation with narrative feedback and goal setting) · ELSA Speak (metalinguistic reflection on rhetorical prosody for register and effect)",
+   "note": "A: 800–1000 word timed essay (75–90 min) OR 7–10 min speaking + 2 follow-up Qs. 3–4 sources. Requires: argument synthesis, evidence evaluation, original thesis, generous counter-acknowledgment, concession, rebuttal, hedging (nuanced), complexity acknowledgment, limitations, implications. 9-criterion C1 rubric. Self-assessment with evidence-cited reflection (300+ words). Teacher moderation."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "B2.5+",
+   "core": "Write & Improve (200-word timed essay) · Google Forms (extended analysis)",
+   "supp": "CommonLit (critical response)",
+   "note": "A: Extended written task against C1 CEFR descriptors. The teacher moderates automated scores for reliability."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "C1−",
+   "core": "Write & Improve (timed publishable‑standard argument) · Google Forms (extended theoretical synthesis with C2 rubric)",
+   "supp": "CommonLit (multi‑text theoretical synthesis) · Flipgrid (extended academic debate with POI & whip speeches)",
+   "note": "A: 1500–2000 word timed essay (135–150 min) OR 15–20 min team debate (8‑min speeches + 4‑min whip + POI). Prompt requires: theoretical framing, synthesis across 5–6 sources, evidence meta‑critique (methodology, funding bias, replication), original thesis with field significance, generous counter‑acknowledgment (cited), concession (qualified), evidence‑based rebuttal (assumption critique, reframing), hedging with epistemic calibration (certainty continuum), explicit complexity (genuine tension), limitations (scope, evidence, perspective, methodology), theoretical & practical implications, self‑critique (foregrounds own weakness), peer‑critique integration (responds to anticipated challenge). 14‑criterion C2‑oriented rubric (adds: theoretical originality, evidence meta‑critique, field significance, self‑critique, peer‑critique integration, POI/whip handling). Teacher moderation + calibration. Self‑assessment with extended reflection (500–600 words) requiring error pattern analysis, evidence citation, and revision plan with timeline & success metrics."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "C1",
+   "core": "Write & Improve (timed publishable‑standard argument) · Google Forms (extended theoretical synthesis with C2 rubric & adjudicator scoring)",
+   "supp": "CommonLit (multi‑text theoretical synthesis across 6–8 sources) · Flipgrid (extended Oxford‑style debate with timed speeches, POI, whip summations, and adjudicator scoring)",
+   "note": "A: 2000–2500 word timed academic essay (150–180 min) OR 20–25 min Oxford‑style team debate (2 constructive: 10 min each + 2 rebuttal: 6 min each + 2 whip: 5 min each + POI throughout) with independent adjudicator scoring. Prompt requires: theoretical framing with paradigm awareness, synthesis across 6–8 sources, evidence meta‑critique (methodology, funding, replicability, ideological skew, citation manipulation), original thesis with field significance and disciplinary intervention claim, generous counter‑acknowledgment (cited, accurately represented), qualified concession (explicit where opponent is correct), evidence‑based rebuttal (assumption critique, reframing, alternative paradigm proposal), hedging with epistemic calibration (certainty continuum mapped to evidence strength), explicit complexity with genuine tension (not performative), limitation candidacy (scope, evidence, perspective, methodology, paradigmatic assumptions), theoretical and practical implications, self‑critique (foregrounds own weakness with specific revision plan), peer‑critique integration (responds to anticipated challenge from earlier draft or known opponent). 18‑criterion C2‑oriented rubric (adds: theoretical originality, evidence meta‑critique depth, field significance/disciplinary intervention, self‑critique with revision specificity, peer‑critique integration, paradigm awareness, counter‑acknowledgment citation, whip synthesis quality, POI handling, adjudicator calibration). Teacher moderation + external adjudicator (for debate). Self‑assessment with extended reflection (600–800 words) requiring: error pattern analysis with frequency accounting, evidence citation from response, revision plan with timeline & success metrics, paradigm reflection (what assumption did your argument rest on that you didn’t examine), peer adjudication response (if debate)."
+  },
+  {
+   "stage": "Check for Understanding",
+   "level": "C1+",
+   "core": "Write & Improve (timed publishable‑standard argument) · Google Forms (extended theoretical synthesis with C2 rubric & adjudicator scoring)",
+   "supp": "CommonLit (multi‑text theoretical synthesis across 6–8 sources) · Flipgrid (extended Oxford‑style debate with timed speeches, POI, whip summations, and adjudicator scoring)",
+   "note": "A: 2000–2500 word timed academic essay (150–180 min) OR 20–25 min Oxford‑style team debate (constructive: 10 min each + rebuttal: 6 min each + whip: 5 min each + POI throughout) with independent adjudicator scoring. Prompt requires: theoretical framing with paradigm awareness, synthesis across 6–8 sources, evidence meta‑critique (methodology, funding, replicability, ideological skew), original thesis with field significance, generous counter‑acknowledgment, qualified concession, evidence‑based rebuttal (assumption critique, reframing, alternative paradigm proposal), hedging with epistemic calibration, explicit complexity with genuine tension, candid limitations (scope, evidence, perspective, paradigm assumptions), theoretical and practical implications, self‑critique (with specific revision plan), peer‑critique integration. 18‑criterion C2 rubric (adds: theoretical originality, evidence meta‑critique depth, field significance, paradigm awareness, counter‑acknowledgment citation, whip synthesis, POI handling, adjudicator calibration). Teacher moderation + external adjudicator. Self‑assessment with extended reflection (600–800 words) requiring error pattern analysis, evidence citation, revision plan with success metrics, paradigm reflection (what assumption did your argument rest on), peer adjudication response."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A0",
+   "core": "Seesaw (drawing or emoji self-rating)",
+   "supp": "Teacher-led thumbs up/thumbs down",
+   "note": "L: Non-literacy-dependent. Drawing, gesture, or image selection. The learner points to how they feel about today's learning."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A1−",
+   "core": "Seesaw (drawing or emoji self-rating)",
+   "supp": "Teacher-led thumbs up / thumbs down",
+   "note": "L: Non-literacy-dependent. Drawing, gesture, or image selection. The learner points to how they feel about today's learning. Introduce very simple 1-word reflection (\"good\" / \"hard\") with teacher scribing if needed."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A1",
+   "core": "Google Forms (1-Q exit ticket) · Seesaw (self-rating + sentence)",
+   "supp": "Padlet (I learned / I want to know) · ELSA Speak (learner checks their pronunciation score improvement)",
+   "note": "L: Confidence rating 1–3. \"Today I learned ___.\" Visible to the teacher before the next session for planning. ELSA Speak: Learner can see their accuracy score improvement over time. Sentence frame provided: \"Today I learned ___.\""
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A1+",
+   "core": "Google Forms (2 Qs, quiz mode) · Nearpod (live poll)",
+   "supp": "Padlet (quick poll) · ELSA Speak (quick pronunciation check — teacher listens individually)",
+   "note": "A: 2 questions maximum (gist + detail). Auto-graded. The teacher sees results NOW and re-teaches any item <60% correct. ELSA Speak: Teacher can ask learners to repeat 1–2 key words from the lesson and listen individually (cannot access recordings in dashboard)."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A2−",
+   "core": "Google Forms (1-Q exit ticket) · Seesaw (self-rating + sentence)",
+   "supp": "Padlet (I learned / I want to know). ELSA Speak (learner checks their pronunciation score improvement)",
+   "note": "L: Confidence rating 1–3. \"Today I learned ___.\" Visible to the teacher before the next session for planning. ELSA Speak: Learner can see their accuracy score improvement over time."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A2",
+   "core": "Google Forms (exit ticket + self-rating) · Padlet (one thing I can now do)",
+   "supp": "Seesaw (self-assessment) · ELSA Speak (learner notes which phonemes still need work)",
+   "note": "L: Can-do statement. Confidence 1–5. Teacher groups learners for next session support. ELSA Speak: Learner identifies specific sounds to practise before next session. Can-do statement frame: \"I can now ___ (e.g., talk about my past weekend, order food in a restaurant, describe my daily routine).\" Confidence rating 1–5. Teacher uses data to form small groups for targeted instruction."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "A2+",
+   "core": "Google Forms (exit ticket + self-assessment) · Padlet (learning journal)",
+   "supp": "Google Forms (quick reflection) · ELSA Speak (learner sets pronunciation goal)",
+   "note": "L: Can-do statement + Confidence 1–5 + \"One thing I will do differently next time.\" Teacher groups learners for next session support. ELSA Speak: Learner sets specific pronunciation goal for next session (e.g., \"I will work on sentence stress in yes/no questions,\" \"I will practise connected speech with 'going to'\"). Can-do statement frame: \"I can now ___ (e.g., talk about my past experiences using present perfect, compare two things using comparatives and superlatives, express my opinion with reasons and examples).\""
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1−",
+   "core": "Google Forms (exit ticket + self-assessment) · Padlet (learning journal)",
+   "supp": "Google Forms (quick reflection) · ELSA Speak (learner sets pronunciation goal)",
+   "note": "L: Can-do statement + Confidence 1–5 + \"Today I could / struggled with / next I want ___.\" Teacher groups learners for next session support. ELSA Speak: Learner sets specific pronunciation goal for next session (e.g., \"I will work on sentence stress in questions,\" \"I will practise connected speech with 'going to' and 'want to'\"). Can-do statement aligned to CEFR A2 descriptors: \"I can now ___ (e.g., describe my daily routine, talk about past experiences, make plans for the future, express opinions with reasons, describe people and places).\""
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1",
+   "core": "Google Forms (exit ticket + self-rating) · Padlet (one thing I can now do)",
+   "supp": "Seesaw (self-assessment). ELSA Speak (learner notes which phonemes still need work)",
+   "note": "L: Can-do statement. Confidence 1–5. The teacher group learners for next session support. ELSA Speak: Learner identifies specific sounds to practise before next session."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1+",
+   "core": "Google Forms (CEFR can-do self-assessment) · Padlet (learning journal)",
+   "supp": "Padlet (peer appreciation + self-target) · ELSA Speak (advanced prosody goal)",
+   "note": "L: CEFR can-do self-assessment for B1. \"I can now ___ (talk about hopes and dreams, describe experiences in detail, give reasons for opinions, explain advantages and disadvantages, narrate a story).\" Confidence 1–5. \"One specific skill I will improve for next session.\" Teacher uses self-assessment data to group learners. ELSA Speak: Learner sets advanced prosody goal (sentence stress, thought groups, intonation for attitude, pitch range, pausing). Peer appreciation: Post one positive comment on a classmate's Padlet reflection."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1.5−",
+   "core": "Google Forms (CEFR self-assessment + goal-setting) · Padlet (critical reflection)",
+   "supp": "Google Forms (peer + self evaluation) · ELSA Speak (metalinguistic reflection)",
+   "note": "L: CEFR can-do self-assessment for solid B1. \"I can now ___ (give detailed descriptions on a wide range of subjects, explain viewpoints with advantages/disadvantages, narrate a story with reactions, understand the main points of authentic media, read straightforward factual texts, write connected text on familiar topics).\" Confidence 1–5. \"One specific linguistic target for next session\" (e.g., \"I will use more hedging language: may, might, could, perhaps, possibly\"). \"One strategy I will use to improve.\" Teacher uses self-assessment data to group learners and plan targeted instruction. ELSA Speak: Metalinguistic reflection on prosody choices (\"I will work on rising intonation for yes/no questions and falling intonation for WH-questions\"). Padlet: Peer appreciation + self-target + one thing I learned from a classmate today."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1.5",
+   "core": "Google Forms (CEFR can-do self-assessment) · Padlet (learning journal)",
+   "supp": "Padlet (peer appreciation + self-target) · ELSA Speak (prosody goal)",
+   "note": "L: CEFR can-do self-assessment for B1. \"I can now ___ (describe experiences and events, dreams, hopes and ambitions, give reasons and explanations for opinions and plans, narrate a story or relate the plot of a book or film, express personal feelings and reactions).\" Confidence 1–5. \"One specific skill I will improve for next session\" (e.g., \"I will use more complex sentences with 'although' and 'despite'\"). \"One goal I have for my English learning.\" Teacher uses self-assessment data to group learners. ELSA Speak: Learner sets specific prosody goal (sentence stress for contrastive emphasis, intonation for listing items, pausing for clarity). Padlet: Peer appreciation: Post one positive comment on a classmate's Padlet reflection."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B1.5+",
+   "core": "Google Forms (CEFR can-do self-assessment) · Padlet (learning journal)",
+   "supp": "Google Forms (quick reflection). ELSA Speak (learner sets a pronunciation goal for next session)",
+   "note": "L: \"Today I could / struggled with / next I want to ___.\" The learner sets one personal goal for the next session. ELSA Speak: Pronunciation goal added to reflection."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2−",
+   "core": "Google Forms (CEFR self-assessment + goal-setting) · Padlet (critical reflection)",
+   "supp": "Google Forms (peer + self evaluation) · ELSA Speak (metalinguistic reflection on prosody)",
+   "note": "L: CEFR can-do self-assessment for B2. \"I can now ___ (understand the main ideas of complex text on both concrete and abstract topics, interact with a degree of fluency and spontaneity, produce clear detailed text on a wide range of subjects, explain a viewpoint on a topical issue giving advantages and disadvantages of various options, develop an argument systematically with appropriate highlighting of significant points and relevant supporting detail).\" Confidence 1–5. \"One specific linguistic target for next session\" (e.g., \"I will use more mixed conditionals,\" \"I will incorporate hedging language – may, might, could, appears to, suggests that\"). \"One strategy I will use to achieve this target\" (e.g., \"I will read academic articles and highlight hedging phrases,\" \"I will write 5 sentences using mixed conditionals each day\"). \"One question I still have about this session's content.\" Teacher uses self-assessment data to group learners and plan targeted instruction. ELSA Speak: Metalinguistic reflection on prosody choices (\"I will distinguish between rising intonation for yes/no questions and falling intonation for WH-questions; I will use pitch range to signal contrastive emphasis; I will pause before key information for rhetorical effect\"). Padlet: Peer appreciation + self-target + one insight from a classmate's reflection + one resource recommendation for the class."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2",
+   "core": "Google Forms (CEFR self-assessment + goal-setting) · Padlet (critical reflection)",
+   "supp": "Google Forms (peer + self evaluation) · ELSA Speak (metalinguistic reflection on prosody and discourse)",
+   "note": "L: CEFR can-do self-assessment for B2 (solid). \"I can now ___ (understand the main ideas of complex text on both concrete and abstract topics, interact with a degree of fluency and spontaneity that makes regular interaction with native speakers quite possible, produce clear detailed text on a wide range of subjects, explain a viewpoint on a topical issue giving advantages and disadvantages of various options, develop an argument systematically with appropriate highlighting of significant points and relevant supporting detail, synthesise information from multiple sources, evaluate evidence quality, use hedging language to express degrees of certainty, adapt register appropriately for different contexts).\" Confidence 1–5. \"One specific linguistic target for next session\" (e.g., \"I will use inverted conditionals in my formal writing,\" \"I will incorporate more hedging phrases such as 'it is possible that' and 'tends to',\" \"I will use cleft sentences for emphasis – what I need is, it was X who/that\"). \"One strategy I will use to achieve this target\" (e.g., \"I will read academic articles and highlight hedging phrases,\" \"I will rewrite 5 sentences from my last essay using inverted conditionals,\" \"I will practice cleft sentences by describing my learning priorities\"). \"One question I still have about this session's content\" (e.g., \"How do I choose between 'may' and 'might' for possibility?\" \"When is it appropriate to use passive voice in academic writing?\"). \"One resource I recommend for the class\" (e.g., \"This website explains hedging: ...\" \"This podcast episode discusses ...\"). \"One insight I gained from a classmate's reflection.\" Teacher uses self-assessment data to group learners, plan targeted instruction, and curate shared resources. ELSA Speak: Metalinguistic reflection on prosody and discourse (\"I will distinguish between rising intonation for listing (1, 2, 3) vs falling intonation for finality; I will use thought groups to break down complex sentences (//); I will stress content words for emphasis (INdeed, CONsequently, HOWever); I will use lower pitch for parenthetical information (which, incidentally, ...); I will practice contour intonation for nuanced attitudes – certainty vs doubt\"). Padlet: Peer appreciation + self-target + one insight from a classmate + one resource recommendation for the class."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2+",
+   "core": "Google Forms (mastery self-assessment) · Padlet (reflection on language choices)",
+   "supp": "Google Forms (peer + self evaluation with narrative feedback) · ELSA Speak (metalinguistic reflection on rhetorical prosody)",
+   "note": "L: Mastery self-assessment against CEFR C1 descriptors. \"I can now ___ (understand a wide range of demanding, longer texts and recognise implicit meaning, express ideas fluently and spontaneously without much obvious searching for expressions, use language flexibly and effectively for social, academic and professional purposes, produce clear, well-structured, detailed text on complex subjects, showing controlled use of organisational patterns, connectors and cohesive devices, summarise information from different spoken and written sources, reconstructing arguments and accounts in a coherent presentation, evaluate the credibility of sources and the quality of evidence, adapt my language register appropriately for different audiences, purposes and media, use hedging language to express degrees of certainty, acknowledge complexity and multiple perspectives, engage with counter-arguments fairly and respond effectively, use grammatical structures flexibly for stylistic effect).\" Confidence 1–5. \"One specific linguistic target for next session\" (e.g., \"I will use more fronting and inversion for emphasis in my academic writing,\" \"I will incorporate more participle clauses for concision,\" \"I will use a wider range of discourse markers for signposting in extended speaking,\" \"I will practise using the subjunctive in formal written recommendations,\" \"I will reduce my use of 'very' and 'really' and replace with more precise adverbs – significantly, substantially, markedly, considerably, profoundly\"). \"One strategy I will use to achieve this target\" (e.g., \"I will read two academic articles and highlight every example of fronting; I will rewrite 10 sentences from my last essay using participle clauses; I will record myself giving a 3-minute academic opinion and count my discourse markers; I will write 5 subjunctive sentences about policy recommendations; I will review my writing and replace all instances of 'very X' with a more precise alternative\"). \"One question I still have about this session's content\" (e.g., \"How do I choose between a that-clause and a participle clause for cohesion?\" \"When is it stylistically appropriate to use inversion in academic writing?\" \"How can I signal concession without weakening my overall argument?\"). \"One resource I recommend for the class\" (e.g., \"This webinar explains hedging in academic writing: ...\" \"This podcast episode discusses rhetorical grammar: ...\" \"This website has practice exercises for advanced inversion: ...\" \"This book chapter on academic style is excellent: ...\"). \"One insight I gained from a classmate's reflection.\" Teacher uses self-assessment data to group learners, plan targeted instruction, curate shared resources, and identify learners ready for C1+ challenge. ELSA Speak: Metalinguistic reflection on rhetorical prosody for persuasive effect (\"I will use rising intonation for rhetorical questions to engage the listener; I will use high falling intonation for emphatic statements; I will use complex intonation patterns within thought groups to signal contrast, concession, and emphasis; I will vary pacing – slow for key points, faster for background or examples; I will lower pitch for parenthetical or tangential information; I will raise pitch range to signal enthusiasm or urgency; I will pause before and after key terms for rhetorical highlighting; I will practice 'thought group chunking' for complex sentence processing by listeners – breaking long sentences into intonation units (//) to aid comprehension, e.g., 'The evidence from multiple studies // conducted over the past decade // indicates a clear correlation // between these variables // despite some methodological concerns.'\"). Padlet: Peer appreciation + self-target + one insight from a classmate's reflection + one resource recommendation for the class + one lingering question for further exploration."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2.5−",
+   "core": "Google Forms (CEFR can-do self-assessment) · Padlet (reflection)",
+   "supp": "Padlet (peer appreciation + self-target)",
+   "note": "L: \"I can now .\" One thing to improve: \".\" Learner selects own next-step resource. Google Forms can include link to resource choices. ELSA Speak: Learner practises target phonemes independently."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2.5+",
+   "core": "Google Forms (CEFR self-assessment + goal-setting) · Padlet (critical reflection)",
+   "supp": "Google Forms (peer + self evaluation)",
+   "note": "L: Learner evaluates own language choices. Sets a specific linguistic target for next session (e.g., hedging, nominalisation). ELSA Speak: Advanced prosody goal (e.g., sentence stress, thought groups)."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "C1−",
+   "core": "Google Forms (mastery self‑assessment with evidence portfolio & publication goal) · Padlet (critical reflection on language ideology, power, and identity)",
+   "supp": "Google Forms (peer evaluation with forward‑looking feedforward) · ELSA Speak (metalinguistic reflection on adversarial & persuasive prosody)",
+   "note": "L: Mastery self‑assessment against CEFR C2 extended descriptors with evidence portfolio. “I can: understand implicature, irony, satire across dialects; produce extended, coherent, rhetorically powerful academic/literary discourse; engage in adversarial debate with strategic concession & cross‑examination; write publishable‑quality research with theoretical originality and disciplinary register mastery; adapt register with precision across all formal/informal settings; critique evidence for methodology, bias, silencing; articulate grammatical choices with metalanguage and justify stylistic decisions; produce idiomatic, culturally attuned, stylistically confident output.” Confidence 1–5 with evidence. SMART+ target (specific, measurable, achievable, relevant, time‑bound, evidence‑baselined, with success metric) + implementation strategy (evaluable, timed) + lingering research question (dissertation‑calibre) + resource recommendation (with application demonstration & alternative evaluation) + peer insight (attributed, with reflection on how it changed practice). ELSA Speak: adversarial prosody reflection (intensity calibration, concession intonation, cross‑examination persistence, pitch for authority vs solidarity, irony/sarcasm cues). Padlet: peer appreciation (discipline‑specific, practice‑changing) + collaborative resource annotation (value‑added, level‑tagged, application‑described, weakness‑identified). Teacher curates class repository by skill/register/disciplinary field."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "C1",
+   "core": "Google Forms (mastery self‑assessment with evidence portfolio & publication goal tracking) · Padlet (critical reflection on language ideology, power, identity, and epistemic justice)",
+   "supp": "Google Forms (peer evaluation with forward‑looking feedforward & adjudicator comments) · ELSA Speak (metalinguistic reflection on adversarial, diplomatic, and narrative prosody for literary effect)",
+   "note": "L: Mastery self‑assessment against CEFR C2 extended descriptors with evidence portfolio (with peer and teacher validation). “I can: understand implicature, irony, satire, parody, subtext across dialects and registers; produce extended, coherent, rhetorically powerful, genre‑appropriate academic/literary/professional discourse; engage in adversarial debate with strategic concession, cross‑examination, and adjudicator‑calibrated performance; write publishable‑quality research with theoretical originality, paradigm awareness, and disciplinary register mastery; adapt register with precision across all formal, professional, informal, literary, technical, legal, and diplomatic settings; critique evidence for methodology, bias, silencing, and paradigmatic assumptions; articulate grammatical choices with metalanguage, justify stylistic decisions, and compare to published authors; produce idiomatic, culturally attuned, stylistically confident, voice‑consistent output across multiple genres; participate in epistemic justice by identifying whose voice is centred/marginalised and what assumptions are taken as universal.” Confidence 1–5 with evidence portfolio link. SMART+ target (specific, measurable, achievable, relevant, time‑bound, evidence‑baselined, with success metric, with milestone checkpoints) + implementation strategy (evaluable, timed, with accountability partner) + lingering research question (dissertation‑calibre, with preliminary methodology sketch) + resource recommendation (with application demonstration, alternative evaluation, and weakness identification) + peer insight (attributed, with reflection on how it changed own practice, with evidence of implementation). ELSA Speak: metalinguistic reflection on adversarial, diplomatic, narrative, and literary prosody (intensity calibration for persuasion vs aggression vs authority, concession intonation for credibility, cross‑examination persistence without hostility, irony/sarcasm cue reliability, pitch for authority vs solidarity vs amusement vs pathos, pacing for suspense vs clarity, pausing for rhetorical weight vs listener processing). Padlet: peer appreciation (discipline‑specific, practice‑changing, with evidence of impact) + collaborative resource annotation (value‑added, level‑tagged, application‑described, weakness‑identified, alternative‑use suggested) + paradigm reflection (what assumption in your field does your resource challenge). Teacher curates class repository by discipline/register/genre/epistemic frame. Teacher also curates “paradigm archive” – resources that challenge dominant assumptions in learners’ fields."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "C1+",
+   "core": "Google Forms (mastery self‑assessment with evidence portfolio & publication goal tracking) · Padlet (critical reflection on language ideology, power, identity, and epistemic justice)",
+   "supp": "Google Forms (peer evaluation with forward‑looking feedforward & adjudicator comments) · ELSA Speak (metalinguistic reflection on adversarial, diplomatic, and narrative prosody for literary effect)",
+   "note": "L: Mastery self‑assessment against CEFR C2 extended descriptors with evidence portfolio (peer/teacher validated). “I can: understand implicature, irony, satire, parody, subtext across dialects and registers; produce extended, coherent, rhetorically powerful, genre‑appropriate discourse; engage in adversarial debate with strategic concession, cross‑examination, and adjudicator‑calibrated performance; write publishable‑quality research with theoretical originality, paradigm awareness, and disciplinary register mastery; adapt register with precision across all formal, professional, informal, literary, technical, legal, and diplomatic settings; critique evidence for methodology, bias, silencing, and paradigmatic assumptions; articulate grammatical choices with metalanguage, justify stylistic decisions, and compare to published authors; produce idiomatic, culturally attuned, stylistically confident, voice‑consistent output across multiple genres; participate in epistemic justice by identifying whose voice is centred/marginalised.” Confidence 1–5 with evidence portfolio link. SMART+ target (specific, measurable, achievable, relevant, time‑bound, evidence‑baselined, with milestones) + implementation strategy (evaluable, timed, with accountability partner) + lingering research question (dissertation‑calibre, with methodology sketch) + resource recommendation (with demonstration, alternative evaluation, weakness identification) + peer insight (attributed, with implementation evidence). ELSA Speak: metalinguistic reflection on adversarial, diplomatic, narrative, and literary prosody (intensity calibration, concession intonation, cross‑examination persistence, irony/sarcasm cues, pitch for authority vs solidarity vs amusement vs pathos, pacing for suspense vs clarity, pausing for rhetorical weight). Padlet: peer appreciation (discipline‑specific, practice‑changing, with evidence of impact) + collaborative resource annotation (value‑added, level‑tagged, application‑described, weakness‑identified) + paradigm reflection (what assumption in your field does your resource challenge). Teacher curates class repository by discipline/register/genre/epistemic frame, plus “paradigm archive” – resources that challenge dominant assumptions in learners’ fields."
+  },
+  {
+   "stage": "Exit & Reflection",
+   "level": "B2.5",
+   "core": null,
+   "supp": null,
+   "note": "L: CEFR C1 can-do self-assessment with evidence from work. Linguistic target (specific, quantified, time-bound) + strategy (actionable) + lingering question (researchable) + resource recommendation (with justification) + peer insight (attributed). ELSA Speak: rhetorical prosody reflection (thought groups, pausing for effect, contour for nuance, pacing for emphasis). Padlet: peer appreciation (specific) + collaborative resource curation (class repository)."
+  }
+ ]
+}

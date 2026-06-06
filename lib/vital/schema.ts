@@ -26,6 +26,7 @@ const toolRole = z.enum([
 ]);
 const status = z.enum(["COMPLIANT", "ONE_GAP", "MULTI_GAP"]);
 const pillar = z.enum(["V", "I", "T", "A", "L"]);
+const answer = z.enum(["YES", "PARTIAL", "NO", "NA"]);
 
 const emptyToNull = (v: unknown) =>
   v === "" || v === undefined ? null : v;
@@ -33,8 +34,10 @@ const emptyToNull = (v: unknown) =>
 export const vitalToolSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
   role: toolRole,
-  // vitalScore10 is always derived from pillarRatings server-side, never accepted
-  // from the client. See vitalScore10FromPillars in lib/vital/compute.ts.
+  // v2Score50, v2Percent, verdict and vitalScore10 are ALL derived server-side
+  // from questionResponses (see deriveFromResponses in lib/vital/compute.ts) and
+  // never accepted from the client. Kept here only as optional legacy passthrough
+  // for assessment tools (no question profile) and the xlsx importer.
   v2Score50: z.preprocess(emptyToNull, z.coerce.number().int().min(0).max(50).nullable()),
   verdict: z.preprocess(emptyToNull, verdict.nullable()),
   deFactoRisk: z.preprocess(emptyToNull, risk.nullable()),
@@ -45,6 +48,22 @@ export const vitalToolSchema = z.object({
   adaptiveTesting: z.preprocess(emptyToNull, z.string().nullable()),
   notes: z.preprocess(emptyToNull, z.string().nullable()),
   platformId: z.preprocess(emptyToNull, z.string().nullable()),
+  // The 25 question answers. When present they drive pillar letters + all scores.
+  questionResponses: z
+    .array(z.object({ questionId: z.string().min(1), answer }))
+    .optional(),
+  // Optional per-pillar manual overrides (evaluator judgement differs from the
+  // derived letter). Each carries an optional rationale note.
+  pillarOverrides: z
+    .array(
+      z.object({
+        pillar,
+        rating,
+        note: z.preprocess(emptyToNull, z.string().nullable()),
+      })
+    )
+    .optional(),
+  // Legacy manual pillar letters (still used by assessment tools / importer).
   pillarRatings: z
     .array(z.object({ pillar, rating }))
     .optional(),

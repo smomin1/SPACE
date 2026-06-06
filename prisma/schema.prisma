@@ -193,6 +193,15 @@ enum VitalComplianceStatus {
   MULTI_GAP
 }
 
+// One answer to a VITAL checklist question. Points: YES=2, PARTIAL=1, NO=0;
+// NA is excluded from both the score and the max (denominator).
+enum VitalAnswer {
+  YES
+  PARTIAL
+  NO
+  NA
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -547,8 +556,9 @@ model VitalLevel {
   isPreEmergent  Boolean  @default(false)
   assessmentOnly Boolean  @default(false) // true only for the "A0 (Pre)" assessment-landscape column
 
-  levelMappings   VitalToolLevelMapping[]
-  recommendations VitalRecommendation[]
+  levelMappings        VitalToolLevelMapping[]
+  recommendations      VitalRecommendation[]
+  stageRecommendations VitalStageRecommendation[]
 }
 
 // A catalogue tool (28 teaching tools + 11 assessment/placement tools).
@@ -556,9 +566,10 @@ model VitalTool {
   id                String               @id @default(cuid())
   name              String               @unique
   role              VitalToolRole
-  vitalScore10      Int?                 // "VITAL /10"
-  v2Score50         Int?                 // "V2 /50"
-  verdict           VitalVerdict?
+  vitalScore10      Int?                 // legacy 0–10 (derived from pillar letters; kept for results scatter/filter)
+  v2Score50         Int?                 // derived total /50 from the 25 question responses
+  v2Percent         Int?                 // derived % of non-N/A max (0–100)
+  verdict           VitalVerdict?        // derived from v2Score50: ≥35 STRONG · 25–34 GOOD · 15–24 PARTIAL · <15 POOR
   deFactoRisk       VitalRisk?
   overallDependency VitalToolDependency?
   belowA0           Boolean              @default(false)
@@ -574,16 +585,22 @@ model VitalTool {
   pillarRatings      VitalToolPillarRating[]
   skillCoverage      VitalToolSkillCoverage[]
   levelMappings      VitalToolLevelMapping[]
+  questionResponses  VitalQuestionResponse[]
   coreRecommendations VitalRecommendation[]   @relation("CoreTool")
   suppRecommendations VitalRecommendation[]   @relation("SuppTool")
 }
 
 // One pillar rating for one tool (5 rows per tool).
+// `rating` defaults to the value derived from the pillar's /10 question score
+// (≥7 → Y, ≥5 → P, else N). When isOverride is true the rating was set manually
+// by an evaluator/admin whose judgement differed; overrideNote captures why.
 model VitalToolPillarRating {
-  id     String      @id @default(cuid())
-  toolId String
-  pillar VitalPillar
-  rating VitalRating
+  id           String      @id @default(cuid())
+  toolId       String
+  pillar       VitalPillar
+  rating       VitalRating
+  isOverride   Boolean     @default(false)
+  overrideNote String?
 
   tool VitalTool @relation(fields: [toolId], references: [id], onDelete: Cascade)
 
@@ -664,4 +681,74 @@ model VitalImportLog {
   importedAt   DateTime @default(now())
 
   importedBy User @relation(fields: [importedById], references: [id])
+}
+
+// ─── VITAL Model 2.0: question-driven evaluation + stage matrix ──────────────────
+
+// The 25 VITAL checklist questions (5 per pillar). `key` is stable (e.g. "V1").
+model VitalQuestion {
+  id        String      @id @default(cuid())
+  key       String      @unique
+  pillar    VitalPillar
+  order     Int         @default(0)
+  text      String
+  createdAt DateTime    @default(now())
+
+  responses VitalQuestionResponse[]
+}
+
+// One tool's answer to one question. The per-pillar /10, total /50, %-score and
+// verdict are all derived from these rows (see lib/vital/compute.ts).
+model VitalQuestionResponse {
+  id         String      @id @default(cuid())
+  toolId     String
+  questionId String
+  answer     VitalAnswer
+
+  tool     VitalTool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  question VitalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, questionId])
+}
+
+// A period stage (row dimension of the CEFR × Stage × Tools matrix). 9 rows.
+// `pillars` holds the stage's primary VITAL pillar(s), e.g. ["T","I"].
+model VitalStage {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  order     Int      @default(0)
+  pillars   String[]
+  createdAt DateTime @default(now())
+
+  recommendations VitalStageRecommendation[]
+}
+
+// One cell of the stage × level matrix: authored core/supp tool text + VITAL note.
+// Cells hold human-authored multi-tool lists ("Starfall · ICT Games"), not single
+// tool FKs — so the text is stored verbatim. 9 stages × 22 levels = 198 rows.
+model VitalStageRecommendation {
+  id        String @id @default(cuid())
+  stageId   String
+  levelId   String
+  coreText  String?
+  suppText  String?
+  vitalNote String?
+
+  stage VitalStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  level VitalLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([stageId, levelId])
+}
+
+// Read-only Grade Band ↔ CEFR range reference (K–5 / 6–8 / 9–12 × learner level).
+// Connects to the platform age-range feature via Grade = Age − 5.
+model VitalGradeBand {
+  id           String   @id @default(cuid())
+  band         String
+  learnerLevel String
+  cefrRange    String
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@unique([band, learnerLevel])
 }

@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { canDo } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { vitalToolSchema } from "@/lib/vital/schema";
-import { vitalScore10FromPillars } from "@/lib/vital/compute";
+import { writeToolProfile } from "@/lib/vital/responses-server";
 import { recomputeRecommendations } from "@/lib/vital/derive-server";
 import { transitionEvaluation } from "@/lib/evaluation-state";
 
@@ -57,10 +57,16 @@ export async function POST(
     );
   }
 
-  const { pillarRatings, skillCoverage, levelMappings, ...scalar } = parsed.data;
-  const vitalScore10 = scalar.isAssessmentTool
-    ? null
-    : vitalScore10FromPillars((pillarRatings ?? []).map((p) => p.rating));
+  const {
+    pillarRatings,
+    pillarOverrides,
+    questionResponses,
+    skillCoverage,
+    levelMappings,
+    v2Score50,
+    verdict,
+    ...scalar
+  } = parsed.data;
 
   // Profile is owned by the platform; link is server-set, never client-trusted.
   const platformId = evaluation.platformId;
@@ -70,26 +76,27 @@ export async function POST(
     await prisma.$transaction(async (tx) => {
       let toolId: string;
       if (existing) {
-        await tx.vitalTool.update({
-          where: { id: existing.id },
-          data: { ...scalar, platformId, vitalScore10 },
-        });
+        await tx.vitalTool.update({ where: { id: existing.id }, data: { ...scalar, platformId } });
         toolId = existing.id;
-        await tx.vitalToolPillarRating.deleteMany({ where: { toolId } });
         await tx.vitalToolSkillCoverage.deleteMany({ where: { toolId } });
         await tx.vitalToolLevelMapping.deleteMany({ where: { toolId } });
       } else {
-        const created = await tx.vitalTool.create({
-          data: { ...scalar, platformId, vitalScore10 },
-        });
+        const created = await tx.vitalTool.create({ data: { ...scalar, platformId } });
         toolId = created.id;
       }
 
-      if (pillarRatings?.length) {
-        await tx.vitalToolPillarRating.createMany({
-          data: pillarRatings.map((p) => ({ toolId, pillar: p.pillar, rating: p.rating })),
-        });
-      }
+      // Derive pillar letters + all scores from the 25 answers (or legacy path)
+      // and persist responses + pillar ratings.
+      const scores = await writeToolProfile(tx, toolId, {
+        isAssessmentTool: scalar.isAssessmentTool,
+        questionResponses,
+        pillarOverrides,
+        pillarRatings,
+        v2Score50,
+        verdict,
+      });
+      await tx.vitalTool.update({ where: { id: toolId }, data: scores });
+
       if (skillCoverage?.length) {
         await tx.vitalToolSkillCoverage.createMany({
           data: skillCoverage.map((s) => ({

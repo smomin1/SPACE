@@ -1,0 +1,62 @@
+[
+ {
+  "band": "K–5",
+  "learnerLevel": "Pre-Beginner",
+  "cefrRange": "Pre-A1 (A1−) and below — A0 / Pre-emergent",
+  "order": 1
+ },
+ {
+  "band": "K–5",
+  "learnerLevel": "Beginner",
+  "cefrRange": "A1− through A2+ (levels 1–6)",
+  "order": 2
+ },
+ {
+  "band": "K–5",
+  "learnerLevel": "Intermediate",
+  "cefrRange": "B1− through B2+ (levels 7–15, incl. B1.5 and B2 non-CEFR bands)",
+  "order": 3
+ },
+ {
+  "band": "K–5",
+  "learnerLevel": "Advanced",
+  "cefrRange": "C1− through C1+ (levels 19–21)",
+  "order": 4
+ },
+ {
+  "band": "6–8",
+  "learnerLevel": "Beginner",
+  "cefrRange": "A1− through A2+ (levels 1–6)",
+  "order": 5
+ },
+ {
+  "band": "6–8",
+  "learnerLevel": "Intermediate",
+  "cefrRange": "B1− through B2+ (levels 7–15, incl. B1.5 and B2 non-CEFR bands)",
+  "order": 6
+ },
+ {
+  "band": "6–8",
+  "learnerLevel": "Advanced",
+  "cefrRange": "C1− through C1+ (levels 19–21)",
+  "order": 7
+ },
+ {
+  "band": "9–12",
+  "learnerLevel": "Beginner",
+  "cefrRange": "A1− through A2+ (levels 1–6)",
+  "order": 8
+ },
+ {
+  "band": "9–12",
+  "learnerLevel": "Intermediate",
+  "cefrRange": "B1− through B2+ (levels 7–15, incl. B1.5 and B2 non-CEFR bands)",
+  "order": 9
+ },
+ {
+  "band": "9–12",
+  "learnerLevel": "Advanced",
+  "cefrRange": "C1− through C1+ (levels 19–21)",
+  "order": 10
+ }
+]

@@ -457,9 +457,6 @@ model AccessRequest {
   name          String
   team          Team
   requestedRole Role
-  // Whether the requester is also asking for additive Admin access on top of
-  // their base role. Granted as User.isAdmin on approval.
-  requestAdmin  Boolean             @default(false)
   status        AccessRequestStatus @default(PENDING)
   notes         String?
   reviewedAt    DateTime?

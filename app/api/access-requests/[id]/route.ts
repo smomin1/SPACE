@@ -59,8 +59,8 @@ export async function PATCH(
         email: accessRequest.email,
         name: accessRequest.name,
         role: accessRequest.requestedRole,
-        // Additive admin grant requested on the form, approved by Super Admin.
-        isAdmin: accessRequest.requestAdmin,
+        // Admin is never granted via access requests; only a Super Admin can
+        // toggle User.isAdmin from the user editor afterwards.
         team: accessRequest.team,
         passwordHash,
         mustChangePassword: true,

@@ -40,7 +40,6 @@ type AccessRequest = {
   name: string
   team: string
   requestedRole: string
-  requestAdmin: boolean
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   notes: string | null
   createdAt: Date | string
@@ -255,14 +254,7 @@ export function AccessRequestsTable({ initialData }: AccessRequestsTableProps) {
                   <TableCell className="py-2.5 align-top font-mono text-[12.5px] text-stone-600">{req.email}</TableCell>
                   <TableCell className="py-2.5 align-top text-[13px]">{TEAM_LABELS[req.team] ?? req.team}</TableCell>
                   <TableCell className="py-2.5 align-top text-[13px]">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span>{ROLE_LABELS[req.requestedRole] ?? req.requestedRole}</span>
-                      {req.requestAdmin && (
-                        <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10.5px] font-semibold text-violet-800 ring-1 ring-inset ring-violet-300/60">
-                          + Admin
-                        </span>
-                      )}
-                    </div>
+                    {ROLE_LABELS[req.requestedRole] ?? req.requestedRole}
                   </TableCell>
                   <TableCell className="py-2.5">
                     <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset', STATUS_BADGE[req.status])}>

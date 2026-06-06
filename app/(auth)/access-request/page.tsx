@@ -59,7 +59,6 @@ export default function AccessRequestPage() {
   const [email, setEmail] = React.useState('')
   const [team,  setTeam]  = React.useState('')
   const [role,  setRole]  = React.useState('')
-  const [requestAdmin, setRequestAdmin] = React.useState(false)
   const [notes, setNotes] = React.useState('')
 
   const [errors, setErrors] = React.useState<FieldErrors>({})
@@ -117,7 +116,7 @@ export default function AccessRequestPage() {
       const res = await fetch('/api/access-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), team, requestedRole: role, requestAdmin, notes: notes.trim() || undefined }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), team, requestedRole: role, notes: notes.trim() || undefined }),
       })
 
       if (res.ok) {
@@ -267,31 +266,6 @@ export default function AccessRequestPage() {
                 </Select>
                 <FieldError msg={touched.role ? errors.role : undefined} />
               </div>
-
-              {/* Admin access (additive) */}
-              <label
-                htmlFor="requestAdmin"
-                className={cn(
-                  'flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 transition-colors',
-                  requestAdmin ? 'border-emerald-300 bg-emerald-50/60' : 'border-stone-200 hover:bg-stone-50',
-                )}
-              >
-                <input
-                  id="requestAdmin"
-                  type="checkbox"
-                  checked={requestAdmin}
-                  onChange={(e) => setRequestAdmin(e.target.checked)}
-                  className="mt-0.5 size-4 rounded border-stone-300 text-emerald-700 focus:ring-emerald-300"
-                />
-                <span className="space-y-0.5">
-                  <span className="block text-sm font-medium text-emerald-950">
-                    Also request admin access
-                  </span>
-                  <span className="block text-[12px] text-stone-500">
-                    Adds platform management on top of your role. A Super Admin must approve it.
-                  </span>
-                </span>
-              </label>
 
               {/* Notes */}
               <div className="space-y-1">

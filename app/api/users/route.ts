@@ -13,8 +13,8 @@ const createSchema = z.object({
   isAdmin: z.boolean().optional(),
   team:  z.enum([
     'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
-    'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
-    'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
+    'STRATEGY_5', 'STRATEGY_6', 'STRATEGY_7', 'IMPLEMENTATION_LAB',
+    'LEARNING_SCIENCES', 'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
   ]).optional().nullable(),
   isActive: z.boolean().optional(),
 })

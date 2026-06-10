@@ -78,6 +78,8 @@ const TEAM_LABELS: Record<Team, string> = {
   STRATEGY_4:              'Strategy 4',
   STRATEGY_5:              'Strategy 5',
   STRATEGY_6:              'Strategy 6',
+  STRATEGY_7:              'Strategy 7',
+  IMPLEMENTATION_LAB:      'Implementation Lab',
   LEARNING_SCIENCES:       'Learning Sciences',
   EMERGING_TECHNOLOGY:     'Emerging Technology',
   RESEARCH_AND_INNOVATION: 'Research & Innovation',

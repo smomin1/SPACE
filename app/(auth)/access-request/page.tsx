@@ -17,6 +17,8 @@ const TEAM_OPTIONS = [
   { value: 'STRATEGY_4',              label: 'Strategy 4' },
   { value: 'STRATEGY_5',              label: 'Strategy 5' },
   { value: 'STRATEGY_6',              label: 'Strategy 6' },
+  { value: 'STRATEGY_7',              label: 'Strategy 7' },
+  { value: 'IMPLEMENTATION_LAB',      label: 'Implementation Lab' },
   { value: 'LEARNING_SCIENCES',       label: 'Learning Sciences' },
   { value: 'EMERGING_TECHNOLOGY',     label: 'Emerging Technology' },
   { value: 'RESEARCH_AND_INNOVATION', label: 'Research and Innovation Team' },

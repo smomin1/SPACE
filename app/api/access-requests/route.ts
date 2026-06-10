@@ -18,8 +18,8 @@ const createSchema = z.object({
     .transform((v) => v.trim()),
   team: z.enum([
     'STRATEGY_1', 'STRATEGY_2', 'STRATEGY_3', 'STRATEGY_4',
-    'STRATEGY_5', 'STRATEGY_6', 'LEARNING_SCIENCES',
-    'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
+    'STRATEGY_5', 'STRATEGY_6', 'STRATEGY_7', 'IMPLEMENTATION_LAB',
+    'LEARNING_SCIENCES', 'EMERGING_TECHNOLOGY', 'RESEARCH_AND_INNOVATION', 'STEERING_COMMITTEE',
   ], { message: 'Please select a team' }),
   // Admin is not requestable here; only a Super Admin can grant it (User.isAdmin).
   requestedRole: z.enum([

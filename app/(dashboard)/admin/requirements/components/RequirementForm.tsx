@@ -42,15 +42,24 @@ import {
 type FormValues = z.output<typeof requirementBaseSchema>
 type FormInput = z.input<typeof requirementBaseSchema>
 
+const NEW_CATEGORY_SENTINEL = '__new__'
+
 interface RequirementFormProps {
   mode: 'create' | 'edit'
   defaultValues?: Partial<FormInput>
   id?: string
+  categories?: string[]
 }
 
-export function RequirementForm({ mode, defaultValues, id }: RequirementFormProps) {
+export function RequirementForm({ mode, defaultValues, id, categories = [] }: RequirementFormProps) {
   const router = useRouter()
   const [showGateDialog, setShowGateDialog] = React.useState(false)
+
+  // If the current category value isn't in the list (or there are no categories), start in free-text mode
+  const initialIsNew =
+    categories.length === 0 ||
+    (!!defaultValues?.category && !categories.includes(defaultValues.category as string))
+  const [isNewCategory, setIsNewCategory] = React.useState(initialIsNew)
   // Stores the resolver callback passed by the AlertDialog confirmation
   const confirmGateRef = React.useRef<(() => void) | null>(null)
 
@@ -245,15 +254,62 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. Compliance, Interoperability"
-                      {...field}
-                      value={field.value ?? ''}
-                      onChange={(e) => field.onChange(e.target.value || null)}
-                    />
-                  </FormControl>
-                  <FormDescription>Optional grouping label</FormDescription>
+                  {!isNewCategory && categories.length > 0 ? (
+                    <>
+                      <Select
+                        value={field.value ?? ''}
+                        onValueChange={(v) => {
+                          if (v === NEW_CATEGORY_SENTINEL) {
+                            field.onChange(null)
+                            setIsNewCategory(true)
+                          } else {
+                            field.onChange(v || null)
+                          }
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {cat}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value={NEW_CATEGORY_SENTINEL} className="text-muted-foreground italic">
+                            + Add new category
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>Optional grouping label</FormDescription>
+                    </>
+                  ) : (
+                    <>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Compliance, Interoperability"
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value || null)}
+                          autoFocus={isNewCategory && categories.length > 0}
+                        />
+                      </FormControl>
+                      {categories.length > 0 && (
+                        <button
+                          type="button"
+                          className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline mt-0.5"
+                          onClick={() => {
+                            field.onChange(null)
+                            setIsNewCategory(false)
+                          }}
+                        >
+                          Choose existing category
+                        </button>
+                      )}
+                      <FormDescription>Optional grouping label</FormDescription>
+                    </>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

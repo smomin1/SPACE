@@ -16,8 +16,17 @@ export default async function EditRequirementPage({
   if (!canDo(session.user.role, 'manage:requirements')) redirect('/dashboard')
 
   const { id } = await params
-  const requirement = await prisma.requirement.findUnique({ where: { id } })
+  const [requirement, categoryRows] = await Promise.all([
+    prisma.requirement.findUnique({ where: { id } }),
+    prisma.requirement.findMany({
+      where: { category: { not: null } },
+      select: { category: true },
+      distinct: ['category'],
+      orderBy: { category: 'asc' },
+    }),
+  ])
   if (!requirement) notFound()
+  const categories = categoryRows.map((r) => r.category as string)
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -33,6 +42,7 @@ export default async function EditRequirementPage({
       <RequirementForm
         mode="edit"
         id={requirement.id}
+        categories={categories}
         defaultValues={{
           title: requirement.title,
           description: requirement.description,

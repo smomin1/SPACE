@@ -245,7 +245,7 @@ function GapScoringDialog({
               disabled={reopening || submitting || loading}
               onClick={handleReopen}
             >
-              {reopening ? 'Reopening...' : reopenLabel()}
+              {reopening ? 'Reopening...' : 'Reopen'}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={submitting || reopening}>
               Cancel

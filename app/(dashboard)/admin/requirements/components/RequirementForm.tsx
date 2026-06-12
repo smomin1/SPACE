@@ -72,7 +72,6 @@ export function RequirementForm({ mode, defaultValues, id, categories = [] }: Re
       weight: 'MEDIUM',
       isComplianceGate: false,
       category: null,
-      order: 0,
       ...defaultValues,
     },
   })
@@ -247,8 +246,7 @@ export function RequirementForm({ mode, defaultValues, id, categories = [] }: Re
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
+          <FormField
               control={form.control}
               name="category"
               render={({ field }) => (
@@ -313,23 +311,7 @@ export function RequirementForm({ mode, defaultValues, id, categories = [] }: Re
                   <FormMessage />
                 </FormItem>
               )}
-            />
-
-            <FormField
-              control={form.control}
-              name="order"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Display Order</FormLabel>
-                  <FormControl>
-                    <Input type="number" min={0} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-                  </FormControl>
-                  <FormDescription>Sort position within category</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          />
 
           <FormField
             control={form.control}

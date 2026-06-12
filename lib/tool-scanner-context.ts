@@ -10,7 +10,6 @@ export type ToolScannerRequirement = {
   category: string | null
   weight: WeightLevel
   isComplianceGate: boolean
-  order: number
 }
 
 /**
@@ -63,7 +62,6 @@ export async function loadToolScannerRequirements(contextId?: string | null): Pr
     category: r.category,
     weight: weightOverrideMap.get(r.id) ?? r.weight,
     isComplianceGate: r.isComplianceGate,
-    order: r.order,
   }))
 
   const scoringRequirements: Requirement[] = applyContextWeights(

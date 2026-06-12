@@ -50,7 +50,6 @@ export default async function EditRequirementPage({
           weight: requirement.weight,
           isComplianceGate: requirement.isComplianceGate,
           category: requirement.category,
-          order: requirement.order,
         }}
       />
     </div>

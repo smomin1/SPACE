@@ -19,7 +19,6 @@ export const requirementBaseSchema = z.object({
     .max(100, 'Category must be 100 characters or fewer')
     .nullish()
     .transform((v) => v ?? null),
-  order: z.number().int('Order must be a whole number').min(0, 'Order must be 0 or greater').default(0),
 })
 
 // Used for XLSX bulk import; handles string/number/boolean cell values from sheet_to_json
@@ -50,7 +49,8 @@ export const requirementRowSchema = z.object({
   category: z.string().optional().nullable(),
   order: z
     .union([z.number().int(), z.string().transform((v) => parseInt(v, 10))])
-    .default(0),
+    .default(0)
+    .optional(),
 })
 
 export type RequirementFormValues = z.infer<typeof requirementBaseSchema>

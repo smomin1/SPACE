@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   try {
     const requirements = await prisma.requirement.findMany({
       where,
-      orderBy: [{ category: 'asc' }, { order: 'asc' }],
+      orderBy: [{ category: 'asc' }, { title: 'asc' }],
     })
     return Response.json({ requirements })
   } catch {
@@ -50,7 +50,6 @@ async function backfillToolScannerScores(requirement: {
   category: string | null
   weight: 'HIGH' | 'MEDIUM' | 'LOW'
   isComplianceGate: boolean
-  order: number
 }) {
   if (!process.env.ANTHROPIC_API_KEY) return
 

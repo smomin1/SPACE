@@ -51,7 +51,6 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
       weight: "MEDIUM",
       isComplianceGate: false,
       category: null,
-      order: 0,
       ...defaultValues,
     },
   })
@@ -164,42 +163,25 @@ export function RequirementForm({ mode, defaultValues, id }: RequirementFormProp
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g. Compliance, Interoperability"
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(e.target.value || null)}
-                  />
-                </FormControl>
-                <FormDescription>Optional grouping for the data table</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="order"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Display Order</FormLabel>
-                <FormControl>
-                  <Input type="number" min={0} {...field} />
-                </FormControl>
-                <FormDescription>Sort position within its category</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Compliance, Interoperability"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value || null)}
+                />
+              </FormControl>
+              <FormDescription>Optional grouping for the data table</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

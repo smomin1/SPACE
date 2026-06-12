@@ -318,17 +318,6 @@ function buildColumns(): ColumnDef<Requirement>[] {
       ),
     },
     {
-      accessorKey: 'order',
-      header: '#',
-      size: 48,
-      enableColumnFilter: false,
-      cell: ({ row }) => (
-        <span className="font-mono text-[11px] text-stone-400 tabular-nums">
-          {row.original.order}
-        </span>
-      ),
-    },
-    {
       accessorKey: 'title',
       header: ({ column }) => <ColHeader column={column} title="Requirement" />,
       cell: ({ row }) => (
@@ -398,7 +387,6 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
   const [globalFilter, setGlobalFilter] = React.useState('')
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: 'category', desc: false },
-    { id: 'order', desc: false },
   ])
   const [gatesOnly, setGatesOnly] = React.useState(false)
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})

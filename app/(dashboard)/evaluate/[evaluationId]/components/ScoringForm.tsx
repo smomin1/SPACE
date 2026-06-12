@@ -254,12 +254,53 @@ export function ScoringForm({
           const submittedCount = allMembers.filter(m => m.hasSubmitted).length
           const totalCount = allMembers.length
           const allSubmitted = submittedCount === totalCount && totalCount > 0
+          const hasPedagogySubmitted = allMembers.some(m => (m.evaluatorType === 'PEDAGOGY' || m.evaluatorType === 'BOTH') && m.hasSubmitted)
+          const hasTechnicalSubmitted = allMembers.some(m => (m.evaluatorType === 'TECHNICAL' || m.evaluatorType === 'BOTH') && m.hasSubmitted)
+          const canEarlyMerge = assignment.isLead && assignment.hasSubmitted && hasPedagogySubmitted && hasTechnicalSubmitted && !allSubmitted
           return (
-            <p className="text-xs text-muted-foreground pt-1 border-t border-stone-200/60">
-              {allSubmitted
-                ? 'All evaluators submitted - merging automatically…'
-                : `${submittedCount} of ${totalCount} evaluators submitted`}
-            </p>
+            <div className="pt-1 border-t border-stone-200/60 flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                {allSubmitted
+                  ? 'All evaluators submitted - merging automatically…'
+                  : `${submittedCount} of ${totalCount} evaluators submitted`}
+              </p>
+              {canEarlyMerge && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="h-7 text-[12px] shrink-0">
+                      Merge now
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Merge scores now?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        At least one evaluator from each team has submitted. You can merge early
+                        and begin conflict resolution now. Evaluators who haven't submitted yet
+                        will not be able to add more scores after merging.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const res = await fetch(`/api/evaluations/${evaluationId}/merge`, { method: 'POST' })
+                          const data = await res.json().catch(() => ({}))
+                          if (!res.ok) {
+                            toast.error(data.error ?? 'Merge failed')
+                          } else {
+                            toast.success('Scores merged - conflict resolution can now begin')
+                            router.refresh()
+                          }
+                        }}
+                      >
+                        Merge scores
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           )
         })()}
       </div>

@@ -174,3 +174,60 @@ export async function POST(
 
   return Response.json({ saved: scores.length })
 }
+
+// ─── PATCH /api/evaluations/[id]/gaps ────────────────────────────────────────
+// Targeted reopen: resets hasSubmitted only for evaluators whose type matches
+// the gap requirements, without clearing conflict threads or full audit trail.
+
+const reopenBodySchema = z.object({
+  evaluatorTypes: z.array(z.enum(['PEDAGOGY', 'TECHNICAL', 'BOTH'])).min(1),
+})
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await auth()
+  if (!session?.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!canDo(session.user.role, 'manage:platform')) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { id: evaluationId } = await params
+
+  const body = await req.json().catch(() => null)
+  const parsed = reopenBodySchema.safeParse(body)
+  if (!parsed.success) {
+    return Response.json({ error: 'Invalid input' }, { status: 400 })
+  }
+
+  const evaluation = await prisma.evaluation.findUnique({
+    where: { id: evaluationId },
+    select: { id: true, state: true },
+  })
+  if (!evaluation) return Response.json({ error: 'Not found' }, { status: 404 })
+  if (evaluation.state === 'IN_PROGRESS') {
+    return Response.json({ error: 'Evaluation is already in progress' }, { status: 409 })
+  }
+
+  // Expand BOTH: if any gap type includes BOTH, we open for both teams
+  const rawTypes = new Set(parsed.data.evaluatorTypes)
+  const targetTypes = new Set<'PEDAGOGY' | 'TECHNICAL'>()
+  if (rawTypes.has('PEDAGOGY') || rawTypes.has('BOTH')) targetTypes.add('PEDAGOGY')
+  if (rawTypes.has('TECHNICAL') || rawTypes.has('BOTH')) targetTypes.add('TECHNICAL')
+
+  await prisma.$transaction([
+    // Reset submission state only for the relevant evaluator types
+    prisma.evaluatorAssignment.updateMany({
+      where: { evaluationId, evaluatorType: { in: [...targetTypes] } },
+      data: { hasSubmitted: false, submittedAt: null },
+    }),
+    // Transition to IN_PROGRESS and clear lock
+    prisma.evaluation.update({
+      where: { id: evaluationId },
+      data: { state: 'IN_PROGRESS', lockedAt: null },
+    }),
+  ])
+
+  return Response.json({ state: 'IN_PROGRESS', reopenedFor: [...targetTypes] })
+}

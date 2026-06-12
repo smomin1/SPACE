@@ -108,12 +108,43 @@ function GapScoringDialog({
     }
   }
 
+  // Compute which evaluator types have gap requirements
+  function gapEvaluatorTypes(): Array<'PEDAGOGY' | 'TECHNICAL' | 'BOTH'> {
+    const types = new Set<'PEDAGOGY' | 'TECHNICAL' | 'BOTH'>()
+    for (const g of gaps) {
+      const t = g.evaluatorType as 'PEDAGOGY' | 'TECHNICAL' | 'BOTH'
+      if (t === 'BOTH') { types.add('PEDAGOGY'); types.add('TECHNICAL') }
+      else types.add(t)
+    }
+    return [...types] as Array<'PEDAGOGY' | 'TECHNICAL' | 'BOTH'>
+  }
+
+  function reopenLabel() {
+    const types = gapEvaluatorTypes()
+    const hasPed = types.includes('PEDAGOGY')
+    const hasTech = types.includes('TECHNICAL')
+    if (hasPed && hasTech) return 'Reopen for all evaluators'
+    if (hasTech) return 'Reopen for Technical evaluators'
+    if (hasPed) return 'Reopen for Pedagogy evaluators'
+    return 'Reopen for evaluators'
+  }
+
   async function handleReopen() {
     setReopening(true)
     try {
-      const res = await fetch(`/api/evaluations/${evaluation.id}/reopen`, { method: 'POST' })
+      const evaluatorTypes = gapEvaluatorTypes()
+      const res = await fetch(`/api/evaluations/${evaluation.id}/gaps`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evaluatorTypes }),
+      })
       if (res.ok) {
-        toast.success('Evaluation reopened - evaluators can now score the new requirements')
+        const data = await res.json()
+        const reopened = (data.reopenedFor as string[]) ?? []
+        const label = reopened.length === 2
+          ? 'all evaluators'
+          : `${reopened[0]?.toLowerCase() ?? ''} evaluators`
+        toast.success(`Evaluation reopened for ${label}`)
         setOpen(false)
         router.refresh()
       } else {
@@ -214,7 +245,7 @@ function GapScoringDialog({
               disabled={reopening || submitting || loading}
               onClick={handleReopen}
             >
-              {reopening ? 'Reopening...' : 'Reopen for evaluators'}
+              {reopening ? 'Reopening...' : reopenLabel()}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={submitting || reopening}>
               Cancel

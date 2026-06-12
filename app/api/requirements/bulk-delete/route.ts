@@ -10,7 +10,7 @@ const bodySchema = z.object({
 interface FailedDelete {
   id: string
   title: string
-  reason: 'HAS_SCORES' | 'NOT_FOUND' | 'UNKNOWN'
+  reason: 'NOT_FOUND' | 'UNKNOWN'
 }
 
 export async function POST(request: Request) {
@@ -39,22 +39,13 @@ export async function POST(request: Request) {
 
   const { ids } = parsed.data
 
-  // Resolve which requirements exist and which have scores.
-  const [existing, withScores] = await Promise.all([
-    prisma.requirement.findMany({
-      where: { id: { in: ids } },
-      select: { id: true, title: true },
-    }),
-    prisma.score.groupBy({
-      by: ['requirementId'],
-      where: { requirementId: { in: ids } },
-      _count: { id: true },
-    }),
-  ])
+  const existing = await prisma.requirement.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, title: true },
+  })
 
   const existingIds = new Set(existing.map((r) => r.id))
   const titleById = new Map(existing.map((r) => [r.id, r.title] as const))
-  const blockedIds = new Set(withScores.map((s) => s.requirementId))
 
   const failed: FailedDelete[] = []
   const deletable: string[] = []
@@ -62,8 +53,6 @@ export async function POST(request: Request) {
   for (const id of ids) {
     if (!existingIds.has(id)) {
       failed.push({ id, title: titleById.get(id) ?? id, reason: 'NOT_FOUND' })
-    } else if (blockedIds.has(id)) {
-      failed.push({ id, title: titleById.get(id) ?? id, reason: 'HAS_SCORES' })
     } else {
       deletable.push(id)
     }
@@ -72,13 +61,19 @@ export async function POST(request: Request) {
   let deletedCount = 0
   if (deletable.length > 0) {
     try {
-      // Clean up join-table rows first, then the requirements themselves,
-      // in a single transaction so partial state never persists.
+      const scoreIds = await prisma.score.findMany({
+        where: { requirementId: { in: deletable } },
+        select: { id: true },
+      })
       const result = await prisma.$transaction([
+        prisma.scoreAuditLog.deleteMany({ where: { scoreId: { in: scoreIds.map(s => s.id) } } }),
+        prisma.score.deleteMany({ where: { requirementId: { in: deletable } } }),
+        prisma.conflictMessage.deleteMany({ where: { thread: { requirementId: { in: deletable } } } }),
+        prisma.conflictThread.deleteMany({ where: { requirementId: { in: deletable } } }),
         prisma.requirementContext.deleteMany({ where: { requirementId: { in: deletable } } }),
         prisma.requirement.deleteMany({ where: { id: { in: deletable } } }),
       ])
-      deletedCount = result[1].count
+      deletedCount = result[5].count
     } catch (err) {
       console.error('Bulk delete failed', err)
       return Response.json(

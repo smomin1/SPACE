@@ -213,11 +213,7 @@ function DeleteAction({ req }: { req: Requirement }) {
       router.refresh()
     } else {
       const data = await res.json().catch(() => ({}))
-      setErr(
-        data.code === 'HAS_SCORES'
-          ? 'Cannot delete - this requirement has recorded scores.'
-          : (data.error ?? 'Delete failed.')
-      )
+      setErr(data.error ?? 'Delete failed.')
     }
   }
 
@@ -237,7 +233,8 @@ function DeleteAction({ req }: { req: Requirement }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Delete requirement?</AlertDialogTitle>
           <AlertDialogDescription>
-            <strong>&ldquo;{req.title}&rdquo;</strong> will be permanently removed.
+            <strong>&ldquo;{req.title}&rdquo;</strong> will be permanently removed, along with any
+            scores recorded against it in existing evaluations.
             {err && <span className="mt-1 block font-medium text-amber-800">{err}</span>}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -604,11 +601,7 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
                           <span key={i} className="block">
                             &ldquo;{f.title}&rdquo;{' '}
                             <span className="text-amber-700">
-                              ({f.reason === 'HAS_SCORES'
-                                ? 'has recorded scores'
-                                : f.reason === 'NOT_FOUND'
-                                  ? 'not found'
-                                  : 'error'})
+                              ({f.reason === 'NOT_FOUND' ? 'not found' : 'error'})
                             </span>
                           </span>
                         ))}
@@ -618,8 +611,8 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
                 </span>
               ) : (
                 <span>
-                  This will permanently remove the selected requirements. Items with
-                  recorded scores will be skipped and reported.
+                  This will permanently remove the selected requirements and any scores
+                  recorded against them in existing evaluations.
                 </span>
               )}
             </AlertDialogDescription>

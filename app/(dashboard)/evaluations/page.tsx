@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { ArrowRightIcon, ClipboardCheckIcon } from 'lucide-react'
 import type { EvaluationState, EvaluatorType, EvaluationTrack } from '@prisma/client'
 import { cn } from '@/lib/utils'
+import { GapBadge } from './GapScoringPanel'
 
 const TYPE_LABEL: Record<EvaluatorType, string> = {
   PEDAGOGY:  'Pedagogy',
@@ -100,6 +101,38 @@ export default async function EvaluationsPage({
     VITAL: rows.filter((a) => a.evaluation.platform.track === 'VITAL').length,
   }
 
+  // Gap counts: for admin only, compute how many requirements have no scores per TOOL evaluation
+  const gapCounts: Record<string, number> = {}
+  if (isAdmin) {
+    const toolEvalIds = rows
+      .filter((a) => (a.evaluation.platform.track ?? 'TOOL') === 'TOOL')
+      .map((a) => a.evaluation.id)
+
+    if (toolEvalIds.length > 0) {
+      const [allToolReqs, scoredGroups] = await Promise.all([
+        prisma.requirement.findMany({
+          where: { evaluatorType: { in: ['PEDAGOGY', 'TECHNICAL', 'BOTH'] } },
+          select: { id: true },
+        }),
+        prisma.score.groupBy({
+          by: ['evaluationId', 'requirementId'],
+          where: { evaluationId: { in: toolEvalIds } },
+        }),
+      ])
+
+      const totalReqs = allToolReqs.length
+      const scoredPerEval = new Map<string, Set<string>>()
+      for (const s of scoredGroups) {
+        if (!scoredPerEval.has(s.evaluationId)) scoredPerEval.set(s.evaluationId, new Set())
+        scoredPerEval.get(s.evaluationId)!.add(s.requirementId)
+      }
+      for (const evalId of toolEvalIds) {
+        const scored = scoredPerEval.get(evalId)?.size ?? 0
+        gapCounts[evalId] = Math.max(0, totalReqs - scored)
+      }
+    }
+  }
+
   return (
     <div>
       <PageHeader
@@ -161,43 +194,54 @@ export default async function EvaluationsPage({
             const href = ev.platform.track === 'VITAL'
               ? `/vital-evaluate/${ev.id}`
               : `/evaluate/${ev.id}`
+            const gapCount = gapCounts[ev.id] ?? 0
             return (
-              <Link
-                key={a.id}
-                href={href}
-                className="flex items-center gap-4 px-5 py-4 hover:bg-emerald-900/[0.025] transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[13px] font-medium text-emerald-950">
-                      {ev.platform.name}
-                    </span>
-                    {!isAdmin && a.isLead && (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
-                        Lead
+              <div key={a.id} className="flex items-center group hover:bg-emerald-900/[0.025] transition-colors">
+                <Link
+                  href={href}
+                  className="flex flex-1 items-center gap-4 px-5 py-4 min-w-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[13px] font-medium text-emerald-950">
+                        {ev.platform.name}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="text-xs text-stone-400">{ev.platform.vendor}</span>
-                    {!isAdmin && (
-                      <>
-                        <span className="text-stone-300">·</span>
-                        <span className="text-xs text-stone-400">{TYPE_LABEL[a.evaluatorType]}</span>
-                        <span className="text-stone-300">·</span>
-                        <span className={cn(
-                          'text-xs font-medium',
-                          a.hasSubmitted ? 'text-emerald-700' : 'text-stone-400'
-                        )}>
-                          {a.hasSubmitted ? 'Submitted' : 'Not submitted'}
+                      {!isAdmin && a.isLead && (
+                        <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
+                          Lead
                         </span>
-                      </>
-                    )}
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="text-xs text-stone-400">{ev.platform.vendor}</span>
+                      {!isAdmin && (
+                        <>
+                          <span className="text-stone-300">·</span>
+                          <span className="text-xs text-stone-400">{TYPE_LABEL[a.evaluatorType]}</span>
+                          <span className="text-stone-300">·</span>
+                          <span className={cn(
+                            'text-xs font-medium',
+                            a.hasSubmitted ? 'text-emerald-700' : 'text-stone-400'
+                          )}>
+                            {a.hasSubmitted ? 'Submitted' : 'Not submitted'}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <EvalStateBadge value={ev.state} />
-                <ArrowRightIcon className="size-4 text-stone-300 group-hover:text-emerald-700 transition-colors shrink-0" />
-              </Link>
+                  <EvalStateBadge value={ev.state} />
+                  <ArrowRightIcon className="size-4 text-stone-300 group-hover:text-emerald-700 transition-colors shrink-0" />
+                </Link>
+                {isAdmin && gapCount > 0 && (
+                  <div className="pr-5">
+                    <GapBadge
+                      evaluationId={ev.id}
+                      gapCount={gapCount}
+                      evaluation={{ id: ev.id, state: ev.state, platform: ev.platform }}
+                    />
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>

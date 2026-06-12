@@ -71,15 +71,19 @@ export async function DELETE(
       return Response.json({ error: 'Not found', code: 'NOT_FOUND' }, { status: 404 })
     }
 
-    const scoreCount = await prisma.score.count({ where: { requirementId: id } })
-    if (scoreCount > 0) {
-      return Response.json(
-        { error: 'Cannot delete: requirement has associated scores', code: 'HAS_SCORES' },
-        { status: 409 }
-      )
-    }
-
-    await prisma.requirement.delete({ where: { id } })
+    // Cascade: audit logs -> scores -> conflict messages -> conflict threads -> context join -> requirement
+    const scoreIds = await prisma.score.findMany({
+      where: { requirementId: id },
+      select: { id: true },
+    })
+    await prisma.$transaction([
+      prisma.scoreAuditLog.deleteMany({ where: { scoreId: { in: scoreIds.map(s => s.id) } } }),
+      prisma.score.deleteMany({ where: { requirementId: id } }),
+      prisma.conflictMessage.deleteMany({ where: { thread: { requirementId: id } } }),
+      prisma.conflictThread.deleteMany({ where: { requirementId: id } }),
+      prisma.requirementContext.deleteMany({ where: { requirementId: id } }),
+      prisma.requirement.delete({ where: { id } }),
+    ])
     return new Response(null, { status: 204 })
   } catch {
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })

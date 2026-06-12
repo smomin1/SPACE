@@ -40,17 +40,8 @@ const VALUE_OPTIONS = [
   { label: '4', value: 4 },
 ]
 
-const EVIDENCE_OPTIONS = [
-  { label: 'None', value: null },
-  { label: 'Trial', value: 'TRIAL' },
-  { label: 'Demo', value: 'DEMO' },
-  { label: 'Documentation', value: 'DOCUMENTATION' },
-  { label: 'Vendor claim', value: 'VENDOR_CLAIM' },
-]
-
 type ScoreEntry = {
   value: number | null
-  evidenceType: string | null
   comment: string
 }
 
@@ -78,7 +69,7 @@ function GapScoringDialog({
       setGaps(data.gaps ?? [])
       const initial: Record<string, ScoreEntry> = {}
       for (const g of (data.gaps ?? [])) {
-        initial[g.id] = { value: null, evidenceType: null, comment: '' }
+        initial[g.id] = { value: null, comment: '' }
       }
       setScores(initial)
     } finally {
@@ -94,7 +85,6 @@ function GapScoringDialog({
     const payload = gaps.map((g) => ({
       requirementId: g.id,
       value: scores[g.id]?.value ?? null,
-      evidenceType: scores[g.id]?.evidenceType ?? null,
       comment: scores[g.id]?.comment || null,
     }))
 
@@ -181,46 +171,24 @@ function GapScoringDialog({
                     )}
                   </div>
 
-                  {/* Score + evidence in one row */}
-                  <div className="flex flex-wrap gap-4">
-                    <div className="space-y-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Score</p>
-                      <div className="flex gap-1">
-                        {VALUE_OPTIONS.map((opt) => (
-                          <button
-                            key={String(opt.value)}
-                            onClick={() => setScore(g.id, { value: opt.value })}
-                            className={cn(
-                              'h-7 w-10 rounded-md text-[12px] font-medium border transition-colors',
-                              scores[g.id]?.value === opt.value
-                                ? 'bg-emerald-900 border-emerald-900 text-white'
-                                : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700',
-                            )}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Evidence</p>
-                      <div className="flex gap-1">
-                        {EVIDENCE_OPTIONS.map((opt) => (
-                          <button
-                            key={String(opt.value)}
-                            onClick={() => setScore(g.id, { evidenceType: opt.value })}
-                            className={cn(
-                              'h-7 rounded-md px-2.5 text-[12px] font-medium border transition-colors whitespace-nowrap',
-                              scores[g.id]?.evidenceType === opt.value
-                                ? 'bg-emerald-900 border-emerald-900 text-white'
-                                : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700',
-                            )}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
+                  {/* Score */}
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Score</p>
+                    <div className="flex gap-1">
+                      {VALUE_OPTIONS.map((opt) => (
+                        <button
+                          key={String(opt.value)}
+                          onClick={() => setScore(g.id, { value: opt.value })}
+                          className={cn(
+                            'h-7 w-10 rounded-md text-[12px] font-medium border transition-colors',
+                            scores[g.id]?.value === opt.value
+                              ? 'bg-emerald-900 border-emerald-900 text-white'
+                              : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700',
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ClipboardPlusIcon, RotateCcwIcon, CheckIcon } from 'lucide-react'
+import { ClipboardPlusIcon, CheckIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -165,77 +165,74 @@ function GapScoringDialog({
               <p className="text-sm text-stone-400 py-8 text-center">No gap requirements found.</p>
             ) : (
               gaps.map((g) => (
-                <div key={g.id} className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[13px] font-medium text-emerald-950">{g.title}</span>
-                        {g.isComplianceGate && (
-                          <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
-                            Gate
-                          </span>
-                        )}
-                        <span className="text-[11px] text-stone-400">{g.evaluatorType} · {g.weight}</span>
-                      </div>
-                      {g.description && (
-                        <p className="text-[12px] text-stone-500 mt-0.5 line-clamp-2">{g.description}</p>
+                <div key={g.id} className="rounded-lg border border-stone-200 bg-white p-4 space-y-3">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[13px] font-semibold text-emerald-950">{g.title}</span>
+                      {g.isComplianceGate && (
+                        <span className="inline-flex items-center rounded-full bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-2 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
+                          Gate
+                        </span>
                       )}
+                      <span className="text-[11px] text-stone-400 ml-auto">{g.evaluatorType} · {g.weight}</span>
                     </div>
+                    {g.description && (
+                      <p className="text-[12px] text-stone-500 mt-1 line-clamp-2">{g.description}</p>
+                    )}
                   </div>
 
-                  {/* Score selector */}
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">Score</p>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {VALUE_OPTIONS.map((opt) => (
-                        <button
-                          key={String(opt.value)}
-                          onClick={() => setScore(g.id, { value: opt.value })}
-                          className={cn(
-                            'h-7 min-w-[36px] rounded-md px-2 text-[12px] font-medium border transition-colors',
-                            scores[g.id]?.value === opt.value
-                              ? 'bg-emerald-900 border-emerald-900 text-white'
-                              : 'bg-white border-stone-200 text-stone-600 hover:border-emerald-300',
-                          )}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                  {/* Score + evidence in one row */}
+                  <div className="flex flex-wrap gap-4">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Score</p>
+                      <div className="flex gap-1">
+                        {VALUE_OPTIONS.map((opt) => (
+                          <button
+                            key={String(opt.value)}
+                            onClick={() => setScore(g.id, { value: opt.value })}
+                            className={cn(
+                              'h-7 w-10 rounded-md text-[12px] font-medium border transition-colors',
+                              scores[g.id]?.value === opt.value
+                                ? 'bg-emerald-900 border-emerald-900 text-white'
+                                : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700',
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Evidence type */}
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">Evidence</p>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {EVIDENCE_OPTIONS.map((opt) => (
-                        <button
-                          key={String(opt.value)}
-                          onClick={() => setScore(g.id, { evidenceType: opt.value })}
-                          className={cn(
-                            'h-7 rounded-md px-2 text-[12px] font-medium border transition-colors',
-                            scores[g.id]?.evidenceType === opt.value
-                              ? 'bg-emerald-900 border-emerald-900 text-white'
-                              : 'bg-white border-stone-200 text-stone-600 hover:border-emerald-300',
-                          )}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Evidence</p>
+                      <div className="flex gap-1">
+                        {EVIDENCE_OPTIONS.map((opt) => (
+                          <button
+                            key={String(opt.value)}
+                            onClick={() => setScore(g.id, { evidenceType: opt.value })}
+                            className={cn(
+                              'h-7 rounded-md px-2.5 text-[12px] font-medium border transition-colors whitespace-nowrap',
+                              scores[g.id]?.evidenceType === opt.value
+                                ? 'bg-emerald-900 border-emerald-900 text-white'
+                                : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700',
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   {/* Comment */}
-                  <div>
-                    <textarea
-                      value={scores[g.id]?.comment ?? ''}
-                      onChange={(e) => setScore(g.id, { comment: e.target.value })}
-                      placeholder="Notes (optional)"
-                      rows={2}
-                      maxLength={2000}
-                      className="w-full resize-none rounded-md border border-stone-200 bg-white px-3 py-2 text-[12.5px] text-stone-700 placeholder:text-stone-400 focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                    />
-                  </div>
+                  <textarea
+                    value={scores[g.id]?.comment ?? ''}
+                    onChange={(e) => setScore(g.id, { comment: e.target.value })}
+                    placeholder="Notes (optional)"
+                    rows={2}
+                    maxLength={2000}
+                    className="w-full resize-none rounded-md border border-stone-200 bg-white px-3 py-2 text-[12.5px] text-stone-700 placeholder:text-stone-400 focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                  />
                 </div>
               ))
             )}
@@ -245,11 +242,10 @@ function GapScoringDialog({
             <Button
               variant="outline"
               size="sm"
-              className="mr-auto"
+              className="mr-auto text-stone-600"
               disabled={reopening || submitting || loading}
               onClick={handleReopen}
             >
-              <RotateCcwIcon className="size-3.5 mr-1.5" />
               {reopening ? 'Reopening...' : 'Reopen for evaluators'}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={submitting || reopening}>

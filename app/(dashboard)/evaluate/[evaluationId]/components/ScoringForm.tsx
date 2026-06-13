@@ -117,6 +117,12 @@ export function ScoringForm({
 
   const isPedagogy = assignment.evaluatorType === 'PEDAGOGY'
 
+  // After submitting, hide requirements that have no score — these are gap requirements added
+  // after the user submitted and can only be handled via the admin gap panel or a reopen.
+  const visibleRequirements = assignment.hasSubmitted
+    ? requirements.filter(r => scores.has(r.id))
+    : requirements
+
   // A requirement is "answered" when a score record exists for it (value may be null = N/A)
   const answeredCount = requirements.filter(r => scores.has(r.id)).length
   const allScored =
@@ -125,7 +131,7 @@ export function ScoringForm({
   // Show numeric progress only for non-N/A responses
   const scoredCount = [...scores.values()].filter(s => s.value !== null).length
 
-  const categories = [...new Set(requirements.map(r => r.category ?? 'General'))].sort()
+  const categories = [...new Set(visibleRequirements.map(r => r.category ?? 'General'))].sort()
 
   async function saveScore(
     requirementId: string,
@@ -306,7 +312,7 @@ export function ScoringForm({
       </div>
 
       {categories.map(category => {
-        const catReqs = requirements.filter(r => (r.category ?? 'General') === category)
+        const catReqs = visibleRequirements.filter(r => (r.category ?? 'General') === category)
         return (
           <section key={category}>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">

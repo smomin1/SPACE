@@ -116,10 +116,10 @@ export function CategoricalAnalysis({
           <div className="overflow-hidden rounded-xl border border-stone-200/80 bg-white shadow-sm">
             <div className="border-b border-stone-200/60 px-4 py-3">
               <h3 className="font-serif text-[16px] tracking-tight text-emerald-950">
-                Competency by category
+                Coverage by category
               </h3>
               <p className="mt-0.5 text-[11.5px] text-stone-500">
-                % of max possible weighted score
+                % coverage (Yes = full, Partial = half)
               </p>
             </div>
             <table className="w-full text-[13px]">

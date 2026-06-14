@@ -104,7 +104,7 @@ export function ToolScannerForm() {
           Run a new evaluation
         </h2>
         <p className="mt-0.5 text-[12.5px] text-stone-500">
-          AI audits public web sources and scores against your requirement set
+          AI investigates public web sources and screens against the 50-point AI screening checklist
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export function ToolScannerForm() {
           <div className="flex items-center justify-between text-[12.5px]">
             <span className="font-medium text-emerald-950">
               {state.currentCategory
-                ? `Scoring: ${state.currentCategory}…`
+                ? `Screening: ${state.currentCategory}…`
                 : 'Classifying metadata…'}
             </span>
             <span className="font-mono tabular-nums text-emerald-800/80">

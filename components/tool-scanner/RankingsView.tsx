@@ -30,7 +30,6 @@ export interface RankingsRow {
   audience: string
   fluency: string[]
   grades: string[]
-  scoresMap: Record<string, number>
 }
 
 interface Props {
@@ -38,7 +37,6 @@ interface Props {
   categories: string[]
   allGrades: string[]
   allFluency: string[]
-  requirementsByWeight: { HIGH: string[]; MEDIUM: string[]; LOW: string[] }
 }
 
 const tooltipStyle = {

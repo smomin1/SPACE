@@ -1,45 +1,22 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { calculateWeightedPercentage } from '@/lib/scoring'
-import type { Score } from '@/lib/scoring'
-import { loadToolScannerRequirements } from '@/lib/tool-scanner-context'
+import { coveragePercent } from '@/lib/screening'
 import { ToolScannerForm } from '@/components/tool-scanner/ToolScannerForm'
 import { DeleteToolScanButton } from '@/components/tool-scanner/DeleteToolScanButton'
 
-export default async function ToolScannerPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ context?: string }>
-}) {
-  const sp = await searchParams
-  const contextId = sp.context || null
-
-  const [evaluations, { scoringRequirements }] = await Promise.all([
-    prisma.searchEvaluation.findMany({ orderBy: { createdAt: 'desc' } }),
-    loadToolScannerRequirements(contextId),
-  ])
-
-  const reqIdSet = new Set(scoringRequirements.map((r) => r.id))
-
-  const rows = evaluations.map((ev) => {
-    const scoresJson = ev.scores as Record<string, number>
-    // Only include scores for requirements that are in the current context scope
-    const scores: Score[] = Object.entries(scoresJson)
-      .filter(([requirementId]) => reqIdSet.has(requirementId))
-      .map(([requirementId, value]) => ({
-        requirementId,
-        value: value as number,
-        evidenceType: null,
-      }))
-    const overallPct = calculateWeightedPercentage(scores, scoringRequirements)
-    return {
-      id: ev.id,
-      platformName: ev.platformName,
-      url: ev.url,
-      createdAt: ev.createdAt,
-      overallPct,
-    }
+export default async function ToolScannerPage() {
+  const evaluations = await prisma.searchEvaluation.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { responses: { select: { answer: true } } },
   })
+
+  const rows = evaluations.map((ev) => ({
+    id: ev.id,
+    platformName: ev.platformName,
+    url: ev.url,
+    createdAt: ev.createdAt,
+    coveragePct: coveragePercent(ev.responses),
+  }))
 
   return (
     <div className="space-y-6">
@@ -73,7 +50,7 @@ export default async function ToolScannerPage({
                     URL
                   </th>
                   <th className="px-3 py-2.5 text-right text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                    Overall %
+                    Coverage
                   </th>
                   <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
                     Date
@@ -105,7 +82,7 @@ export default async function ToolScannerPage({
                       </a>
                     </td>
                     <td className="px-3 py-2.5 text-right font-mono tabular-nums text-emerald-950">
-                      {row.overallPct.toFixed(1)}%
+                      {row.coveragePct.toFixed(1)}%
                     </td>
                     <td className="px-3 py-2.5 text-stone-500">
                       {row.createdAt.toLocaleDateString()}

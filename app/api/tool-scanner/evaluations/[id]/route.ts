@@ -12,7 +12,10 @@ export async function GET(
   }
 
   const { id } = await params
-  const evaluation = await prisma.searchEvaluation.findUnique({ where: { id } })
+  const evaluation = await prisma.searchEvaluation.findUnique({
+    where: { id },
+    include: { responses: true },
+  })
   if (!evaluation) {
     return NextResponse.json({ error: 'Not found', code: 'NOT_FOUND' }, { status: 404 })
   }
@@ -22,7 +25,7 @@ export async function GET(
     platformName: evaluation.platformName,
     url: evaluation.url,
     metadata: evaluation.metadata,
-    scores: evaluation.scores,
+    responses: evaluation.responses,
     createdAt: evaluation.createdAt.toISOString(),
   })
 }

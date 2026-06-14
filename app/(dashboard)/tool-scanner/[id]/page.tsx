@@ -1,70 +1,49 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { calculateWeightedPercentage } from '@/lib/scoring'
-import type { Score } from '@/lib/scoring'
-import { loadToolScannerRequirements } from '@/lib/tool-scanner-context'
-import { ToolScannerScoreBadge } from '@/components/tool-scanner/ToolScannerScoreBadge'
-import { WeightTier, ComplianceGateBadge } from '@/components/admin/_shared/badges'
+import { coveragePercent, coverageByCategory, hardFailTriggered } from '@/lib/screening'
+import { ScreeningAnswerBadge } from '@/components/tool-scanner/ScreeningAnswerBadge'
 import { CategoryChart } from '@/components/tool-scanner/CategoryChart'
-import { GlobeIcon, CalendarIcon, AlertTriangleIcon } from 'lucide-react'
+import { GlobeIcon, CalendarIcon, AlertTriangleIcon, ExternalLinkIcon } from 'lucide-react'
 
 export default async function ToolScannerResultPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ context?: string }>
 }) {
-  const [{ id }, sp] = await Promise.all([params, searchParams])
-  const contextId = sp.context || null
+  const { id } = await params
 
-  const [evaluation, { requirements, scoringRequirements }] = await Promise.all([
-    prisma.searchEvaluation.findUnique({ where: { id } }),
-    loadToolScannerRequirements(contextId),
+  const [evaluation, questions] = await Promise.all([
+    prisma.searchEvaluation.findUnique({
+      where: { id },
+      include: { responses: true },
+    }),
+    prisma.screeningQuestion.findMany({ orderBy: { num: 'asc' } }),
   ])
 
   if (!evaluation) notFound()
 
-  const scoresJson = evaluation.scores as Record<string, number>
   const metadata = evaluation.metadata as {
     Target_Audience?: string
     Fluency_Levels?: string[]
     Grade_Levels?: string[]
   } | null
 
-  const reqIdSet = new Set(scoringRequirements.map((r) => r.id))
-  const scores: Score[] = Object.entries(scoresJson)
-    .filter(([requirementId]) => reqIdSet.has(requirementId))
-    .map(([requirementId, value]) => ({
-      requirementId,
-      value: value as number,
-      evidenceType: null,
-    }))
+  const responseByQuestion = new Map(evaluation.responses.map((r) => [r.questionId, r]))
+  const overallPct = coveragePercent(evaluation.responses)
+  const categoryPct = coverageByCategory(questions, evaluation.responses)
 
-  const overallPct = calculateWeightedPercentage(scores, scoringRequirements)
-
-  // Build per-category breakdown (using context-overridden weights)
-  const categoryMap = new Map<string, { total: number; max: number }>()
-  for (const r of requirements) {
-    const cat = r.category ?? 'General'
-    const val = scoresJson[r.id] ?? 0
-    const m = ({ HIGH: 3, MEDIUM: 2, LOW: 1 } as Record<string, number>)[r.weight] ?? 1
-    const entry = categoryMap.get(cat) ?? { total: 0, max: 0 }
-    entry.total += val * m
-    entry.max += 4 * m
-    categoryMap.set(cat, entry)
-  }
-  const categoryData = Array.from(categoryMap.entries())
-    .map(([category, { total, max }]) => ({
-      category,
-      pct: max === 0 ? 0 : (total / max) * 100,
-    }))
+  const categoryData = Object.entries(categoryPct)
+    .map(([category, pct]) => ({ category, pct }))
     .sort((a, b) => b.pct - a.pct)
 
-  // Compliance gate failures (score 0-1 on a compliance gate requirement, within the context scope)
-  const complianceGateFailures = requirements.filter(
-    (r) => r.isComplianceGate && (scoresJson[r.id] ?? 0) <= 1,
-  )
+  // Hard-fail safeguarding blockers: a hard-fail question answered the disqualifying way.
+  const hardFailBlockers = questions.filter((q) => {
+    const r = responseByQuestion.get(q.id)
+    return r ? hardFailTriggered(q.hardFail, r.answer) : false
+  })
+
+  // Group questions by category in display order
+  const categories = Array.from(new Set(questions.map((q) => q.category)))
 
   return (
     <div className="space-y-6">
@@ -96,7 +75,7 @@ export default async function ToolScannerResultPage({
               {overallPct.toFixed(1)}%
             </div>
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-emerald-800/70">
-              Overall Weighted
+              Coverage
             </p>
           </div>
         </div>
@@ -125,20 +104,20 @@ export default async function ToolScannerResultPage({
         )}
       </div>
 
-      {complianceGateFailures.length > 0 && (
-        <div className="flex items-start gap-2.5 rounded-lg bg-amber-50/60 px-4 py-3 ring-1 ring-amber-700/20">
-          <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-amber-800" />
+      {hardFailBlockers.length > 0 && (
+        <div className="flex items-start gap-2.5 rounded-lg bg-red-50/70 px-4 py-3 ring-1 ring-red-700/25">
+          <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-red-700" />
           <div>
-            <p className="text-[13px] font-semibold text-amber-900">
-              Potential compliance blockers ({complianceGateFailures.length})
+            <p className="text-[13px] font-semibold text-red-900">
+              Safeguarding blockers ({hardFailBlockers.length})
             </p>
-            <p className="mt-0.5 text-[12.5px] text-amber-900/85">
-              The following compliance-gate requirements scored 0. These would
-              disqualify the platform in a formal Tool Evaluator review:
+            <p className="mt-0.5 text-[12.5px] text-red-900/85">
+              These hard-fail screening questions were answered in a way that disqualifies the
+              platform from shortlisting:
             </p>
-            <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[12.5px] text-amber-900/85">
-              {complianceGateFailures.map((r) => (
-                <li key={r.id}>{r.title}</li>
+            <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[12.5px] text-red-900/85">
+              {hardFailBlockers.map((q) => (
+                <li key={q.id}>{q.question}</li>
               ))}
             </ul>
           </div>
@@ -148,57 +127,103 @@ export default async function ToolScannerResultPage({
       {/* Category breakdown chart */}
       {categoryData.length > 0 && (
         <div className="rounded-xl border border-stone-200/80 bg-white p-6 shadow-sm">
-          <h3 className="mb-4 font-serif text-[18px] tracking-tight text-emerald-950">
-            Category breakdown
+          <h3 className="mb-1 font-serif text-[18px] tracking-tight text-emerald-950">
+            Category coverage
           </h3>
+          <p className="mb-4 text-[11.5px] text-stone-500">
+            Yes = full, Partial = half, No = none. Unknown answers are excluded.
+          </p>
           <CategoryChart data={categoryData} />
         </div>
       )}
 
-      {/* Requirement table */}
-      <div className="overflow-hidden rounded-xl border border-stone-200/80 bg-white shadow-sm">
-        <div className="border-b border-stone-200/60 px-6 py-4">
-          <h3 className="font-serif text-[18px] tracking-tight text-emerald-950">
-            All requirements
-          </h3>
-        </div>
-        <table className="w-full text-[13px]">
-          <thead>
-            <tr className="bg-stone-50/60">
-              <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Category
-              </th>
-              <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Requirement
-              </th>
-              <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Weight
-              </th>
-              <th className="px-3 py-2.5 text-center text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Score
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-200/60">
-            {requirements.map((r) => (
-              <tr key={r.id} className="hover:bg-stone-50/30">
-                <td className="px-3 py-2.5 text-stone-600">{r.category ?? '-'}</td>
-                <td className="px-3 py-2.5">
-                  <div className="flex items-start gap-2">
-                    <span className="text-emerald-950">{r.title}</span>
-                    {r.isComplianceGate && <ComplianceGateBadge />}
-                  </div>
-                </td>
-                <td className="px-3 py-2.5">
-                  <WeightTier value={r.weight} />
-                </td>
-                <td className="px-3 py-2.5 text-center">
-                  <ToolScannerScoreBadge value={scoresJson[r.id] ?? 0} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Per-category answers */}
+      <div className="space-y-5">
+        {categories.map((category) => {
+          const catQuestions = questions.filter((q) => q.category === category)
+          return (
+            <div
+              key={category}
+              className="overflow-hidden rounded-xl border border-stone-200/80 bg-white shadow-sm"
+            >
+              <div className="flex items-baseline justify-between border-b border-stone-200/60 px-5 py-3">
+                <h3 className="font-serif text-[16px] tracking-tight text-emerald-950">
+                  {category}
+                </h3>
+                <span className="font-mono text-[11px] tabular-nums text-stone-500">
+                  {(categoryPct[category] ?? 0).toFixed(0)}%
+                </span>
+              </div>
+              <div className="divide-y divide-stone-200/60">
+                {catQuestions.map((q) => {
+                  const r = responseByQuestion.get(q.id)
+                  const answer = r?.answer ?? 'UNKNOWN'
+                  const isBlocker = r ? hardFailTriggered(q.hardFail, r.answer) : false
+                  return (
+                    <div key={q.id} className="px-5 py-3.5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start gap-2">
+                            <span className="font-mono text-[11px] tabular-nums text-stone-400">
+                              {q.num}
+                            </span>
+                            <span className="text-[13px] text-emerald-950">{q.question}</span>
+                            {q.hardFail && (
+                              <span className="shrink-0 rounded bg-red-50 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-red-700 ring-1 ring-inset ring-red-700/25">
+                                Hard fail
+                              </span>
+                            )}
+                          </div>
+                          {r?.notes && (
+                            <p className="mt-1 pl-[22px] text-[12px] text-stone-500">{r.notes}</p>
+                          )}
+                          {r?.evidence && (
+                            <div className="mt-1 pl-[22px]">
+                              {/^https?:\/\//.test(r.evidence) ? (
+                                <a
+                                  href={r.evidence}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11.5px] text-emerald-700 hover:text-emerald-800 hover:underline"
+                                >
+                                  <ExternalLinkIcon className="size-3" />
+                                  {(() => {
+                                    try {
+                                      return new URL(r.evidence).hostname
+                                    } catch {
+                                      return r.evidence
+                                    }
+                                  })()}
+                                </a>
+                              ) : (
+                                <p className="text-[11.5px] italic text-stone-400">
+                                  {r.evidence}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {r?.flag && (
+                            <p className="mt-1 pl-[22px] text-[11.5px] text-amber-700">
+                              ⚑ {r.flag}
+                            </p>
+                          )}
+                        </div>
+                        <div className="shrink-0">
+                          <ScreeningAnswerBadge value={answer} />
+                          {isBlocker && (
+                            <p className="mt-1 text-right text-[10px] font-semibold uppercase tracking-wider text-red-700">
+                              Blocker
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

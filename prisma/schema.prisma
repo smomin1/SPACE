@@ -204,6 +204,21 @@ enum VitalAnswer {
   NA
 }
 
+// Layer 1 Tool Scanner: AI screening answer per question.
+enum ScreeningAnswer {
+  YES
+  PARTIAL
+  NO
+  UNKNOWN
+}
+
+// A screening question marked as a hard-fail safeguarding blocker.
+// IF_YES = answering YES disqualifies; IF_NO = answering NO disqualifies.
+enum ScreeningHardFail {
+  IF_YES
+  IF_NO
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -437,18 +452,49 @@ model ConflictMessage {
   author User           @relation(fields: [authorId], references: [id])
 }
 
-// Layer 1 Search: AI-driven auto-evaluation of any platform from public web sources.
-// Scores are stored as JSON { requirementId: 0|1|2|3|4|null } using the same 0–4 scale as PET.
+// Layer 1 Tool Scanner: AI screening of any platform from public web sources.
+// One scan answers the ScreeningQuestion set; answers are stored as ScreeningResponse rows.
 model SearchEvaluation {
   id           String   @id @default(cuid())
   platformName String
   url          String
   metadata     Json?    // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
-  scores       Json     // { requirementId: number | null }
   createdAt    DateTime @default(now())
   createdById  String
 
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdBy User                @relation(fields: [createdById], references: [id])
+  responses  ScreeningResponse[]
+}
+
+// The Tool Scanner's own question set (independent of the evaluator Requirement table).
+// Seeded from the AI Screening checklist; admin-editable.
+model ScreeningQuestion {
+  id            String             @id @default(cuid())
+  num           Int                // 1-50, canonical number + display order
+  category      String
+  question      String
+  whatToLookFor String?
+  hardFail      ScreeningHardFail? // null = not a hard-fail question
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  responses ScreeningResponse[]
+}
+
+// One answer to one screening question within one scan.
+model ScreeningResponse {
+  id           String          @id @default(cuid())
+  evaluationId String
+  questionId   String
+  answer       ScreeningAnswer
+  evidence     String?         // best supporting URL or short quote
+  flag         String?         // model-surfaced advisory concern
+  notes        String?
+
+  evaluation SearchEvaluation  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  question   ScreeningQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([evaluationId, questionId])
 }
 
 // Access request submitted by someone who wants an account.

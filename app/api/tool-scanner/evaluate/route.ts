@@ -3,7 +3,11 @@ import { Prisma } from '@prisma/client'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { runToolScanEvaluation } from '@/lib/claude-tool-scanner'
-import type { ToolScannerRequirement, ToolScannerMetadata } from '@/lib/claude-tool-scanner'
+import type {
+  ScreeningQuestionInput,
+  ToolScannerMetadata,
+  ScreeningResult,
+} from '@/lib/claude-tool-scanner'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -46,30 +50,23 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const requirements = await prisma.requirement.findMany({
-    orderBy: [{ category: 'asc' }, { order: 'asc' }],
+  const questions = await prisma.screeningQuestion.findMany({
+    orderBy: { num: 'asc' },
+    select: { id: true, num: true, category: true, question: true, whatToLookFor: true },
   })
 
-  if (requirements.length === 0) {
+  if (questions.length === 0) {
     return new Response(
       JSON.stringify({
-        error: 'No requirements exist in the system. Create requirements first.',
-        code: 'NO_REQUIREMENTS',
+        error: 'No screening questions exist. Seed or create screening questions first.',
+        code: 'NO_QUESTIONS',
       }),
       { status: 400, headers: { 'Content-Type': 'application/json' } },
     )
   }
 
-  const searchReqs: ToolScannerRequirement[] = requirements.map((r) => ({
-    id: r.id,
-    title: r.title,
-    description: r.description,
-    category: r.category,
-    weight: r.weight,
-    isComplianceGate: r.isComplianceGate,
-  }))
-
-  const totalCategories = new Set(searchReqs.map((r) => r.category ?? 'General')).size
+  const screeningQuestions: ScreeningQuestionInput[] = questions
+  const totalCategories = new Set(screeningQuestions.map((q) => q.category)).size
   const userId = session.user.id as string
 
   const encoder = new TextEncoder()
@@ -84,16 +81,16 @@ export async function POST(req: NextRequest) {
         send({ type: 'start', totalCategories })
 
         let metadata: ToolScannerMetadata | null = null
-        const accumulatedScores: Record<string, number> = {}
+        const allResults: ScreeningResult[] = []
         let completedCategories = 0
 
-        for await (const chunk of runToolScanEvaluation(platformName, url, searchReqs)) {
+        for await (const chunk of runToolScanEvaluation(platformName, url, screeningQuestions)) {
           if (chunk.type === 'metadata') {
             metadata = chunk.metadata
             send({ type: 'metadata', metadata: chunk.metadata })
           } else if (chunk.type === 'category') {
             completedCategories += 1
-            Object.assign(accumulatedScores, chunk.scores)
+            allResults.push(...chunk.results)
             send({
               type: 'category',
               category: chunk.category,
@@ -103,11 +100,6 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // Default any missed requirements to 0
-        for (const r of searchReqs) {
-          if (!(r.id in accumulatedScores)) accumulatedScores[r.id] = 0
-        }
-
         const saved = await prisma.searchEvaluation.create({
           data: {
             platformName,
@@ -115,8 +107,16 @@ export async function POST(req: NextRequest) {
             metadata: metadata
               ? (metadata as unknown as Prisma.InputJsonValue)
               : Prisma.JsonNull,
-            scores: accumulatedScores as unknown as Prisma.InputJsonValue,
             createdById: userId,
+            responses: {
+              create: allResults.map((r) => ({
+                questionId: r.questionId,
+                answer: r.answer,
+                evidence: r.evidence,
+                flag: r.flag,
+                notes: r.notes,
+              })),
+            },
           },
         })
 

@@ -1,10 +1,8 @@
-import { Prisma } from '@prisma/client'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { requirementBaseSchema } from '@/lib/requirement-schema'
 import type { EvaluatorType } from '@prisma/client'
-import { scoreSingleRequirement } from '@/lib/claude-tool-scanner'
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -37,44 +35,6 @@ export async function GET(request: Request) {
   }
 }
 
-/**
- * Back-fills Tool Scanner scores for the newly created requirement against every
- * existing SearchEvaluation. Runs in the background so the API response stays fast.
- * Failures per platform are swallowed (the helper returns 0); a complete outage
- * (no API key, etc.) is logged and skipped silently.
- */
-async function backfillToolScannerScores(requirement: {
-  id: string
-  title: string
-  description: string
-  category: string | null
-  weight: 'HIGH' | 'MEDIUM' | 'LOW'
-  isComplianceGate: boolean
-}) {
-  if (!process.env.ANTHROPIC_API_KEY) return
-
-  const evaluations = await prisma.searchEvaluation.findMany({
-    select: { id: true, platformName: true, url: true, scores: true },
-  })
-  if (evaluations.length === 0) return
-
-  await Promise.all(
-    evaluations.map(async (ev) => {
-      try {
-        const score = await scoreSingleRequirement(ev.platformName, ev.url, requirement)
-        const current = (ev.scores ?? {}) as Record<string, number>
-        const merged = { ...current, [requirement.id]: score }
-        await prisma.searchEvaluation.update({
-          where: { id: ev.id },
-          data: { scores: merged as unknown as Prisma.InputJsonValue },
-        })
-      } catch (err) {
-        console.error('Tool Scanner back-fill failed for evaluation', ev.id, err)
-      }
-    }),
-  )
-}
-
 export async function POST(request: Request) {
   const session = await auth()
   if (!session?.user) {
@@ -101,13 +61,6 @@ export async function POST(request: Request) {
 
   try {
     const requirement = await prisma.requirement.create({ data: parsed.data })
-
-    // Fire-and-forget: backfill Tool Scanner scores for existing evaluations.
-    // The admin sees the new requirement immediately; scores appear shortly after.
-    void backfillToolScannerScores(requirement).catch((err) => {
-      console.error('Tool Scanner back-fill task crashed', err)
-    })
-
     return Response.json({ requirement }, { status: 201 })
   } catch {
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })

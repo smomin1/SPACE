@@ -2,6 +2,7 @@ import { PrismaClient, Role, EvaluatorType, WeightLevel } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
 import { seedVital } from "./seed-vital";
+import { seedScreening } from "./seed-screening";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -118,6 +119,8 @@ async function main() {
   }
 
   await seedVital(prisma);
+
+  await seedScreening(prisma);
 
   console.log("Seed complete.");
 }

@@ -21,6 +21,7 @@ import {
   InboxIcon,
   CompassIcon,
   GraduationCapIcon,
+  ListChecksIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -72,6 +73,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Tool Scanner',
     icon: SparklesIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/admin/screening-questions',
+    label: 'Screening Questions',
+    icon: ListChecksIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
     href: '/admin/contexts',

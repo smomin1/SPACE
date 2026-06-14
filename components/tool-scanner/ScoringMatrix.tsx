@@ -5,31 +5,39 @@ import * as XLSX from 'xlsx'
 import { DownloadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { ToolScannerScoreBadge } from '@/components/tool-scanner/ToolScannerScoreBadge'
+import { ScreeningAnswerBadge } from '@/components/tool-scanner/ScreeningAnswerBadge'
+import type { ScreeningAnswer } from '@prisma/client'
 
 interface MatrixPlatform {
   id: string
   platformName: string
-  scoresMap: Record<string, number>
+  answerMap: Record<string, ScreeningAnswer>
 }
 
-interface MatrixReq {
+interface MatrixQuestion {
   id: string
+  num: number
   title: string
   category: string
-  weight: string
+}
+
+const ANSWER_LABEL: Record<ScreeningAnswer, string> = {
+  YES: 'Yes',
+  PARTIAL: 'Partial',
+  NO: 'No',
+  UNKNOWN: 'Unknown',
 }
 
 export function ScoringMatrix({
   platforms,
-  requirements,
+  questions,
 }: {
   platforms: MatrixPlatform[]
-  requirements: MatrixReq[]
+  questions: MatrixQuestion[]
 }) {
   const allCategories = React.useMemo(
-    () => Array.from(new Set(requirements.map((r) => r.category))).sort(),
-    [requirements],
+    () => Array.from(new Set(questions.map((q) => q.category))),
+    [questions],
   )
 
   const [selectedPlatforms, setSelectedPlatforms] = React.useState<string[]>(
@@ -38,9 +46,7 @@ export function ScoringMatrix({
   const [selectedCategories, setSelectedCategories] = React.useState<string[]>(allCategories)
 
   const visiblePlatforms = platforms.filter((p) => selectedPlatforms.includes(p.id))
-  const visibleRequirements = requirements.filter((r) =>
-    selectedCategories.includes(r.category),
-  )
+  const visibleQuestions = questions.filter((q) => selectedCategories.includes(q.category))
 
   function togglePlatform(id: string) {
     setSelectedPlatforms((cur) =>
@@ -54,19 +60,19 @@ export function ScoringMatrix({
   }
 
   function downloadExcel() {
-    const header = ['Requirement', 'Category', 'Weight', ...visiblePlatforms.map((p) => p.platformName)]
+    const header = ['#', 'Question', 'Category', ...visiblePlatforms.map((p) => p.platformName)]
     const rows: (string | number)[][] = [header]
-    for (const r of visibleRequirements) {
-      const row: (string | number)[] = [r.title, r.category, r.weight]
+    for (const q of visibleQuestions) {
+      const row: (string | number)[] = [q.num, q.title, q.category]
       for (const p of visiblePlatforms) {
-        row.push(p.scoresMap[r.id] ?? 0)
+        row.push(ANSWER_LABEL[p.answerMap[q.id] ?? 'UNKNOWN'])
       }
       rows.push(row)
     }
     const ws = XLSX.utils.aoa_to_sheet(rows)
     const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Scoring Matrix')
-    XLSX.writeFile(wb, 'search-scoring-matrix.xlsx')
+    XLSX.utils.book_append_sheet(wb, ws, 'Screening Matrix')
+    XLSX.writeFile(wb, 'tool-scanner-screening-matrix.xlsx')
   }
 
   if (platforms.length === 0) {
@@ -125,14 +131,14 @@ export function ScoringMatrix({
 
       <div className="flex items-center justify-between">
         <p className="text-[12.5px] text-stone-500">
-          {visibleRequirements.length} requirement{visibleRequirements.length !== 1 ? 's' : ''} ×{' '}
+          {visibleQuestions.length} question{visibleQuestions.length !== 1 ? 's' : ''} ×{' '}
           {visiblePlatforms.length} platform{visiblePlatforms.length !== 1 ? 's' : ''}
         </p>
         <Button
           variant="outline"
           size="sm"
           onClick={downloadExcel}
-          disabled={visiblePlatforms.length === 0 || visibleRequirements.length === 0}
+          disabled={visiblePlatforms.length === 0 || visibleQuestions.length === 0}
         >
           <DownloadIcon className="mr-1.5 size-3.5" />
           Download Matrix
@@ -144,13 +150,10 @@ export function ScoringMatrix({
           <thead>
             <tr className="bg-stone-50/60">
               <th className="sticky left-0 z-10 bg-stone-50/60 px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Requirement
+                Question
               </th>
               <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
                 Category
-              </th>
-              <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
-                Weight
               </th>
               {visiblePlatforms.map((p) => (
                 <th
@@ -163,16 +166,16 @@ export function ScoringMatrix({
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-200/60">
-            {visibleRequirements.map((r) => (
-              <tr key={r.id} className="hover:bg-stone-50/30">
+            {visibleQuestions.map((q) => (
+              <tr key={q.id} className="hover:bg-stone-50/30">
                 <td className="sticky left-0 z-10 bg-white px-3 py-2 text-emerald-950">
-                  {r.title}
+                  <span className="mr-2 font-mono text-[11px] text-stone-400">{q.num}</span>
+                  {q.title}
                 </td>
-                <td className="px-3 py-2 text-stone-600">{r.category}</td>
-                <td className="px-3 py-2 font-mono text-[11px] text-stone-500">{r.weight}</td>
+                <td className="px-3 py-2 text-stone-600">{q.category}</td>
                 {visiblePlatforms.map((p) => (
                   <td key={p.id} className="px-3 py-2 text-center">
-                    <ToolScannerScoreBadge value={p.scoresMap[r.id] ?? 0} />
+                    <ScreeningAnswerBadge value={p.answerMap[q.id] ?? 'UNKNOWN'} />
                   </td>
                 ))}
               </tr>

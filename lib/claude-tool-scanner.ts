@@ -1,8 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk'
+import type { ScreeningAnswer } from '@prisma/client'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-// ─── Allowed taxonomies (same as FetchAppInfo) ─────────────────────────────────
+const MODEL = 'claude-sonnet-4-6'
+
+// Anthropic server-side web search: the model actually browses live sources and
+// the API runs the search loop internally, returning the final answer in one call.
+const WEB_SEARCH_TOOL: Anthropic.Messages.MessageCreateParams['tools'] = [
+  { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
+]
+
+// ─── Metadata taxonomy (unchanged from the original classification step) ────────
 const ALLOWED_GRADES = [
   'K', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
   'Grade 6', 'Grade 7', 'Grade 8', 'High School', 'Adult',
@@ -14,13 +23,12 @@ const ALLOWED_AUDIENCES = ['Students', 'Teachers', 'Parents', 'Corporate', 'Gene
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export interface ToolScannerRequirement {
+export interface ScreeningQuestionInput {
   id: string
-  title: string
-  description: string
-  category: string | null
-  weight: string
-  isComplianceGate: boolean
+  num: number
+  category: string
+  question: string
+  whatToLookFor: string | null
 }
 
 export interface ToolScannerMetadata {
@@ -29,215 +37,202 @@ export interface ToolScannerMetadata {
   Grade_Levels: string[]
 }
 
-export type ToolScannerScoreChunk =
-  | { type: 'metadata'; metadata: ToolScannerMetadata }
-  | { type: 'category'; category: string; scores: Record<string, number> }
-  | { type: 'error'; message: string }
-
-// ─── Main generator ────────────────────────────────────────────────────────────
-
-export async function* runToolScanEvaluation(
-  platformName: string,
-  url: string,
-  requirements: ToolScannerRequirement[],
-): AsyncGenerator<ToolScannerScoreChunk> {
-  // ── Call 1: Metadata classification (original FetchAppInfo prompt) ────────────
-  const metaPrompt = `ROLE:
-You are an Investigative EdTech Analyst specializing in competitive intelligence.
-
-OBJECTIVE:
-Conduct a multi-source, deep-dive audit of the platform **${platformName}** (${url}) to accurately map it to our internal classification framework.
-
-INVESTIGATIVE PROTOCOL:
-1. Targeted Web Search: Do NOT rely solely on the provided URL. Perform an active web search for "**${platformName}**" to find:
-   - Independent pedagogical reviews
-   - Recent news, press releases, or funding announcements that clarify their current market focus.
-   - App Store/Play Store metadata and user reviews to confirm actual user demographics and use cases.
-2. Fact-Checking & Triangulation: Cross-reference the marketing claims found on ${url} with external evidence found during your search. If claims conflict, prioritize the most recent third-party evidence.
-3. Evidence-Based Inference: Analyze content complexity, technical requirements, and UI design to determine the most likely classifications if explicit data is missing from the public domain.
-
-Allowed Categories (use ONLY these values):
-- **Grades:** ${ALLOWED_GRADES.join(', ')}
-- **Audiences:** ${ALLOWED_AUDIENCES.join(', ')}
-- **Fluency Levels:** ${ALLOWED_FLUENCY.join(', ')}
-
-### CONSTRAINTS
-- **Multi-Label Classification:** Select ALL values that apply across the platform's different modules.
-- **Output Integrity:** Return ONLY a valid JSON object. No reasoning, no markdown headers, and no extra text.
-
-### DATA MAPPING
-- **Target_Audience:** Identify every stakeholder group targeted. Return as a single comma-separated string.
-- **Fluency_Levels:** Identify the supported English proficiency levels. Return as a list of strings.
-- **Grade_Levels:** Identify the supported educational grade levels. Return as a list of strings.
-
-### OUTPUT FORMAT:
-{
-    "Target_Audience": str,
-    "Fluency_Levels": list,
-    "Grade_Levels": list
-}`
-
-  const metaResponse = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    system: 'You are a highly precise EdTech classification engine. You strictly follow allowed category constraints and always return valid JSON.',
-    messages: [{ role: 'user', content: metaPrompt }],
-  })
-
-  const metaText = metaResponse.content[0].type === 'text' ? metaResponse.content[0].text : ''
-  try {
-    // Strip markdown code fences if present
-    const cleaned = metaText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim()
-    const metadata = JSON.parse(cleaned) as ToolScannerMetadata
-    yield { type: 'metadata', metadata }
-  } catch {
-    yield {
-      type: 'metadata',
-      metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] },
-    }
-  }
-
-  // ── Call 2: Per-category scoring (original FetchAppInfo prompt, 0–4 scale) ───
-  const byCategory = new Map<string, ToolScannerRequirement[]>()
-  for (const req of requirements) {
-    const cat = req.category ?? 'General'
-    if (!byCategory.has(cat)) byCategory.set(cat, [])
-    byCategory.get(cat)!.push(req)
-  }
-
-  for (const [category, reqs] of byCategory.entries()) {
-    const reqStr = reqs
-      .map((r) => `${r.id}: ${r.title}. ${r.description}`)
-      .join('\n')
-
-    const scoringPrompt = `ROLE:
-You are an expert EdTech Product Auditor specializing in Technical Feature Verification.
-
-OBJECTIVE:
-Perform a deep-dive evaluation of the platform **${platformName}** (${url}) specifically for the category: "**${category}**".
-
-EVALUATION PROTOCOL:
-1. Multi-Source Verification: Use the provided URL as a starting point, but perform targeted web searches for "**${platformName}** ${category} features" to find:
-   - Technical support documentation and Help Center articles.
-   - User walkthroughs or YouTube feature demos.
-   - Detailed product spec sheets or "feature comparison" pages.
-2. Evidence-Driven Logic: Do not take marketing slogans at face value. Look for screenshots, specific UI mentions, or technical descriptions that prove a feature exists.
-3. Strict Independence: Evaluate EACH requirement in the list below as a standalone item. The presence of one feature does not guarantee the presence of another.
-
-SCORING RULES:
-- 0 (Absent/No Evidence): Not mentioned, no evidence found across web sources, OR explicitly stated as not supported.
-- 1 (Minimal): Feature is vaguely implied or mentioned in passing with no supporting detail.
-- 2 (Partial/Ambiguous): Feature is mentioned but lacks depth, is behind a "coming soon" tag, or is indirectly implied without clear documentation.
-- 3 (Mostly Supported): Feature is clearly present with reasonable evidence but minor gaps remain.
-- 4 (Full Support): Clearly and fully supported with documented evidence, screenshots, or technical descriptions.
-
-REQUIREMENTS TO SCORE:
-${reqStr}
-
-STRICTURES:
-- Prefer 0 over guessing: If you cannot find external proof or direct website mention, the score MUST be 0.
-- No Hallucinations: Base scores ONLY on information found during the current search and the provided site.
-
-OUTPUT FORMAT (STRICT JSON ONLY):
-{
-    "requirementId": score
+export interface ScreeningResult {
+  questionId: string
+  answer: ScreeningAnswer
+  evidence: string | null
+  flag: string | null
+  notes: string | null
 }
 
-Return a flat JSON object mapping each requirement ID to its integer score (0–4). No preamble. No explanations. No extra text.`
+export type ToolScannerChunk =
+  | { type: 'metadata'; metadata: ToolScannerMetadata }
+  | { type: 'category'; category: string; results: ScreeningResult[] }
+  | { type: 'error'; message: string }
 
-    const scoringResponse = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2048,
-      system: 'You are a strict, evidence-based scoring engine for EdTech products. You do not guess and you always return valid JSON.',
-      messages: [{ role: 'user', content: scoringPrompt }],
-    })
+// ─── Response parsing helpers ───────────────────────────────────────────────────
 
-    const scoreText =
-      scoringResponse.content[0].type === 'text' ? scoringResponse.content[0].text : '{}'
-    try {
-      const cleaned = scoreText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim()
-      const rawScores = JSON.parse(cleaned) as Record<string, unknown>
+/** All text blocks from a (possibly tool-interleaved) response. */
+function textBlocks(content: Anthropic.Messages.ContentBlock[]): string[] {
+  return content
+    .filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text')
+    .map((b) => b.text)
+}
 
-      // Clamp all values to integers 0–4; default missing reqs to 0
-      const scores: Record<string, number> = {}
-      for (const req of reqs) {
-        const raw = rawScores[req.id]
-        const n = typeof raw === 'number' ? raw : Number(raw)
-        scores[req.id] = isNaN(n) ? 0 : Math.max(0, Math.min(4, Math.round(n)))
+/** Parse the first JSON object in a string, tolerating ``` fences and prose. */
+function parseJsonObject(text: string): Record<string, unknown> | null {
+  const cleaned = text.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
+  try {
+    return JSON.parse(cleaned) as Record<string, unknown>
+  } catch {
+    // Fall back to the outermost {...} span (model may wrap JSON in prose).
+    const start = cleaned.indexOf('{')
+    const end = cleaned.lastIndexOf('}')
+    if (start !== -1 && end > start) {
+      try {
+        return JSON.parse(cleaned.slice(start, end + 1)) as Record<string, unknown>
+      } catch {
+        return null
       }
-      yield { type: 'category', category, scores }
-    } catch {
-      // Default all to 0 on parse failure
-      const scores: Record<string, number> = {}
-      for (const req of reqs) scores[req.id] = 0
-      yield { type: 'category', category, scores }
     }
+    return null
   }
 }
 
 /**
- * Score a single requirement for a single already-scanned platform. Used to
- * back-fill scores when a new requirement is added to the catalogue after
- * platforms have already been scanned.
- *
- * Returns the integer score (0-4). Falls back to 0 on any error so the
- * caller does not have to handle exceptions.
+ * Extract the JSON object from a web-search response. With server-side web
+ * search the model can emit several text blocks (interim notes then the JSON),
+ * so try the last block first, then each earlier block, then the concatenation.
  */
-export async function scoreSingleRequirement(
-  platformName: string,
-  url: string,
-  requirement: ToolScannerRequirement,
-): Promise<number> {
-  const category = requirement.category ?? 'General'
-
-  const prompt = `ROLE:
-You are an expert EdTech Product Auditor specializing in Technical Feature Verification.
-
-OBJECTIVE:
-Evaluate the platform **${platformName}** (${url}) against ONE specific requirement in the category "**${category}**".
-
-EVALUATION PROTOCOL:
-1. Multi-Source Verification: Use the provided URL as a starting point, but perform targeted web searches for "**${platformName}** ${category} features" to find:
-   - Technical support documentation and Help Center articles.
-   - User walkthroughs or YouTube feature demos.
-   - Detailed product spec sheets or "feature comparison" pages.
-2. Evidence-Driven Logic: Do not take marketing slogans at face value. Look for screenshots, specific UI mentions, or technical descriptions that prove a feature exists.
-
-SCORING RULES:
-- 0 (Absent/No Evidence): Not mentioned, no evidence found across web sources, OR explicitly stated as not supported.
-- 1 (Minimal): Feature is vaguely implied or mentioned in passing with no supporting detail.
-- 2 (Partial/Ambiguous): Feature is mentioned but lacks depth, is behind a "coming soon" tag, or is indirectly implied without clear documentation.
-- 3 (Mostly Supported): Feature is clearly present with reasonable evidence but minor gaps remain.
-- 4 (Full Support): Clearly and fully supported with documented evidence, screenshots, or technical descriptions.
-
-REQUIREMENT TO SCORE:
-${requirement.id}: ${requirement.title}. ${requirement.description}
-
-STRICTURES:
-- Prefer 0 over guessing: If you cannot find external proof or direct website mention, the score MUST be 0.
-- No Hallucinations: Base scores ONLY on information found during the current search and the provided site.
-
-OUTPUT FORMAT (STRICT JSON ONLY):
-{
-    "${requirement.id}": score
+function extractJson(content: Anthropic.Messages.ContentBlock[]): Record<string, unknown> | null {
+  const blocks = textBlocks(content)
+  for (let i = blocks.length - 1; i >= 0; i--) {
+    const parsed = parseJsonObject(blocks[i])
+    if (parsed) return parsed
+  }
+  return parseJsonObject(blocks.join('\n'))
 }
 
-Return a flat JSON object mapping the requirement ID to its integer score (0 to 4). No preamble. No explanations. No extra text.`
+const VALID_ANSWERS: ReadonlySet<string> = new Set(['YES', 'PARTIAL', 'NO', 'UNKNOWN'])
+
+function normAnswer(raw: unknown): ScreeningAnswer {
+  const s = String(raw ?? '').trim().toUpperCase()
+  return (VALID_ANSWERS.has(s) ? s : 'UNKNOWN') as ScreeningAnswer
+}
+
+function cleanField(raw: unknown): string | null {
+  if (raw == null) return null
+  const s = String(raw).trim()
+  if (!s || s.toLowerCase() === 'null' || s.toLowerCase() === 'n/a') return null
+  return s.slice(0, 2000)
+}
+
+// ─── Main generator ──────────────────────────────────────────────────────────────
+
+export async function* runToolScanEvaluation(
+  platformName: string,
+  url: string,
+  questions: ScreeningQuestionInput[],
+): AsyncGenerator<ToolScannerChunk> {
+  // ── Call 1: Metadata classification (evidence-based via web search) ───────────
+  const metaPrompt = `ROLE:
+You are an Investigative EdTech Analyst specializing in competitive intelligence.
+
+OBJECTIVE:
+Audit the platform "${platformName}" (${url}) and map it to our internal classification framework. Use the web_search tool to find independent reviews, app-store metadata, and recent news; do not rely on the homepage alone.
+
+Allowed Categories (use ONLY these values):
+- Grades: ${ALLOWED_GRADES.join(', ')}
+- Audiences: ${ALLOWED_AUDIENCES.join(', ')}
+- Fluency Levels: ${ALLOWED_FLUENCY.join(', ')}
+
+CONSTRAINTS:
+- Multi-label: select ALL values that apply across the platform's modules.
+- Base classifications on evidence you actually find; infer conservatively when explicit data is missing.
+
+OUTPUT (STRICT JSON ONLY, no markdown):
+{ "Target_Audience": "comma-separated string", "Fluency_Levels": ["..."], "Grade_Levels": ["..."] }`
 
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 256,
-      system: 'You are a strict, evidence-based scoring engine for EdTech products. You do not guess and you always return valid JSON.',
-      messages: [{ role: 'user', content: prompt }],
+    const metaResponse = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 2048,
+      tools: WEB_SEARCH_TOOL,
+      system:
+        'You are a highly precise EdTech classification engine. You investigate with live web search, follow the allowed category constraints, and always return valid JSON.',
+      messages: [{ role: 'user', content: metaPrompt }],
     })
-    const text = response.content[0].type === 'text' ? response.content[0].text : '{}'
-    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim()
-    const parsed = JSON.parse(cleaned) as Record<string, unknown>
-    const raw = parsed[requirement.id]
-    const n = typeof raw === 'number' ? raw : Number(raw)
-    return isNaN(n) ? 0 : Math.max(0, Math.min(4, Math.round(n)))
-  } catch {
-    return 0
+    const parsed = extractJson(metaResponse.content)
+    if (parsed) {
+      yield {
+        type: 'metadata',
+        metadata: {
+          Target_Audience: typeof parsed.Target_Audience === 'string' ? parsed.Target_Audience : '',
+          Fluency_Levels: Array.isArray(parsed.Fluency_Levels) ? parsed.Fluency_Levels.map(String) : [],
+          Grade_Levels: Array.isArray(parsed.Grade_Levels) ? parsed.Grade_Levels.map(String) : [],
+        },
+      }
+    } else {
+      yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
+    }
+  } catch (err) {
+    console.error('[tool-scanner] metadata call failed:', err instanceof Error ? err.message : err)
+    yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
+  }
+
+  // ── Call 2..N: One evidence-based screening pass per category ─────────────────
+  const byCategory = new Map<string, ScreeningQuestionInput[]>()
+  for (const q of questions) {
+    if (!byCategory.has(q.category)) byCategory.set(q.category, [])
+    byCategory.get(q.category)!.push(q)
+  }
+
+  for (const [category, qs] of byCategory.entries()) {
+    const questionBlock = qs
+      .map((q) => `${q.id} | ${q.question} | look for: ${q.whatToLookFor ?? '-'}`)
+      .join('\n')
+
+    const prompt = `OBJECTIVE
+Screen "${platformName}" (${url}) for the category "${category}" as part of a Layer-1 procurement shortlist. Answer each question from EVIDENCE you find via web search, not assumptions.
+
+INVESTIGATION PROTOCOL (use the web_search tool)
+1. Search the official site (${url}): home, features, pricing, privacy/security, accessibility, help/docs.
+2. Search beyond it: "${platformName} review", "${platformName} pricing", "${platformName} privacy policy GDPR", "${platformName} LTI / Moodle integration", app-store listings, independent reviews.
+3. Triangulate: prefer official docs and recent third-party evidence over marketing slogans; on conflict trust the most specific/recent source.
+
+ANSWER EACH QUESTION (exactly one of):
+- YES     clear documented evidence the criterion is met (cite source).
+- PARTIAL present but limited, ambiguous, "coming soon", or only indirectly evidenced.
+- NO      you found positive evidence it is absent or explicitly unsupported.
+- UNKNOWN public sources don't reveal enough to decide. Prefer this over guessing. (UNKNOWN is not NO.)
+Also give: evidence (the single best URL you actually retrieved, or "" if UNKNOWN), flag (short risk/safeguarding concern or null), notes (ONE short sentence, 25 words max).
+
+Keep every field short so the JSON stays small and complete.
+
+QUESTIONS (id | question | what to look for)
+${questionBlock}
+
+RULES
+- Only answer YES with real retrieved evidence. Prefer UNKNOWN over guessing. Never invent URLs. Keep text short.
+
+OUTPUT (STRICT JSON ONLY, no markdown):
+{ "<id>": { "answer": "YES|PARTIAL|NO|UNKNOWN", "evidence": "...", "flag": null, "notes": "..." }, ... }
+One entry per question id above. No preamble.`
+
+    let results: ScreeningResult[]
+    try {
+      const response = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 8192,
+        tools: WEB_SEARCH_TOOL,
+        system:
+          'You are a meticulous EdTech procurement screening auditor. You investigate platforms using live web search and answer only from evidence you actually retrieve. You never fabricate URLs or features. You always return valid JSON.',
+        messages: [{ role: 'user', content: prompt }],
+      })
+
+      const parsed = extractJson(response.content) ?? {}
+      results = qs.map((q) => {
+        const entry = parsed[q.id] as Record<string, unknown> | undefined
+        return {
+          questionId: q.id,
+          answer: normAnswer(entry?.answer),
+          evidence: cleanField(entry?.evidence),
+          flag: cleanField(entry?.flag),
+          notes: cleanField(entry?.notes),
+        }
+      })
+    } catch (err) {
+      console.error(`[tool-scanner] category "${category}" failed:`, err instanceof Error ? err.message : err)
+      // On failure, record every question in the category as UNKNOWN.
+      results = qs.map((q) => ({
+        questionId: q.id,
+        answer: 'UNKNOWN' as ScreeningAnswer,
+        evidence: null,
+        flag: null,
+        notes: null,
+      }))
+    }
+
+    yield { type: 'category', category, results }
   }
 }

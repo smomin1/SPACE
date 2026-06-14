@@ -14,6 +14,7 @@ export type Action =
   | 'create:users'
   | 'manage:platform'
   | 'manage:requirements'
+  | 'manage:screening'
   | 'manage:contexts'
   | 'access:admin'
   | 'access:evaluate'
@@ -33,6 +34,7 @@ const PERMISSIONS: Record<Action, Role[]> = {
   'create:users':           ['SUPER_ADMIN'],
   'manage:platform':        ['SUPER_ADMIN', 'ADMIN'],
   'manage:requirements':    ['SUPER_ADMIN', 'ADMIN'],
+  'manage:screening':       ['SUPER_ADMIN', 'ADMIN'],
   'manage:contexts':        ['SUPER_ADMIN', 'ADMIN'],
   'access:admin':           ['SUPER_ADMIN', 'ADMIN'],
   'access:evaluate':        ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'],

@@ -144,7 +144,7 @@ export function ToolScannerForm() {
             <span className="font-medium text-emerald-950">
               {state.currentCategory
                 ? `Screening: ${state.currentCategory}…`
-                : 'Classifying metadata…'}
+                : 'Investigating platform…'}
             </span>
             <span className="font-mono tabular-nums text-emerald-800/80">
               {state.completed} / {state.total || '…'}

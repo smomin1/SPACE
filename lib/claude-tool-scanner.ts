@@ -7,8 +7,10 @@ const MODEL = 'claude-sonnet-4-6'
 
 // Anthropic server-side web search: the model actually browses live sources and
 // the API runs the search loop internally, returning the final answer in one call.
+// max_uses caps searches per request — one comprehensive pass covers all 50
+// questions, so this is also the per-scan search ceiling (≈$0.01/search).
 const WEB_SEARCH_TOOL: Anthropic.Messages.MessageCreateParams['tools'] = [
-  { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
+  { type: 'web_search_20250305', name: 'web_search', max_uses: 10 },
 ]
 
 // ─── Metadata taxonomy (unchanged from the original classification step) ────────
@@ -114,125 +116,116 @@ export async function* runToolScanEvaluation(
   url: string,
   questions: ScreeningQuestionInput[],
 ): AsyncGenerator<ToolScannerChunk> {
-  // ── Call 1: Metadata classification (evidence-based via web search) ───────────
-  const metaPrompt = `ROLE:
-You are an Investigative EdTech Analyst specializing in competitive intelligence.
-
-OBJECTIVE:
-Audit the platform "${platformName}" (${url}) and map it to our internal classification framework. Use the web_search tool to find independent reviews, app-store metadata, and recent news; do not rely on the homepage alone.
-
-Allowed Categories (use ONLY these values):
-- Grades: ${ALLOWED_GRADES.join(', ')}
-- Audiences: ${ALLOWED_AUDIENCES.join(', ')}
-- Fluency Levels: ${ALLOWED_FLUENCY.join(', ')}
-
-CONSTRAINTS:
-- Multi-label: select ALL values that apply across the platform's modules.
-- Base classifications on evidence you actually find; infer conservatively when explicit data is missing.
-
-OUTPUT (STRICT JSON ONLY, no markdown):
-{ "Target_Audience": "comma-separated string", "Fluency_Levels": ["..."], "Grade_Levels": ["..."] }`
-
-  try {
-    const metaResponse = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 2048,
-      tools: WEB_SEARCH_TOOL,
-      system:
-        'You are a highly precise EdTech classification engine. You investigate with live web search, follow the allowed category constraints, and always return valid JSON.',
-      messages: [{ role: 'user', content: metaPrompt }],
-    })
-    const parsed = extractJson(metaResponse.content)
-    if (parsed) {
-      yield {
-        type: 'metadata',
-        metadata: {
-          Target_Audience: typeof parsed.Target_Audience === 'string' ? parsed.Target_Audience : '',
-          Fluency_Levels: Array.isArray(parsed.Fluency_Levels) ? parsed.Fluency_Levels.map(String) : [],
-          Grade_Levels: Array.isArray(parsed.Grade_Levels) ? parsed.Grade_Levels.map(String) : [],
-        },
-      }
-    } else {
-      yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
-    }
-  } catch (err) {
-    console.error('[tool-scanner] metadata call failed:', err instanceof Error ? err.message : err)
-    yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
-  }
-
-  // ── Call 2..N: One evidence-based screening pass per category ─────────────────
   const byCategory = new Map<string, ScreeningQuestionInput[]>()
   for (const q of questions) {
     if (!byCategory.has(q.category)) byCategory.set(q.category, [])
     byCategory.get(q.category)!.push(q)
   }
 
-  for (const [category, qs] of byCategory.entries()) {
-    const questionBlock = qs
-      .map((q) => `${q.id} | ${q.question} | look for: ${q.whatToLookFor ?? '-'}`)
-      .join('\n')
+  // Helper: yield every question as UNKNOWN, used on total failure.
+  function* allUnknown(): Generator<ToolScannerChunk> {
+    for (const [category, qs] of byCategory.entries()) {
+      yield {
+        type: 'category',
+        category,
+        results: qs.map((q) => ({
+          questionId: q.id,
+          answer: 'UNKNOWN' as ScreeningAnswer,
+          evidence: null,
+          flag: null,
+          notes: null,
+        })),
+      }
+    }
+  }
 
-    const prompt = `OBJECTIVE
-Screen "${platformName}" (${url}) for the category "${category}" as part of a Layer-1 procurement shortlist. Answer each question from EVIDENCE you find via web search, not assumptions.
+  // ── Single consolidated call: classify + answer all questions in one pass ─────
+  // One investigation covers the whole platform, so the site is searched and read
+  // once (not re-searched per category). This is the dominant cost lever: it caps
+  // web-search volume and avoids pulling the same page content into context N times.
+  const questionBlock = [...byCategory.entries()]
+    .map(
+      ([category, qs]) =>
+        `## ${category}\n` +
+        qs.map((q) => `${q.id} | ${q.question} | look for: ${q.whatToLookFor ?? '-'}`).join('\n'),
+    )
+    .join('\n\n')
+
+  const prompt = `OBJECTIVE
+Screen the platform "${platformName}" (${url}) for an EdTech procurement shortlist. In ONE investigation, (a) classify the platform and (b) answer all ${questions.length} screening questions below from EVIDENCE you find via web search, not assumptions.
 
 INVESTIGATION PROTOCOL (use the web_search tool)
-1. Search the official site (${url}): home, features, pricing, privacy/security, accessibility, help/docs.
+1. Investigate the official site (${url}): home, features, pricing, privacy/security, accessibility, help/docs.
 2. Search beyond it: "${platformName} review", "${platformName} pricing", "${platformName} privacy policy GDPR", "${platformName} LTI / Moodle integration", app-store listings, independent reviews.
-3. Triangulate: prefer official docs and recent third-party evidence over marketing slogans; on conflict trust the most specific/recent source.
+3. Triangulate: prefer official docs and recent third-party evidence over marketing slogans; on conflict trust the most specific/recent source. Investigate broadly enough to cover every category below, then answer all questions from what you found.
+
+CLASSIFY (metadata) using ONLY these allowed values, selecting ALL that apply across the platform's modules:
+- Audiences: ${ALLOWED_AUDIENCES.join(', ')}
+- Fluency Levels: ${ALLOWED_FLUENCY.join(', ')}
+- Grades: ${ALLOWED_GRADES.join(', ')}
 
 ANSWER EACH QUESTION (exactly one of):
 - YES     clear documented evidence the criterion is met (cite source).
 - PARTIAL present but limited, ambiguous, "coming soon", or only indirectly evidenced.
 - NO      you found positive evidence it is absent or explicitly unsupported.
 - UNKNOWN public sources don't reveal enough to decide. Prefer this over guessing. (UNKNOWN is not NO.)
-Also give: evidence (the single best URL you actually retrieved, or "" if UNKNOWN), flag (short risk/safeguarding concern or null), notes (ONE short sentence, 25 words max).
+For each: evidence (the single best URL you actually retrieved, or "" if UNKNOWN), flag (short risk/safeguarding concern or null), notes (ONE short sentence, 25 words max). Keep every field short so the JSON stays small and complete.
 
-Keep every field short so the JSON stays small and complete.
-
-QUESTIONS (id | question | what to look for)
+QUESTIONS (id | question | what to look for), grouped by category:
 ${questionBlock}
 
 RULES
 - Only answer YES with real retrieved evidence. Prefer UNKNOWN over guessing. Never invent URLs. Keep text short.
 
 OUTPUT (STRICT JSON ONLY, no markdown):
-{ "<id>": { "answer": "YES|PARTIAL|NO|UNKNOWN", "evidence": "...", "flag": null, "notes": "..." }, ... }
-One entry per question id above. No preamble.`
+{
+  "metadata": { "Target_Audience": "comma-separated string", "Fluency_Levels": ["..."], "Grade_Levels": ["..."] },
+  "answers": { "<id>": { "answer": "YES|PARTIAL|NO|UNKNOWN", "evidence": "...", "flag": null, "notes": "..." }, ... }
+}
+Return one "answers" entry per question id above. No preamble.`
 
-    let results: ScreeningResult[]
-    try {
-      const response = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 8192,
-        tools: WEB_SEARCH_TOOL,
-        system:
-          'You are a meticulous EdTech procurement screening auditor. You investigate platforms using live web search and answer only from evidence you actually retrieve. You never fabricate URLs or features. You always return valid JSON.',
-        messages: [{ role: 'user', content: prompt }],
-      })
+  let parsed: Record<string, unknown>
+  try {
+    const response = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 16000,
+      tools: WEB_SEARCH_TOOL,
+      system:
+        'You are a meticulous EdTech procurement screening auditor and classifier. You investigate platforms using live web search and answer only from evidence you actually retrieve. You never fabricate URLs or features. You always return valid JSON.',
+      messages: [{ role: 'user', content: prompt }],
+    })
+    parsed = extractJson(response.content) ?? {}
+  } catch (err) {
+    console.error('[tool-scanner] investigation failed:', err instanceof Error ? err.message : err)
+    yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
+    yield* allUnknown()
+    return
+  }
 
-      const parsed = extractJson(response.content) ?? {}
-      results = qs.map((q) => {
-        const entry = parsed[q.id] as Record<string, unknown> | undefined
-        return {
-          questionId: q.id,
-          answer: normAnswer(entry?.answer),
-          evidence: cleanField(entry?.evidence),
-          flag: cleanField(entry?.flag),
-          notes: cleanField(entry?.notes),
-        }
-      })
-    } catch (err) {
-      console.error(`[tool-scanner] category "${category}" failed:`, err instanceof Error ? err.message : err)
-      // On failure, record every question in the category as UNKNOWN.
-      results = qs.map((q) => ({
+  // Metadata
+  const md = (parsed.metadata ?? {}) as Record<string, unknown>
+  yield {
+    type: 'metadata',
+    metadata: {
+      Target_Audience: typeof md.Target_Audience === 'string' ? md.Target_Audience : '',
+      Fluency_Levels: Array.isArray(md.Fluency_Levels) ? md.Fluency_Levels.map(String) : [],
+      Grade_Levels: Array.isArray(md.Grade_Levels) ? md.Grade_Levels.map(String) : [],
+    },
+  }
+
+  // Answers, sliced back into per-category chunks so the progress UI still advances.
+  const answers = (parsed.answers ?? {}) as Record<string, Record<string, unknown> | undefined>
+  for (const [category, qs] of byCategory.entries()) {
+    const results: ScreeningResult[] = qs.map((q) => {
+      const entry = answers[q.id]
+      return {
         questionId: q.id,
-        answer: 'UNKNOWN' as ScreeningAnswer,
-        evidence: null,
-        flag: null,
-        notes: null,
-      }))
-    }
-
+        answer: normAnswer(entry?.answer),
+        evidence: cleanField(entry?.evidence),
+        flag: cleanField(entry?.flag),
+        notes: cleanField(entry?.notes),
+      }
+    })
     yield { type: 'category', category, results }
   }
 }

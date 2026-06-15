@@ -30,7 +30,9 @@ export interface BestFitTool {
 
 export interface BestFitQuestion {
   id: string
+  num: number
   category: string
+  question: string
 }
 
 // ─── Outputs ───────────────────────────────────────────────────────────────────
@@ -46,6 +48,8 @@ export interface SetMember {
 
 export interface GapItem {
   id: string
+  num: number
+  question: string
   category: string
   type: 'uncovered' | 'weak'
   bestPoints: number | null // best points any tool in the set has (null = none)
@@ -302,6 +306,8 @@ export function buildCombinedAnalysis(
 
     gaps.push({
       id: q.id,
+      num: q.num,
+      question: q.question,
       category: q.category,
       type: !determinable || pts === 0 ? 'uncovered' : 'weak',
       bestPoints: pts > 0 ? pts : null,

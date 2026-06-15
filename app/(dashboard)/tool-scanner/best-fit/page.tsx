@@ -12,7 +12,7 @@ export default async function BestFitPage() {
     }),
     prisma.screeningQuestion.findMany({
       orderBy: { num: 'asc' },
-      select: { id: true, category: true },
+      select: { id: true, num: true, category: true, question: true },
     }),
   ])
 

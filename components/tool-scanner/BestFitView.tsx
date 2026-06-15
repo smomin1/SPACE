@@ -440,7 +440,13 @@ function GapGroup({
             <div className="flex items-start gap-3">
               <div className={cn('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', dotCls)} />
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-start gap-2">
+                  <span className="shrink-0 font-mono text-[11px] tabular-nums text-stone-400">
+                    {item.num}
+                  </span>
+                  <p className="text-[13px] text-stone-800">{item.question}</p>
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2 pl-[22px]">
                   <span className="text-[11px] text-stone-400">{item.category}</span>
                   {item.bestPoints !== null && (
                     <span className="text-[11.5px] tabular-nums font-medium text-amber-600">

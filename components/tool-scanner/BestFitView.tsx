@@ -192,8 +192,8 @@ function CombinedSetSection({ analysis: a }: { analysis: CombinedAnalysis }) {
             Recommended Combination
           </h2>
           <p className="mt-0.5 text-[12px] text-stone-500">
-            The fewest tools that together cover the most screening questions. A question is
-            satisfied when a tool answers Yes.
+            The highest-scoring tool is the primary pick; each addition is the tool that most
+            raises the combined coverage. A question is satisfied when a tool answers Yes.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-6 text-right">

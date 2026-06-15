@@ -141,62 +141,79 @@ export function greedyToolSetCover(
   bestPerQuestion: Map<string, { points: number; toolId: string }>
   marginalGains: Map<string, number>
 } {
-  // Questions any tool can determine — the denominator for marginal coverage.
-  const determinableIds = new Set<string>()
+  // Denominator for combined coverage %: every question any tool can determine,
+  // each worth a YES (MAX_POINTS).
+  let determinableCount = 0
   for (const q of questions) {
-    if (tools.some((t) => isDetermined(t, q.id))) determinableIds.add(q.id)
+    if (tools.some((t) => isDetermined(t, q.id))) determinableCount += 1
   }
-  const totalDeterminable = determinableIds.size
+  const denominator = determinableCount * MAX_POINTS
 
   const selectedIds: string[] = []
   const bestPerQuestion = new Map<string, { points: number; toolId: string }>()
   const marginalGains = new Map<string, number>()
 
-  for (let i = 0; i < maxSize; i++) {
-    let bestId: string | null = null
-    let bestNewlySatisfied = 0 // questions this tool newly brings to YES
-    let bestPointsGain = 0 // tiebreak: raw points improvement
-
-    for (const t of tools) {
-      if (selectedIds.includes(t.id)) continue
-
-      let newlySatisfied = 0
-      let pointsGain = 0
-      for (const q of questions) {
-        const newPts = points(t, q.id)
-        const curBest = bestPerQuestion.get(q.id)?.points ?? 0
-        if (newPts > curBest) pointsGain += newPts - curBest
-        if (curBest < SATISFIED && newPts >= SATISFIED) newlySatisfied += 1
-      }
-
-      if (
-        newlySatisfied > bestNewlySatisfied ||
-        (newlySatisfied === bestNewlySatisfied && pointsGain > bestPointsGain)
-      ) {
-        bestNewlySatisfied = newlySatisfied
-        bestPointsGain = pointsGain
-        bestId = t.id
-      }
-    }
-
-    if (!bestId) break
-    // The first pick always seeds the set; later picks must add real coverage.
-    if (i > 0 && bestNewlySatisfied === 0 && bestPointsGain === 0) break
-
-    selectedIds.push(bestId)
-    marginalGains.set(
-      bestId,
-      totalDeterminable > 0 ? (bestNewlySatisfied / totalDeterminable) * 100 : 0,
-    )
-
-    const chosen = tools.find((t) => t.id === bestId)!
+  // Apply a tool's answers to the running best-per-question map.
+  const applyTool = (toolId: string) => {
+    const chosen = tools.find((t) => t.id === toolId)!
     for (const q of questions) {
       const newPts = points(chosen, q.id)
       const cur = bestPerQuestion.get(q.id)
       if (newPts > 0 && (!cur || newPts > cur.points)) {
-        bestPerQuestion.set(q.id, { points: newPts, toolId: bestId })
+        bestPerQuestion.set(q.id, { points: newPts, toolId })
       }
     }
+  }
+  const combinedPoints = () => {
+    let sum = 0
+    for (const q of questions) sum += bestPerQuestion.get(q.id)?.points ?? 0
+    return sum
+  }
+  const toPct = (pts: number) => (denominator > 0 ? (pts / denominator) * 100 : 0)
+
+  // Primary = the single highest-scoring tool on its own. "Scores the most" wins
+  // the headline slot, even if another tool would satisfy more questions.
+  let primaryId: string | null = null
+  let primaryPct = -1
+  for (const t of tools) {
+    if (!questions.some((q) => isDetermined(t, q.id))) continue // no usable answers
+    const pct = toolOverallPct(t, questions)
+    if (pct > primaryPct) {
+      primaryPct = pct
+      primaryId = t.id
+    }
+  }
+  if (!primaryId) return { selectedIds, bestPerQuestion, marginalGains }
+
+  applyTool(primaryId)
+  selectedIds.push(primaryId)
+  marginalGains.set(primaryId, toPct(combinedPoints()))
+
+  // Additions: at each step add the tool that most increases the combined score
+  // (largest total points improvement over the current best-per-question). Stop
+  // once no remaining tool can raise the score.
+  for (let i = 1; i < maxSize; i++) {
+    const prevPoints = combinedPoints()
+    let bestId: string | null = null
+    let bestGain = 0
+    for (const t of tools) {
+      if (selectedIds.includes(t.id)) continue
+      let gain = 0
+      for (const q of questions) {
+        const cur = bestPerQuestion.get(q.id)?.points ?? 0
+        const np = points(t, q.id)
+        if (np > cur) gain += np - cur
+      }
+      if (gain > bestGain) {
+        bestGain = gain
+        bestId = t.id
+      }
+    }
+    if (!bestId || bestGain === 0) break
+
+    applyTool(bestId)
+    selectedIds.push(bestId)
+    marginalGains.set(bestId, toPct(combinedPoints() - prevPoints))
   }
 
   return { selectedIds, bestPerQuestion, marginalGains }

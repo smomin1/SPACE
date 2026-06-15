@@ -1,7 +1,14 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ScreeningAnswer } from '@prisma/client'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// maxRetries: 0 — a slow scan must NOT be silently retried (each retry is another
+// paid web-search call). timeout caps a single call so a hung request fails fast
+// instead of running for many minutes and burning credits.
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  maxRetries: 0,
+  timeout: 180_000, // 3 minutes
+})
 
 const MODEL = 'claude-sonnet-4-6'
 
@@ -10,7 +17,7 @@ const MODEL = 'claude-sonnet-4-6'
 // max_uses caps searches per request — one comprehensive pass covers all 50
 // questions, so this is also the per-scan search ceiling (≈$0.01/search).
 const WEB_SEARCH_TOOL: Anthropic.Messages.MessageCreateParams['tools'] = [
-  { type: 'web_search_20250305', name: 'web_search', max_uses: 10 },
+  { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
 ]
 
 // ─── Metadata taxonomy (unchanged from the original classification step) ────────
@@ -122,23 +129,6 @@ export async function* runToolScanEvaluation(
     byCategory.get(q.category)!.push(q)
   }
 
-  // Helper: yield every question as UNKNOWN, used on total failure.
-  function* allUnknown(): Generator<ToolScannerChunk> {
-    for (const [category, qs] of byCategory.entries()) {
-      yield {
-        type: 'category',
-        category,
-        results: qs.map((q) => ({
-          questionId: q.id,
-          answer: 'UNKNOWN' as ScreeningAnswer,
-          evidence: null,
-          flag: null,
-          notes: null,
-        })),
-      }
-    }
-  }
-
   // ── Single consolidated call: classify + answer all questions in one pass ─────
   // One investigation covers the whole platform, so the site is searched and read
   // once (not re-searched per category). This is the dominant cost lever: it caps
@@ -196,10 +186,11 @@ Return one "answers" entry per question id above. No preamble.`
     })
     parsed = extractJson(response.content) ?? {}
   } catch (err) {
-    console.error('[tool-scanner] investigation failed:', err instanceof Error ? err.message : err)
-    yield { type: 'metadata', metadata: { Target_Audience: '', Fluency_Levels: [], Grade_Levels: [] } }
-    yield* allUnknown()
-    return
+    // Fail fast and visibly. Don't silently degrade to an all-UNKNOWN scan (which
+    // would save a junk 0% result and hide that the call timed out or errored).
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[tool-scanner] investigation failed:', message)
+    throw new Error(`AI investigation failed: ${message}`)
   }
 
   // Metadata

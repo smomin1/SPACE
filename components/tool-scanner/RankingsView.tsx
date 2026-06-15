@@ -54,6 +54,21 @@ function barFill(pct: number): string {
   return '#ef4444'
 }
 
+// Single-line, truncated Y-axis label so long platform names don't wrap and
+// overlap their neighbours. The full name stays available via the native <title>.
+const TICK_MAX = 22
+function PlatformTick(props: { x?: number; y?: number; payload?: { value?: string } }) {
+  const { x = 0, y = 0, payload } = props
+  const full = String(payload?.value ?? '')
+  const label = full.length > TICK_MAX ? `${full.slice(0, TICK_MAX - 1)}…` : full
+  return (
+    <text x={x} y={y} dy={4} textAnchor="end" fontSize={11} fill="#78716c">
+      <title>{full}</title>
+      {label}
+    </text>
+  )
+}
+
 export function RankingsView({ data, categories, allGrades, allFluency }: Props) {
   const [gradeFilter, setGradeFilter] = React.useState<string>('all')
   const [fluencyFilter, setFluencyFilter] = React.useState<string>('all')
@@ -185,10 +200,11 @@ export function RankingsView({ data, categories, allGrades, allFluency }: Props)
                 <YAxis
                   type="category"
                   dataKey="platformName"
-                  tick={{ fontSize: 11, fill: '#78716c' }}
+                  tick={<PlatformTick />}
                   axisLine={false}
                   tickLine={false}
-                  width={110}
+                  width={140}
+                  interval={0}
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}

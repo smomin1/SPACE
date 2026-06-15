@@ -4,8 +4,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
+// Reserved tab slugs: a single-segment route that is NOT one of these is an
+// evaluation detail page (/tool-scanner/{id}), which highlights the Evaluator tab.
+const RESERVED = ['/tool-scanner/best-fit', '/tool-scanner/rankings', '/tool-scanner/matrix', '/tool-scanner/analysis']
+
 const TABS = [
-  { href: '/tool-scanner', label: 'Evaluator', match: (p: string) => p === '/tool-scanner' || /^\/tool-scanner\/[^/]+$/.test(p) },
+  { href: '/tool-scanner', label: 'Evaluator', match: (p: string) => p === '/tool-scanner' || (/^\/tool-scanner\/[^/]+$/.test(p) && !RESERVED.includes(p)) },
+  { href: '/tool-scanner/best-fit', label: 'Best Fit', match: (p: string) => p.startsWith('/tool-scanner/best-fit') },
   { href: '/tool-scanner/rankings', label: 'Rankings', match: (p: string) => p.startsWith('/tool-scanner/rankings') },
   { href: '/tool-scanner/matrix', label: 'Scoring Matrix', match: (p: string) => p.startsWith('/tool-scanner/matrix') },
   { href: '/tool-scanner/analysis', label: 'Categorical Analysis', match: (p: string) => p.startsWith('/tool-scanner/analysis') },

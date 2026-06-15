@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { coveragePercent, coverageByCategory, hardFailTriggered } from '@/lib/screening'
 import { ScreeningAnswerBadge } from '@/components/tool-scanner/ScreeningAnswerBadge'
 import { CategoryChart } from '@/components/tool-scanner/CategoryChart'
-import { GlobeIcon, CalendarIcon, AlertTriangleIcon, ExternalLinkIcon } from 'lucide-react'
+import { GlobeIcon, CalendarIcon, AlertTriangleIcon, ExternalLinkIcon, Loader2Icon } from 'lucide-react'
 
 export default async function ToolScannerResultPage({
   params,
@@ -103,6 +103,26 @@ export default async function ToolScannerResultPage({
           </div>
         )}
       </div>
+
+      {(evaluation.status === 'QUEUED' || evaluation.status === 'SCANNING') && (
+        <div className="flex items-start gap-2.5 rounded-lg bg-emerald-50/60 px-4 py-3 ring-1 ring-emerald-700/15">
+          <Loader2Icon className="mt-0.5 size-4 shrink-0 animate-spin text-emerald-700" />
+          <p className="text-[13px] font-medium text-emerald-900">
+            {evaluation.status === 'SCANNING'
+              ? 'Scan in progress. Results will appear here once it completes.'
+              : 'Queued. This scan will start once earlier scans finish.'}
+          </p>
+        </div>
+      )}
+
+      {evaluation.status === 'FAILED' && (
+        <div className="flex items-start gap-2.5 rounded-lg bg-red-50/70 px-4 py-3 ring-1 ring-red-700/25">
+          <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-red-700" />
+          <p className="text-[13px] font-medium text-red-900">
+            Scan failed: {evaluation.error ?? 'Unknown error.'}
+          </p>
+        </div>
+      )}
 
       {hardFailBlockers.length > 0 && (
         <div className="flex items-start gap-2.5 rounded-lg bg-red-50/70 px-4 py-3 ring-1 ring-red-700/25">

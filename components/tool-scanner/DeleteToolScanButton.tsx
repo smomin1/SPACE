@@ -15,14 +15,23 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
-export function DeleteToolScanButton({ id, platformName }: { id: string; platformName: string }) {
+export function DeleteToolScanButton({
+  id,
+  platformName,
+  onDeleted,
+}: {
+  id: string
+  platformName: string
+  onDeleted?: () => void
+}) {
   const router = useRouter()
   const [deleting, setDeleting] = React.useState(false)
 
   async function handleDelete() {
     setDeleting(true)
     await fetch(`/api/tool-scanner/evaluations/${id}`, { method: 'DELETE' })
-    router.refresh()
+    if (onDeleted) onDeleted()
+    else router.refresh()
   }
 
   return (

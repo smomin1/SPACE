@@ -7,7 +7,7 @@ import type { ScreeningAnswer } from '@prisma/client'
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
   maxRetries: 0,
-  timeout: 180_000, // 3 minutes
+  timeout: 300_000, // 5 minutes
 })
 
 const MODEL = 'claude-sonnet-4-6'

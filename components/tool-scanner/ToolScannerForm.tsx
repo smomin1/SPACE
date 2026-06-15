@@ -1,43 +1,44 @@
 'use client'
 
 import * as React from 'react'
-import { useRouter } from 'next/navigation'
-import { SparklesIcon, AlertTriangleIcon, GlobeIcon } from 'lucide-react'
+import { SparklesIcon, AlertTriangleIcon, GlobeIcon, CheckCircle2Icon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-type StreamState =
+type FormState =
   | { stage: 'idle' }
-  | { stage: 'running'; completed: number; total: number; currentCategory: string | null }
+  | { stage: 'submitting' }
+  | { stage: 'queued'; platformName: string }
   | { stage: 'error'; message: string }
 
-export function ToolScannerForm() {
-  const router = useRouter()
+export function ToolScannerForm({ onQueued }: { onQueued?: () => void }) {
   const [platformName, setPlatformName] = React.useState('')
   const [url, setUrl] = React.useState('')
-  const [state, setState] = React.useState<StreamState>({ stage: 'idle' })
+  const [state, setState] = React.useState<FormState>({ stage: 'idle' })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!platformName.trim() || !url.trim()) return
+    const name = platformName.trim()
+    const link = url.trim()
+    if (!name || !link) return
 
-    setState({ stage: 'running', completed: 0, total: 0, currentCategory: null })
+    setState({ stage: 'submitting' })
 
     let res: Response
     try {
       res = await fetch('/api/tool-scanner/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platformName: platformName.trim(), url: url.trim() }),
+        body: JSON.stringify({ platformName: name, url: link }),
       })
     } catch (err) {
       setState({ stage: 'error', message: err instanceof Error ? err.message : 'Network error' })
       return
     }
 
-    if (!res.ok || !res.body) {
+    if (!res.ok) {
       let message = `Request failed (${res.status})`
       try {
         const data = await res.json()
@@ -47,55 +48,14 @@ export function ToolScannerForm() {
       return
     }
 
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
-
-    while (true) {
-      const { value, done } = await reader.read()
-      if (done) break
-      buffer += decoder.decode(value, { stream: true })
-
-      const events = buffer.split('\n\n')
-      buffer = events.pop() ?? ''
-
-      for (const evt of events) {
-        const line = evt.split('\n').find((l) => l.startsWith('data: '))
-        if (!line) continue
-        const json = line.slice(6)
-        try {
-          const data = JSON.parse(json) as Record<string, unknown>
-          if (data.type === 'start') {
-            setState({
-              stage: 'running',
-              completed: 0,
-              total: Number(data.totalCategories ?? 0),
-              currentCategory: null,
-            })
-          } else if (data.type === 'category') {
-            setState({
-              stage: 'running',
-              completed: Number(data.completed ?? 0),
-              total: Number(data.total ?? 0),
-              currentCategory: String(data.category ?? ''),
-            })
-          } else if (data.type === 'complete') {
-            router.push(`/tool-scanner/${data.evaluationId}`)
-            router.refresh()
-            return
-          } else if (data.type === 'error') {
-            setState({ stage: 'error', message: String(data.message ?? 'Evaluation failed') })
-            return
-          }
-        } catch {
-          // ignore malformed event
-        }
-      }
-    }
+    // Queued for background scanning. Clear inputs and let the parent refetch.
+    setPlatformName('')
+    setUrl('')
+    setState({ stage: 'queued', platformName: name })
+    onQueued?.()
   }
 
-  const isRunning = state.stage === 'running'
-  const progressPct = isRunning && state.total > 0 ? (state.completed / state.total) * 100 : 0
+  const isSubmitting = state.stage === 'submitting'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-stone-200/80 bg-white p-6 shadow-sm">
@@ -104,7 +64,8 @@ export function ToolScannerForm() {
           Run a new evaluation
         </h2>
         <p className="mt-0.5 text-[12.5px] text-stone-500">
-          AI investigates public web sources and screens against the 50-point AI screening checklist
+          AI investigates public web sources and screens against the 50-point AI screening checklist.
+          Scans run in the background and are queued one at a time.
         </p>
       </div>
 
@@ -118,7 +79,7 @@ export function ToolScannerForm() {
             placeholder="e.g. Duolingo"
             value={platformName}
             onChange={(e) => setPlatformName(e.target.value)}
-            disabled={isRunning}
+            disabled={isSubmitting}
             required
           />
         </div>
@@ -132,30 +93,19 @@ export function ToolScannerForm() {
             placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            disabled={isRunning}
+            disabled={isSubmitting}
             required
           />
         </div>
       </div>
 
-      {state.stage === 'running' && (
-        <div className="space-y-2 rounded-lg bg-emerald-50/60 px-4 py-3 ring-1 ring-emerald-700/15">
-          <div className="flex items-center justify-between text-[12.5px]">
-            <span className="font-medium text-emerald-950">
-              {state.currentCategory
-                ? `Screening: ${state.currentCategory}…`
-                : 'Investigating platform…'}
-            </span>
-            <span className="font-mono tabular-nums text-emerald-800/80">
-              {state.completed} / {state.total || '…'}
-            </span>
-          </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-emerald-900/10">
-            <div
-              className="h-full bg-emerald-700 transition-all duration-300"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
+      {state.stage === 'queued' && (
+        <div className="flex items-start gap-2.5 rounded-lg bg-emerald-50/60 px-3 py-2.5 ring-1 ring-emerald-700/15">
+          <CheckCircle2Icon className="mt-0.5 size-4 shrink-0 text-emerald-700" />
+          <p className="text-[13px] font-medium text-emerald-900">
+            <strong>{state.platformName}</strong> added to the queue. It will scan in the
+            background. You can leave this page.
+          </p>
         </div>
       )}
 
@@ -167,9 +117,9 @@ export function ToolScannerForm() {
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isRunning || !platformName.trim() || !url.trim()}>
+        <Button type="submit" disabled={isSubmitting || !platformName.trim() || !url.trim()}>
           <SparklesIcon className="mr-1.5 size-3.5" />
-          {isRunning ? 'Evaluating…' : 'Run Evaluation'}
+          {isSubmitting ? 'Adding…' : 'Add to Queue'}
         </Button>
         <p className="flex items-center gap-1.5 text-[11.5px] text-stone-500">
           <GlobeIcon className="size-3" />

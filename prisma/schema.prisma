@@ -219,6 +219,16 @@ enum ScreeningHardFail {
   IF_NO
 }
 
+// Lifecycle of a Tool Scanner scan. Scans run as a background queue: a row is
+// created QUEUED, a single worker drains the queue one-by-one (SCANNING), then
+// COMPLETED or FAILED.
+enum ScanStatus {
+  QUEUED
+  SCANNING
+  COMPLETED
+  FAILED
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -455,11 +465,16 @@ model ConflictMessage {
 // Layer 1 Tool Scanner: AI screening of any platform from public web sources.
 // One scan answers the ScreeningQuestion set; answers are stored as ScreeningResponse rows.
 model SearchEvaluation {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   platformName String
   url          String
-  metadata     Json?    // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
-  createdAt    DateTime @default(now())
+  metadata     Json?      // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
+  status       ScanStatus @default(COMPLETED) // backfills existing rows as COMPLETED; new rows start QUEUED
+  error        String?    // failure message when status = FAILED
+  attempts     Int        @default(0)         // run count; supports a single auto-retry
+  startedAt    DateTime?  // when the worker began scanning
+  completedAt  DateTime?  // when it reached COMPLETED or FAILED
+  createdAt    DateTime   @default(now())
   createdById  String
 
   createdBy User                @relation(fields: [createdById], references: [id])

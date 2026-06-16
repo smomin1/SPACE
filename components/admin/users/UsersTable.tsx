@@ -34,6 +34,7 @@ import {
 } from 'lucide-react'
 import type { Role, Team } from '@prisma/client'
 import { ROLE_LABELS, ROLE_BADGE } from '@/lib/roles'
+import { formatDate } from '@/lib/utils'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -381,7 +382,7 @@ function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
       header: ({ column }) => <ColHeader column={column} title="Created" />,
       cell: ({ row }) => (
         <span className="text-[12.5px] text-stone-500 tabular-nums">
-          {new Date(row.original.createdAt).toLocaleDateString()}
+          {formatDate(row.original.createdAt)}
         </span>
       ),
     },

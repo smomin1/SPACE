@@ -8,6 +8,7 @@ import type { ScanStatus } from '@prisma/client'
 import { ToolScannerForm } from '@/components/tool-scanner/ToolScannerForm'
 import { DeleteToolScanButton } from '@/components/tool-scanner/DeleteToolScanButton'
 import { ScanStatusBadge } from '@/components/tool-scanner/ScanStatusBadge'
+import { formatDate } from '@/lib/utils'
 
 export interface ScanRow {
   id: string
@@ -188,7 +189,7 @@ export function ToolScannerDashboard({ initialRows }: { initialRows: ScanRow[] }
                       {row.coveragePct.toFixed(1)}%
                     </td>
                     <td className="px-3 py-2.5 text-stone-500">
-                      {new Date(row.createdAt).toLocaleDateString()}
+                      {formatDate(row.createdAt)}
                     </td>
                     <td className="px-3 py-2.5 text-right">
                       <DeleteToolScanButton

@@ -25,6 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { EvaluatorType } from '@prisma/client'
+import { formatDate } from '@/lib/utils'
 
 type Requirement = {
   id: string
@@ -170,7 +171,7 @@ export function FinalisedView({
             Finalised - scores are locked
           </p>
           <p className="text-xs text-emerald-700/70">
-            Locked on {new Date(lockedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
+            Locked on {formatDate(lockedAt)}
           </p>
         </div>
         {isAdmin && (

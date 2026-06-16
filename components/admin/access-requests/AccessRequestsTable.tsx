@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { CheckIcon, XIcon, ClockIcon, CopyIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Role } from '@prisma/client'
-import { cn } from '@/lib/utils'
+import { cn, formatDate } from '@/lib/utils'
 import { ROLE_LABELS } from '@/lib/roles'
 import { Button } from '@/components/ui/button'
 import {
@@ -264,7 +264,7 @@ export function AccessRequestsTable({ initialData }: AccessRequestsTableProps) {
                     )}
                   </TableCell>
                   <TableCell className="py-2.5 text-[12.5px] text-stone-500 tabular-nums">
-                    {new Date(req.createdAt).toLocaleDateString()}
+                    {formatDate(req.createdAt)}
                   </TableCell>
                   <TableCell className="py-2.5">
                     {req.status === 'PENDING' && <ActionButtons request={req} />}

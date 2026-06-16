@@ -31,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { TOOL_ROLE_LABEL, VERDICT_LABEL, STATUS_LABEL } from "@/lib/vital/labels";
 import { VitalToolForm } from "./VitalToolForm";
 import { VitalRecommendationForm } from "./VitalRecommendationForm";
@@ -310,7 +310,7 @@ export function VitalAdmin({
                     <TableCell>{i.skipped}</TableCell>
                     <TableCell>{i.by}</TableCell>
                     <TableCell className="text-[12px] text-stone-500">
-                      {new Date(i.importedAt).toLocaleString()}
+                      {formatDate(i.importedAt)}
                     </TableCell>
                   </TableRow>
                 ))

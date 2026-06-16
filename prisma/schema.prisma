@@ -229,6 +229,27 @@ enum ScanStatus {
   FAILED
 }
 
+// CEFR human evaluation answer (mirrors the screening scale; NA is excluded from
+// the alignment %, like UNKNOWN is for the Tool Scanner).
+enum CefrAnswer {
+  YES
+  PARTIAL
+  NO
+  NA
+}
+
+// The two skill clusters used in CEFR final output: Listening & Speaking (LS) and
+// Reading, Writing, Vocabulary & Grammar (RWVG).
+enum CefrSkillGroup {
+  LS
+  RWVG
+}
+
+enum CefrEvalStatus {
+  DRAFT
+  COMPLETED
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -261,6 +282,7 @@ model User {
   ageRanges                  PlatformAgeRange[]
   closedAgeRangeConflicts    AgeRangeConflict[]          @relation("AgeRangeConflictClosedBy")
   ageRangeConflictMessages   AgeRangeConflictMessage[]   @relation("AgeRangeConflictMessageAuthor")
+  cefrEvaluations            CefrEvaluation[]
 }
 
 model Platform {
@@ -278,6 +300,7 @@ model Platform {
   contexts             PlatformContext[]
   evaluatorAssignments PlatformEvaluatorAssignment[]
   vitalTools           VitalTool[]
+  cefrEvaluation       CefrEvaluation?
 }
 
 // Central aggregate for one scoring run on a Platform.
@@ -508,6 +531,73 @@ model ScreeningResponse {
 
   evaluation SearchEvaluation  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
   question   ScreeningQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([evaluationId, questionId])
+}
+
+// ─── CEFR evaluation (pedagogy human stage) ─────────────────────────────────────
+// A pedagogy evaluator scores a platform against CEFR level × skill questions
+// (22-point human set). Mirrors the Tool Scanner screening shape; produces an
+// alignment %. One evaluation per platform.
+
+model CefrSkill {
+  id        String         @id @default(cuid())
+  name      String         @unique // Speaking, Listening, Writing, Reading, Grammar, Vocabulary
+  group     CefrSkillGroup         // LS or RWVG, for the per-cluster final output
+  order     Int
+  questions CefrQuestion[]
+}
+
+model CefrLevel {
+  id        String         @id @default(cuid())
+  code      String         @unique // A0, A1-, A1, A1+, A2-, …, C2
+  label     String
+  order     Int
+  questions CefrQuestion[]
+}
+
+model CefrQuestion {
+  id             String   @id @default(cuid())
+  levelId        String
+  skillId        String
+  num            Int      // 1..2 within a level×skill (display order)
+  text           String
+  quickReference String?  // short rubric anchor (e.g. "Single words")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  level     CefrLevel      @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  skill     CefrSkill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  responses CefrResponse[]
+
+  @@unique([levelId, skillId, num])
+}
+
+model CefrEvaluation {
+  id           String         @id @default(cuid())
+  platformId   String         @unique // one CEFR evaluation per platform
+  status       CefrEvalStatus @default(DRAFT)
+  alignmentPct Float?         // overall alignment %, computed on submit
+  createdById  String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  platform  Platform       @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  createdBy User           @relation(fields: [createdById], references: [id])
+  responses CefrResponse[]
+}
+
+model CefrResponse {
+  id            String     @id @default(cuid())
+  evaluationId  String
+  questionId    String
+  answer        CefrAnswer
+  fitConfidence Int?       // 1-5 evaluator confidence
+  evidence      String?
+  notes         String?
+
+  evaluation CefrEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  question   CefrQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([evaluationId, questionId])
 }

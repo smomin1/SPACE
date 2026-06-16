@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed:screening": "tsx prisma/seed-screening-run.ts",
+    "seed:cefr": "tsx prisma/seed-cefr-run.ts",
     "test": "jest && vitest run",
     "test:jest": "jest",
     "test:vitest": "vitest run",

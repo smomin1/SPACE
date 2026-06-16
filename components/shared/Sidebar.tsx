@@ -22,6 +22,7 @@ import {
   CompassIcon,
   GraduationCapIcon,
   ListChecksIcon,
+  LanguagesIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -114,6 +115,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/vital',
     label: 'VITAL Insights',
     icon: CompassIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/cefr',
+    label: 'CEFR Evaluation',
+    icon: LanguagesIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {

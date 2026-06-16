@@ -20,6 +20,8 @@ export type Action =
   | 'access:evaluate'
   | 'view:vital'
   | 'manage:vital'
+  | 'view:cefr'
+  | 'submit:cefr_score'
 
 const PERMISSIONS: Record<Action, Role[]> = {
   'view:dashboard':         ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
@@ -45,6 +47,10 @@ const PERMISSIONS: Record<Action, Role[]> = {
   // authorises per-assignment.
   'view:vital':             ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   'manage:vital':           ['SUPER_ADMIN', 'ADMIN'],
+  // CEFR evaluation: everyone can view results; the CEFR & VITAL Evaluator
+  // (enum VITAL_EVALUATOR) and admins submit the scoring.
+  'view:cefr':              ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  'submit:cefr_score':      ['SUPER_ADMIN', 'ADMIN', 'VITAL_EVALUATOR'],
 }
 
 export function canDo(role: Role, action: Action): boolean {

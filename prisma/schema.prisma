@@ -250,6 +250,23 @@ enum CefrEvalStatus {
   COMPLETED
 }
 
+// The four ordered pipeline stages a tool flows through.
+enum PipelineStage {
+  AI_SCREENING
+  CEFR
+  VITAL
+  PRD
+}
+
+enum PipelineStageStatus {
+  NOT_STARTED
+  QUEUED        // previous stage passed; this stage is ready to be worked
+  IN_PROGRESS
+  PASSED        // score >= threshold
+  FAILED        // score < threshold
+  SKIPPED
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -301,6 +318,8 @@ model Platform {
   evaluatorAssignments PlatformEvaluatorAssignment[]
   vitalTools           VitalTool[]
   cefrEvaluation       CefrEvaluation?
+  searchEvaluations    SearchEvaluation[]
+  pipelineStages       PipelineStageRun[]
 }
 
 // Central aggregate for one scoring run on a Platform.
@@ -499,8 +518,13 @@ model SearchEvaluation {
   completedAt  DateTime?  // when it reached COMPLETED or FAILED
   createdAt    DateTime   @default(now())
   createdById  String
+  // Optional link into the pipeline: a screening run can be attached to a Platform
+  // so its coverage feeds the AI_SCREENING stage. Nullable — standalone scans stay
+  // unlinked and untouched.
+  platformId   String?
 
   createdBy User                @relation(fields: [createdById], references: [id])
+  platform   Platform?           @relation(fields: [platformId], references: [id])
   responses  ScreeningResponse[]
 }
 
@@ -600,6 +624,42 @@ model CefrResponse {
   question   CefrQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([evaluationId, questionId])
+}
+
+// ─── Pipeline orchestration ─────────────────────────────────────────────────────
+// One row per (platform, stage). Tracks where a tool is in the linear pipeline
+// (AI_SCREENING → CEFR → VITAL → PRD), the stage score, and a pointer to the
+// underlying record the score came from. Derived/synced from the source modules;
+// passing a stage's threshold auto-queues the next.
+model PipelineStageRun {
+  id         String              @id @default(cuid())
+  platformId String
+  stage      PipelineStage
+  status     PipelineStageStatus @default(NOT_STARTED)
+  score      Float?              // 0-100 normalised stage score
+  sourceId   String?             // id of the SearchEvaluation / CefrEvaluation / VitalTool / Evaluation
+  passedAt   DateTime?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+
+  @@unique([platformId, stage])
+}
+
+// Single-row settings: per-stage pass thresholds and the aggregate weights.
+// Seeded with one row (id = "singleton"); admin-editable.
+model PipelineConfig {
+  id            String   @id @default("singleton")
+  aiThreshold   Float    @default(50)
+  cefrThreshold Float    @default(50)
+  vitalThreshold Float   @default(50)
+  prdThreshold  Float    @default(50)
+  aiWeight      Float    @default(20)
+  cefrWeight    Float    @default(40)
+  vitalWeight   Float    @default(30)
+  prdWeight     Float    @default(10)
+  updatedAt     DateTime @updatedAt
 }
 
 // Access request submitted by someone who wants an account.

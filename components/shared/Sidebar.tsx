@@ -23,6 +23,7 @@ import {
   GraduationCapIcon,
   ListChecksIcon,
   LanguagesIcon,
+  GitBranchIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -67,6 +68,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/requirements',
     label: 'Requirements',
     icon: ClipboardListIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+  },
+  {
+    href: '/admin/pipeline',
+    label: 'Pipeline',
+    icon: GitBranchIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {

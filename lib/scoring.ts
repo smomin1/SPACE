@@ -139,6 +139,35 @@ export function getRecommendedAction(
   return 'NOT_RECOMMENDED'
 }
 
+// ─── Pipeline aggregate scoring ─────────────────────────────────────────────────
+
+export type StageWeights = { ai: number; cefr: number; vital: number; prd: number }
+export type StageScores = {
+  ai: number | null
+  cefr: number | null
+  vital: number | null
+  prd: number | null
+}
+
+export const DEFAULT_STAGE_WEIGHTS: StageWeights = { ai: 20, cefr: 40, vital: 30, prd: 10 }
+
+/**
+ * Weighted aggregate (0–100) across the four pipeline stages. Each component is a
+ * 0–100 score; missing components are excluded and the remaining weights are
+ * renormalised over the present ones, so a partially-evaluated tool still gets a
+ * fair provisional aggregate. Returns 0 when nothing is scored.
+ */
+export function calculateAggregateScore(scores: StageScores, weights: StageWeights): number {
+  const parts: Array<[number, number]> = []
+  if (scores.ai !== null) parts.push([scores.ai, weights.ai])
+  if (scores.cefr !== null) parts.push([scores.cefr, weights.cefr])
+  if (scores.vital !== null) parts.push([scores.vital, weights.vital])
+  if (scores.prd !== null) parts.push([scores.prd, weights.prd])
+  const weightSum = parts.reduce((s, [, w]) => s + w, 0)
+  if (weightSum === 0) return 0
+  return parts.reduce((s, [v, w]) => s + v * w, 0) / weightSum
+}
+
 /**
  * Calculates the ratio of high-confidence to low-confidence evidence across
  * all scores. Scores without an evidenceType are excluded from both counts.

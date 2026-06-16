@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import type { Role } from '@prisma/client'
 import { ROLE_SHORT_LABELS } from '@/lib/roles'
+import { LocalTime } from '@/components/shared/LocalTime'
 
 type Author = { id: string; name: string | null; role: Role }
 
@@ -51,13 +52,11 @@ const SCORE_BUTTONS = [
   { label: '4', value: 4 },
 ]
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+const TIME_OPTS: Intl.DateTimeFormatOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
 }
 
 function initials(name: string | null) {
@@ -310,7 +309,7 @@ export function ConflictThread({
               {' submitted score '}
               <span className="font-medium">{s.value ?? 'N/A'}</span>
               {' - '}
-              {formatTime(s.updatedAt)}
+              <LocalTime value={s.updatedAt} options={TIME_OPTS} />
             </p>
           ))}
         </div>
@@ -341,7 +340,7 @@ export function ConflictThread({
                   {ROLE_LABELS[msg.author.role] ?? msg.author.role}
                 </Badge>
                 <span className="ml-auto text-[10px] text-muted-foreground">
-                  {formatTime(msg.createdAt)}
+                  <LocalTime value={msg.createdAt} options={TIME_OPTS} />
                 </span>
               </div>
               <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>

@@ -28,6 +28,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import type { Role } from '@prisma/client'
+import { LocalTime } from '@/components/shared/LocalTime'
 
 type Requirement = {
   id: string
@@ -614,7 +615,7 @@ export function MergedView({
               <div key={entry.id} className="px-4 py-2.5">
                 <p className="text-[12px] text-stone-700 leading-snug">{entry.label}</p>
                 <p className="text-[10px] text-stone-400 mt-0.5">
-                  {new Date(entry.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  <LocalTime value={entry.timestamp} options={{ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }} />
                 </p>
               </div>
             ))}

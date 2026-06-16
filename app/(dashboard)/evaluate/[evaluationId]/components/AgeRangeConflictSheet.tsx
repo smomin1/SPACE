@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import type { Role } from '@prisma/client'
 import { ROLE_SHORT_LABELS } from '@/lib/roles'
+import { LocalTime } from '@/components/shared/LocalTime'
 import { AGE_OPTIONS, ageLabel, gradeRangeLabel } from '@/lib/age-range'
 
 type AgeRangeEntry = {
@@ -45,13 +46,11 @@ type Props = {
 
 const ROLE_LABELS = ROLE_SHORT_LABELS
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+const TIME_OPTS: Intl.DateTimeFormatOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
 }
 
 function initials(name: string | null) {
@@ -308,7 +307,7 @@ export function AgeRangeConflictSheet({
                   {ROLE_LABELS[msg.user.role] ?? msg.user.role}
                 </Badge>
                 <span className="ml-auto text-[10px] text-muted-foreground">
-                  {formatTime(msg.createdAt)}
+                  <LocalTime value={msg.createdAt} options={TIME_OPTS} />
                 </span>
               </div>
               <p className="whitespace-pre-wrap leading-relaxed">{msg.body}</p>

@@ -33,6 +33,7 @@ import {
   SearchIcon,
 } from 'lucide-react'
 import type { Role, Team } from '@prisma/client'
+import { ROLE_LABELS, ROLE_BADGE } from '@/lib/roles'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -99,23 +100,7 @@ type UserRow = {
 
 const PAGE_SIZE = 25
 
-const ROLE_LABELS: Record<Role, string> = {
-  SUPER_ADMIN:         'Super Admin',
-  ADMIN:               'Admin',
-  PEDAGOGY_EVALUATOR:  'Pedagogy Evaluator',
-  TECHNICAL_EVALUATOR: 'Technical Evaluator',
-  VITAL_EVALUATOR:     'VITAL Evaluator',
-  VIEWER:              'Viewer',
-}
-
-const ROLE_BADGE: Record<Role, string> = {
-  SUPER_ADMIN:         'bg-violet-100 text-violet-800 ring-violet-300/60',
-  ADMIN:               'bg-emerald-100 text-emerald-800 ring-emerald-300/60',
-  PEDAGOGY_EVALUATOR:  'bg-blue-100 text-blue-800 ring-blue-300/60',
-  TECHNICAL_EVALUATOR: 'bg-amber-100 text-amber-800 ring-amber-300/60',
-  VITAL_EVALUATOR:     'bg-teal-100 text-teal-800 ring-teal-300/60',
-  VIEWER:              'bg-stone-100 text-stone-700 ring-stone-300/60',
-}
+// Role labels and badge colours come from the single source of truth in lib/roles.
 
 function ColHeader<T, V>({
   column,

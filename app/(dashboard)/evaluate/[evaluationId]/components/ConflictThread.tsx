@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import type { Role } from '@prisma/client'
+import { ROLE_SHORT_LABELS } from '@/lib/roles'
 
 type Author = { id: string; name: string | null; role: Role }
 
@@ -39,12 +40,7 @@ type Props = {
   onScoreUpdated: (newValue: number | null, threadAutoClosed: boolean) => void
 }
 
-const ROLE_LABELS: Partial<Record<Role, string>> = {
-  ADMIN: 'Admin',
-  PEDAGOGY_EVALUATOR: 'Pedagogy',
-  TECHNICAL_EVALUATOR: 'Technical',
-  VIEWER: 'Viewer',
-}
+const ROLE_LABELS = ROLE_SHORT_LABELS
 
 const SCORE_BUTTONS = [
   { label: 'N/A', value: null },

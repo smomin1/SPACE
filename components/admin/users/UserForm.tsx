@@ -12,15 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const ALL_ROLE_OPTIONS: { value: Role; label: string; description: string }[] = [
-  { value: 'SUPER_ADMIN',          label: 'Super Admin',          description: 'Full access including user account creation and management.' },
-  { value: 'ADMIN',                label: 'Admin',                description: 'Full access to platforms, requirements, contexts, and evaluations. Cannot create accounts.' },
-  { value: 'PEDAGOGY_EVALUATOR',   label: 'Pedagogy Evaluator',   description: 'Scores pedagogy requirements.' },
-  { value: 'TECHNICAL_EVALUATOR',  label: 'Technical Evaluator',  description: 'Scores technical requirements.' },
-  { value: 'VITAL_EVALUATOR',      label: 'VITAL Evaluator',      description: 'Manages the VITAL evaluation module.' },
-  { value: 'VIEWER',               label: 'Viewer',               description: 'Read-only access to results and dashboards.' },
-]
+import { ALL_ROLE_OPTIONS } from '@/lib/roles'
 
 const TEAM_OPTIONS: { value: Team; label: string }[] = [
   { value: 'STRATEGY_1',              label: 'Strategy 1' },

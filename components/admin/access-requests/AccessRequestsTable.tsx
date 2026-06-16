@@ -4,7 +4,9 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckIcon, XIcon, ClockIcon, CopyIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import type { Role } from '@prisma/client'
 import { cn } from '@/lib/utils'
+import { ROLE_LABELS } from '@/lib/roles'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -60,14 +62,6 @@ const TEAM_LABELS: Record<string, string> = {
   EMERGING_TECHNOLOGY:     'Emerging Technology',
   RESEARCH_AND_INNOVATION: 'Research & Innovation',
   STEERING_COMMITTEE:      'Steering Committee',
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  ADMIN:               'Admin',
-  PEDAGOGY_EVALUATOR:  'Pedagogy Evaluator',
-  TECHNICAL_EVALUATOR: 'Technical Evaluator',
-  VITAL_EVALUATOR:     'VITAL Evaluator',
-  VIEWER:              'Viewer',
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -256,7 +250,7 @@ export function AccessRequestsTable({ initialData }: AccessRequestsTableProps) {
                   <TableCell className="py-2.5 align-top font-mono text-[12.5px] text-stone-600">{req.email}</TableCell>
                   <TableCell className="py-2.5 align-top text-[13px]">{TEAM_LABELS[req.team] ?? req.team}</TableCell>
                   <TableCell className="py-2.5 align-top text-[13px]">
-                    {ROLE_LABELS[req.requestedRole] ?? req.requestedRole}
+                    {ROLE_LABELS[req.requestedRole as Role] ?? req.requestedRole}
                   </TableCell>
                   <TableCell className="py-2.5">
                     <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset', STATUS_BADGE[req.status])}>

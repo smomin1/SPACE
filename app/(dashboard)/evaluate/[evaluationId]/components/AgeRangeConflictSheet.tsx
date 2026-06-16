@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { Role } from '@prisma/client'
+import { ROLE_SHORT_LABELS } from '@/lib/roles'
 import { AGE_OPTIONS, ageLabel, gradeRangeLabel } from '@/lib/age-range'
 
 type AgeRangeEntry = {
@@ -42,12 +43,7 @@ type Props = {
   onRangeUpdated: (ageMin: number, ageMax: number, autoClosed: boolean) => void
 }
 
-const ROLE_LABELS: Partial<Record<Role, string>> = {
-  ADMIN: 'Admin',
-  PEDAGOGY_EVALUATOR: 'Pedagogy',
-  TECHNICAL_EVALUATOR: 'Technical',
-  VIEWER: 'Viewer',
-}
+const ROLE_LABELS = ROLE_SHORT_LABELS
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString('en-US', {

@@ -11,10 +11,10 @@ async function main() {
   const testUsers = [
     { email: "superadmin@eval.com", name: "Super Admin",          role: Role.SUPER_ADMIN,         password: "Admin1234!" },
     { email: "admin@eval.com",      name: "Admin",                role: Role.ADMIN,               password: "Admin1234!" },
-    { email: "pedagogy@eval.com",   name: "Pedagogy Evaluator",   role: Role.PEDAGOGY_EVALUATOR,  password: "Evaluator1234!" },
-    { email: "technical@eval.com",  name: "Technical Evaluator",  role: Role.TECHNICAL_EVALUATOR, password: "Evaluator1234!" },
-    { email: "viewer@eval.com",     name: "Viewer",               role: Role.VIEWER,              password: "Viewer1234!" },
-    { email: "vital@eval.com",      name: "VITAL Evaluator",      role: Role.VITAL_EVALUATOR,     password: "Evaluator1234!" },
+    { email: "pedagogy@eval.com",   name: "PRD - Pedagogical Evaluator", role: Role.PEDAGOGY_EVALUATOR,  password: "Evaluator1234!" },
+    { email: "technical@eval.com",  name: "PRD - Technical Evaluator",   role: Role.TECHNICAL_EVALUATOR, password: "Evaluator1234!" },
+    { email: "viewer@eval.com",     name: "Viewer",                      role: Role.VIEWER,              password: "Viewer1234!" },
+    { email: "vital@eval.com",      name: "CEFR & VITAL Evaluator",      role: Role.VITAL_EVALUATOR,     password: "Evaluator1234!" },
   ];
 
   for (const u of testUsers) {

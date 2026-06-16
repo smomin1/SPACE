@@ -40,7 +40,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What user roles exist?',
         answer:
-          'There are six roles: Super Admin (full system control including user management), Admin (manages requirements, contexts, platforms, and evaluations), Pedagogy Evaluator (scores pedagogy-typed requirements), Technical Evaluator (scores technical-typed requirements), VITAL Evaluator (fills VITAL profiles for assigned platforms), and Viewer (read-only access to results and Tool Scanner).',
+          'There are six roles: Super Admin (full system control including user management), Admin (manages requirements, contexts, platforms, and evaluations), PRD - Pedagogical Evaluator (scores pedagogy-typed PRD requirements), PRD - Technical Evaluator (scores technical-typed PRD requirements), CEFR & VITAL Evaluator (runs the CEFR and VITAL evaluations for assigned platforms), and Viewer (read-only access to results and Tool Scanner).',
         keywords: ['permissions', 'access', 'admin', 'evaluator', 'viewer'],
       },
       {
@@ -372,7 +372,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'Who can view and manage VITAL?',
         answer:
-          'All signed in roles can view the VITAL dashboards. Managing the VITAL catalogue (tools, recommendations, levels, skills and workbook imports) is gated behind the manage:vital permission, held by Super Admin and Admin only. The VITAL Evaluator role fills VITAL profiles for its assigned platforms through the evaluations workspace; submitting a profile reruns the recommendation engine.',
+          'All signed in roles can view the VITAL dashboards. Managing the VITAL catalogue (tools, recommendations, levels, skills and workbook imports) is gated behind the manage:vital permission, held by Super Admin and Admin only. The CEFR & VITAL Evaluator role fills VITAL profiles for its assigned platforms through the evaluations workspace; submitting a profile reruns the recommendation engine.',
         keywords: ['vital', 'permissions', 'vital evaluator', 'role', 'access'],
       },
       {

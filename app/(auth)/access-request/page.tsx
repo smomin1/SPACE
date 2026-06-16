@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
+import { ACCESS_REQUEST_ROLE_OPTIONS } from '@/lib/roles'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -25,12 +26,7 @@ const TEAM_OPTIONS = [
   { value: 'STEERING_COMMITTEE',      label: 'Steering Committee' },
 ]
 
-const ROLE_OPTIONS = [
-  { value: 'PEDAGOGY_EVALUATOR',  label: 'Pedagogy Evaluator',  description: 'Scores pedagogy requirements' },
-  { value: 'TECHNICAL_EVALUATOR', label: 'Technical Evaluator', description: 'Scores technical requirements' },
-  { value: 'VITAL_EVALUATOR',     label: 'VITAL Evaluator',     description: 'Manages the VITAL evaluation module' },
-  { value: 'VIEWER',              label: 'Viewer',              description: 'Read-only access to results' },
-]
+const ROLE_OPTIONS = ACCESS_REQUEST_ROLE_OPTIONS
 
 type FieldErrors = {
   name?: string

@@ -3,19 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Sidebar } from '@/components/shared/Sidebar'
 import { Footer } from '@/components/shared/Footer'
+import { ROLE_SHORT_LABELS } from '@/lib/roles'
 
 function getInitials(name: string | null | undefined): string {
   if (!name) return '?'
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  ADMIN: 'Administrator',
-  PEDAGOGY_EVALUATOR: 'Pedagogy',
-  TECHNICAL_EVALUATOR: 'Technical',
-  VITAL_EVALUATOR: 'VITAL',
-  VIEWER: 'Viewer',
 }
 
 export default async function DashboardLayout({
@@ -34,7 +26,7 @@ export default async function DashboardLayout({
 
   // Label reflects the true base role; an additive grant appends "+ Admin".
   const showAdminSuffix = isAdmin && baseRole !== 'ADMIN' && baseRole !== 'SUPER_ADMIN'
-  const roleLabel = `${ROLE_LABELS[baseRole] ?? baseRole}${showAdminSuffix ? ' + Admin' : ''}`
+  const roleLabel = `${ROLE_SHORT_LABELS[baseRole] ?? baseRole}${showAdminSuffix ? ' + Admin' : ''}`
 
   return (
     <div className="flex h-screen overflow-hidden">

@@ -12,6 +12,7 @@ import {
   Legend,
 } from 'recharts'
 import { Label } from '@/components/ui/label'
+import { MultiSelect } from '@/components/tool-scanner/MultiSelect'
 
 interface Platform {
   id: string
@@ -41,14 +42,6 @@ export function CategoricalAnalysis({
     platforms.length > 0 ? [platforms[0].id] : [],
   )
 
-  function toggle(id: string) {
-    setSelectedIds((cur) => {
-      if (cur.includes(id)) return cur.filter((x) => x !== id)
-      if (cur.length >= 3) return cur // max 3
-      return [...cur, id]
-    })
-  }
-
   if (platforms.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50/30 px-6 py-12 text-center">
@@ -76,31 +69,17 @@ export function CategoricalAnalysis({
         <Label className="text-[12px] text-stone-600">
           Select up to 3 platforms to compare
         </Label>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {platforms.map((p) => {
-            const isSelected = selectedIds.includes(p.id)
-            const disabled = !isSelected && selectedIds.length >= 3
-            return (
-              <button
-                key={p.id}
-                onClick={() => toggle(p.id)}
-                disabled={disabled}
-                className={
-                  'h-7 rounded-md px-2.5 text-[12px] font-medium transition-colors ' +
-                  (isSelected
-                    ? 'bg-emerald-900 text-white'
-                    : disabled
-                      ? 'bg-stone-50 text-stone-300 cursor-not-allowed'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200')
-                }
-              >
-                {p.platformName}
-                <span className="ml-1.5 font-mono text-[10.5px] tabular-nums opacity-70">
-                  {p.overallPct.toFixed(0)}%
-                </span>
-              </button>
-            )
-          })}
+        <div className="mt-2 max-w-xs">
+          <MultiSelect
+            label="Platforms"
+            max={3}
+            options={platforms.map((p) => ({
+              value: p.id,
+              label: `${p.platformName} · ${p.overallPct.toFixed(0)}%`,
+            }))}
+            selected={selectedIds}
+            onChange={setSelectedIds}
+          />
         </div>
       </div>
 

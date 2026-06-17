@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { MultiSelect } from '@/components/tool-scanner/MultiSelect'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -38,11 +39,6 @@ export function BestFitView({ tools, questions, categories, allGrades, allFluenc
   const [gradeFilter, setGradeFilter] = React.useState('all')
   const [fluencyFilter, setFluencyFilter] = React.useState('all')
   const [selectedCategories, setSelectedCategories] = React.useState<string[]>([])
-
-  const toggleCategory = (c: string) =>
-    setSelectedCategories((prev) =>
-      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c],
-    )
 
   // Tools that match the grade/fluency filters
   const filteredTools = React.useMemo(
@@ -116,37 +112,14 @@ export function BestFitView({ tools, questions, categories, allGrades, allFluenc
           </div>
         </div>
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label className="text-[12px] text-stone-600">
-              Scope to Categories {selectedCategories.length > 0 && `(${selectedCategories.length})`}
-            </Label>
-            {selectedCategories.length > 0 && (
-              <button
-                onClick={() => setSelectedCategories([])}
-                className="text-[11px] font-medium text-emerald-700 hover:text-emerald-900"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {categories.map((c) => {
-              const on = selectedCategories.includes(c)
-              return (
-                <button
-                  key={c}
-                  onClick={() => toggleCategory(c)}
-                  className={cn(
-                    'rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors',
-                    on
-                      ? 'border-emerald-700/40 bg-emerald-100/80 text-emerald-900'
-                      : 'border-stone-200 bg-white text-stone-500 hover:border-emerald-700/30 hover:text-emerald-800',
-                  )}
-                >
-                  {c}
-                </button>
-              )
-            })}
+          <Label className="text-[12px] text-stone-600">Scope to Categories</Label>
+          <div className="max-w-xs">
+            <MultiSelect
+              label="Categories"
+              options={categories.map((c) => ({ value: c, label: c }))}
+              selected={selectedCategories}
+              onChange={setSelectedCategories}
+            />
           </div>
           <p className="text-[11px] text-stone-400">
             No selection scores tools across all categories.

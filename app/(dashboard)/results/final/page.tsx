@@ -8,8 +8,27 @@ import {
   type StageScoreMap,
 } from '@/lib/pipeline'
 import { evaluatePlatformPipeline, getOrCreateConfig } from '@/lib/pipeline-server'
-import { alignmentByLevelAndGroup } from '@/lib/cefr'
+import { alignmentPercent } from '@/lib/cefr'
 import type { CefrAnswer } from '@prisma/client'
+
+// Map individual skill names → one of 4 display buckets
+const SKILL_BUCKET: Record<string, 'SL' | 'RV' | 'G' | 'W'> = {
+  Speaking:    'SL',
+  Listening:   'SL',
+  Reading:     'RV',
+  Vocabulary:  'RV',
+  Grammar:     'G',
+  Writing:     'W',
+}
+
+const BUCKET_LABELS = {
+  SL: 'Speaking & Listening',
+  RV: 'Reading & Vocab',
+  G:  'Grammar',
+  W:  'Writing',
+} as const
+
+type Bucket = keyof typeof BUCKET_LABELS
 
 const TIER_STYLE: Record<string, string> = {
   TOP_PICK: 'bg-emerald-600',
@@ -145,8 +164,7 @@ export default async function FinalReportPage() {
             Recommended Tools per CEFR Micro-Level
           </h2>
           <p className="mt-0.5 text-[12px] text-stone-500">
-            Top two tools at each level by skill cluster: L&amp;S (Listening &amp; Speaking) and
-            RWV&amp;G (Reading, Writing, Vocabulary &amp; Grammar), by CEFR alignment.
+            Top two tools at each level by skill cluster, ranked by CEFR alignment score.
           </p>
         </div>
 
@@ -155,21 +173,26 @@ export default async function FinalReportPage() {
             <p className="text-[13px] text-stone-500">No completed CEFR evaluations yet.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-stone-200/80 bg-white">
+          <div className="overflow-x-auto overflow-hidden rounded-xl border border-stone-200/80 bg-white">
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="bg-stone-50/60">
                   <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">Level</th>
-                  <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">L&amp;S — top tools</th>
-                  <th className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">RWV&amp;G — top tools</th>
+                  {(['SL', 'RV', 'G', 'W'] as Bucket[]).map((b) => (
+                    <th key={b} className="px-3 py-2.5 text-left text-[10.5px] font-medium uppercase tracking-[0.1em] text-emerald-950/55">
+                      {BUCKET_LABELS[b]}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200/60">
                 {microLevels.map((lvl) => (
                   <tr key={lvl.code} className="hover:bg-stone-50/40">
                     <td className="px-3 py-2.5 font-medium text-emerald-950">{lvl.code}</td>
-                    <td className="px-3 py-2.5"><PickList picks={lvl.ls} /></td>
-                    <td className="px-3 py-2.5"><PickList picks={lvl.rwvg} /></td>
+                    <td className="px-3 py-2.5"><PickList picks={lvl.SL} /></td>
+                    <td className="px-3 py-2.5"><PickList picks={lvl.RV} /></td>
+                    <td className="px-3 py-2.5"><PickList picks={lvl.G} /></td>
+                    <td className="px-3 py-2.5"><PickList picks={lvl.W} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -198,12 +221,12 @@ function PickList({ picks }: { picks: { name: string; pct: number }[] }) {
   )
 }
 
-// Build the "2 tools per CEFR micro-level" output from completed CEFR evaluations.
+// Build the "2 tools per CEFR micro-level × 4 skill buckets" output.
 async function buildCefrMicroLevels() {
   const [levels, questions, evaluations] = await Promise.all([
     prisma.cefrLevel.findMany({ orderBy: { order: 'asc' }, select: { id: true, code: true } }),
     prisma.cefrQuestion.findMany({
-      select: { id: true, levelId: true, skill: { select: { group: true } } },
+      select: { id: true, levelId: true, skill: { select: { name: true } } },
     }),
     prisma.cefrEvaluation.findMany({
       where: { status: 'COMPLETED' },
@@ -216,30 +239,59 @@ async function buildCefrMicroLevels() {
 
   if (evaluations.length === 0) return []
 
-  const q = questions.map((x) => ({ id: x.id, levelId: x.levelId, skillId: '', group: x.skill.group }))
+  // Pre-build a lookup: questionId → { levelId, bucket }
+  const qMeta = new Map(
+    questions.map((q) => [q.id, { levelId: q.levelId, bucket: SKILL_BUCKET[q.skill.name] as Bucket | undefined }]),
+  )
 
-  // levelId -> { ls: [{name,pct}], rwvg: [...] }
   type Pick = { name: string; pct: number }
-  const lsByLevel = new Map<string, Pick[]>()
-  const rwvgByLevel = new Map<string, Pick[]>()
+  // levelId → bucket → list of answers (per evaluation scored separately)
+  // We accumulate per-platform scores then pick top-2
+
+  // levelId → bucket → [{ platformName, answers[] }]
+  const acc = new Map<string, Map<Bucket, { name: string; answers: CefrAnswer[] }[]>>()
 
   for (const ev of evaluations) {
-    const byLevel = alignmentByLevelAndGroup(
-      q,
-      ev.responses as { questionId: string; answer: CefrAnswer }[],
-    )
-    for (const [levelId, g] of Object.entries(byLevel)) {
-      if (!lsByLevel.has(levelId)) lsByLevel.set(levelId, [])
-      if (!rwvgByLevel.has(levelId)) rwvgByLevel.set(levelId, [])
-      lsByLevel.get(levelId)!.push({ name: ev.platform.name, pct: g.LS })
-      rwvgByLevel.get(levelId)!.push({ name: ev.platform.name, pct: g.RWVG })
+    // bucket within level → answers for this platform
+    const perLevelBucket = new Map<string, Map<Bucket, CefrAnswer[]>>()
+
+    for (const r of ev.responses as { questionId: string; answer: CefrAnswer }[]) {
+      const meta = qMeta.get(r.questionId)
+      if (!meta?.bucket) continue
+      if (!perLevelBucket.has(meta.levelId)) perLevelBucket.set(meta.levelId, new Map())
+      const bm = perLevelBucket.get(meta.levelId)!
+      if (!bm.has(meta.bucket)) bm.set(meta.bucket, [])
+      bm.get(meta.bucket)!.push(r.answer)
+    }
+
+    for (const [levelId, bm] of perLevelBucket.entries()) {
+      if (!acc.has(levelId)) acc.set(levelId, new Map())
+      const levelAcc = acc.get(levelId)!
+      for (const bucket of ['SL', 'RV', 'G', 'W'] as Bucket[]) {
+        const answers = bm.get(bucket) ?? []
+        if (!levelAcc.has(bucket)) levelAcc.set(bucket, [])
+        levelAcc.get(bucket)!.push({ name: ev.platform.name, answers })
+      }
     }
   }
 
-  const top2 = (arr: Pick[] = []) =>
-    [...arr].filter((p) => p.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 2)
+  const top2 = (entries: { name: string; answers: CefrAnswer[] }[] = []): Pick[] =>
+    entries
+      .map((e) => ({ name: e.name, pct: alignmentPercent(e.answers.map((a) => ({ answer: a }))) }))
+      .filter((p) => p.pct > 0)
+      .sort((a, b) => b.pct - a.pct)
+      .slice(0, 2)
 
   return levels
-    .map((l) => ({ code: l.code, ls: top2(lsByLevel.get(l.id)), rwvg: top2(rwvgByLevel.get(l.id)) }))
-    .filter((l) => l.ls.length > 0 || l.rwvg.length > 0)
+    .map((l) => {
+      const bMap = acc.get(l.id)
+      return {
+        code: l.code,
+        SL: top2(bMap?.get('SL')),
+        RV: top2(bMap?.get('RV')),
+        G:  top2(bMap?.get('G')),
+        W:  top2(bMap?.get('W')),
+      }
+    })
+    .filter((l) => l.SL.length > 0 || l.RV.length > 0 || l.G.length > 0 || l.W.length > 0)
 }

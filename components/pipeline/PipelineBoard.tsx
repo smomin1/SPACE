@@ -27,6 +27,7 @@ type Config = {
   aiWeight: number; cefrWeight: number; vitalWeight: number; prdWeight: number
 }
 type Scan = { id: string; platformName: string; url: string }
+type VitalTool = { id: string; name: string; v2Percent: number | null }
 
 const STATUS_STYLE: Record<PipelineStageStatus, string> = {
   PASSED: 'bg-emerald-100 text-emerald-800 ring-emerald-700/30',
@@ -47,12 +48,25 @@ function aggColor(pct: number): string {
   return 'text-red-600'
 }
 
-export function PipelineBoard({ rows, config, unlinkedScans }: { rows: PipelineRow[]; config: Config; unlinkedScans: Scan[] }) {
+export function PipelineBoard({
+  rows,
+  config,
+  unlinkedScans,
+  unlinkedVitalTools = [],
+}: {
+  rows: PipelineRow[]
+  config: Config
+  unlinkedScans: Scan[]
+  unlinkedVitalTools?: VitalTool[]
+}) {
   const router = useRouter()
   const [busy, setBusy] = React.useState(false)
+  // Per-platform link panel open state: key = `${platformId}-${stage}`
+  const [openLink, setOpenLink] = React.useState<string | null>(null)
 
   async function act(body: Record<string, unknown>) {
     setBusy(true)
+    setOpenLink(null)
     try {
       const res = await fetch('/api/pipeline/action', {
         method: 'POST',
@@ -66,6 +80,18 @@ export function PipelineBoard({ rows, config, unlinkedScans }: { rows: PipelineR
     } finally {
       setBusy(false)
     }
+  }
+
+  function toggleLink(platformId: string, stage: PipelineStage) {
+    const key = `${platformId}-${stage}`
+    setOpenLink((prev) => (prev === key ? null : key))
+  }
+
+  // Which stages support linking and what options exist
+  function linkOptions(stage: PipelineStage): boolean {
+    if (stage === 'AI_SCREENING') return unlinkedScans.length > 0
+    if (stage === 'VITAL') return unlinkedVitalTools.length > 0
+    return false
   }
 
   return (
@@ -82,11 +108,6 @@ export function PipelineBoard({ rows, config, unlinkedScans }: { rows: PipelineR
         </Button>
       </div>
 
-      {/* Link an existing AI screening into a platform's pipeline */}
-      {unlinkedScans.length > 0 && (
-        <LinkScans rows={rows} scans={unlinkedScans} disabled={busy} onLink={act} />
-      )}
-
       <div className="overflow-x-auto rounded-xl border border-stone-200/80 bg-white">
         <table className="w-full text-[13px]">
           <thead>
@@ -102,37 +123,91 @@ export function PipelineBoard({ rows, config, unlinkedScans }: { rows: PipelineR
           </thead>
           <tbody className="divide-y divide-stone-200/60">
             {rows.map((row) => (
-              <tr key={row.platformId} className="hover:bg-stone-50/40">
-                <td className="px-3 py-2.5">
-                  <div className="font-medium text-emerald-950">{row.name}</div>
-                  <div className="text-[11px] text-stone-400">{row.vendor}</div>
-                </td>
-                {row.stages.map((st) => (
-                  <td key={st.stage} className="px-3 py-2.5 text-center">
-                    <span className={cn('inline-flex h-[20px] items-center rounded-md px-1.5 text-[10.5px] font-semibold ring-1 ring-inset', STATUS_STYLE[st.status])}>
-                      {STATUS_LABEL[st.status]}
-                    </span>
-                    <div className="mt-1 font-mono text-[11px] tabular-nums text-stone-500">
-                      {st.score != null ? `${st.score.toFixed(0)}%` : '—'}
-                    </div>
-                    <button
-                      disabled={busy}
-                      onClick={() => act({ type: st.status === 'SKIPPED' ? 'unskip' : 'skip', platformId: row.platformId, stage: st.stage })}
-                      className="mt-0.5 text-[10px] text-stone-400 hover:text-emerald-700 disabled:opacity-50"
-                    >
-                      {st.status === 'SKIPPED' ? 'un-skip' : 'skip'}
-                    </button>
+              <React.Fragment key={row.platformId}>
+                <tr className="hover:bg-stone-50/40">
+                  <td className="px-3 py-2.5">
+                    <div className="font-medium text-emerald-950">{row.name}</div>
+                    <div className="text-[11px] text-stone-400">{row.vendor}</div>
                   </td>
-                ))}
-                <td className="px-3 py-2.5 text-right">
-                  <div className={cn('font-serif text-[18px] tabular-nums', aggColor(row.aggregate))}>
-                    {row.aggregate.toFixed(1)}%
-                  </div>
-                  {row.complete && (
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Complete</div>
-                  )}
-                </td>
-              </tr>
+                  {row.stages.map((st) => {
+                    const linkKey = `${row.platformId}-${st.stage}`
+                    const hasLinkOptions = linkOptions(st.stage)
+                    return (
+                      <td key={st.stage} className="px-3 py-2.5 text-center">
+                        <span className={cn('inline-flex h-[20px] items-center rounded-md px-1.5 text-[10.5px] font-semibold ring-1 ring-inset', STATUS_STYLE[st.status])}>
+                          {STATUS_LABEL[st.status]}
+                        </span>
+                        <div className="mt-1 font-mono text-[11px] tabular-nums text-stone-500">
+                          {st.score != null ? `${st.score.toFixed(0)}%` : '—'}
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                          <button
+                            disabled={busy}
+                            onClick={() => act({ type: st.status === 'SKIPPED' ? 'unskip' : 'skip', platformId: row.platformId, stage: st.stage })}
+                            className="text-[10px] text-stone-400 hover:text-emerald-700 disabled:opacity-50"
+                          >
+                            {st.status === 'SKIPPED' ? 'un-skip' : 'skip'}
+                          </button>
+                          {hasLinkOptions && (
+                            <>
+                              <span className="text-stone-200">·</span>
+                              <button
+                                disabled={busy}
+                                onClick={() => toggleLink(row.platformId, st.stage)}
+                                className={cn(
+                                  'text-[10px] disabled:opacity-50',
+                                  openLink === linkKey ? 'text-emerald-700' : 'text-stone-400 hover:text-emerald-700',
+                                )}
+                              >
+                                link
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    )
+                  })}
+                  <td className="px-3 py-2.5 text-right">
+                    <div className={cn('font-serif text-[18px] tabular-nums', aggColor(row.aggregate))}>
+                      {row.aggregate.toFixed(1)}%
+                    </div>
+                    {row.complete && (
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Complete</div>
+                    )}
+                  </td>
+                </tr>
+
+                {/* Inline link panel — rendered as a full-width row when open */}
+                {row.stages.map((st) => {
+                  const linkKey = `${row.platformId}-${st.stage}`
+                  if (openLink !== linkKey) return null
+                  return (
+                    <tr key={`link-${linkKey}`} className="bg-stone-50/60">
+                      <td colSpan={STAGE_ORDER.length + 2} className="px-4 py-3">
+                        {st.stage === 'AI_SCREENING' && (
+                          <LinkPanel
+                            label="Link an existing AI screening"
+                            options={unlinkedScans.map((s) => ({ id: s.id, label: s.platformName }))}
+                            disabled={busy}
+                            onLink={(sourceId) => act({ type: 'link', platformId: row.platformId, searchEvaluationId: sourceId })}
+                          />
+                        )}
+                        {st.stage === 'VITAL' && (
+                          <LinkPanel
+                            label="Link an existing VITAL assessment"
+                            options={unlinkedVitalTools.map((v) => ({
+                              id: v.id,
+                              label: `${v.name}${v.v2Percent != null ? ` — ${v.v2Percent}%` : ''}`,
+                            }))}
+                            disabled={busy}
+                            onLink={(sourceId) => act({ type: 'link-vital', platformId: row.platformId, vitalToolId: sourceId })}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </React.Fragment>
             ))}
             {rows.length === 0 && (
               <tr><td colSpan={STAGE_ORDER.length + 2} className="px-3 py-12 text-center text-stone-500">No platforms yet.</td></tr>
@@ -140,6 +215,41 @@ export function PipelineBoard({ rows, config, unlinkedScans }: { rows: PipelineR
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function LinkPanel({
+  label,
+  options,
+  disabled,
+  onLink,
+}: {
+  label: string
+  options: { id: string; label: string }[]
+  disabled: boolean
+  onLink: (id: string) => void
+}) {
+  const [selectedId, setSelectedId] = React.useState('')
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-[12px] font-medium text-emerald-950">{label}:</span>
+      <select
+        value={selectedId}
+        onChange={(e) => setSelectedId(e.target.value)}
+        className="rounded-md border border-stone-200 bg-white px-2 py-1.5 text-[12.5px]"
+      >
+        <option value="">Select…</option>
+        {options.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+      </select>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={disabled || !selectedId}
+        onClick={() => onLink(selectedId)}
+      >
+        Link
+      </Button>
     </div>
   )
 }
@@ -201,33 +311,6 @@ function ConfigEditor({ config, disabled }: { config: Config; disabled: boolean 
       <p className={cn('mt-2 text-[11px]', weightSum === 100 ? 'text-stone-400' : 'text-amber-600')}>
         Weights sum to {weightSum}{weightSum !== 100 && ' (aggregate renormalises, but 100 is clearest)'}.
       </p>
-    </div>
-  )
-}
-
-function LinkScans({ rows, scans, disabled, onLink }: {
-  rows: PipelineRow[]; scans: Scan[]; disabled: boolean; onLink: (b: Record<string, unknown>) => void
-}) {
-  const [scanId, setScanId] = React.useState('')
-  const [platformId, setPlatformId] = React.useState('')
-  return (
-    <div className="rounded-xl border border-stone-200/80 bg-stone-50/40 p-4">
-      <p className="mb-2 text-[12.5px] font-medium text-emerald-950">Link an existing AI screening to a platform</p>
-      <div className="flex flex-wrap items-center gap-2">
-        <select value={scanId} onChange={(e) => setScanId(e.target.value)} className="rounded-md border border-stone-200 bg-white px-2 py-1.5 text-[12.5px]">
-          <option value="">Select a scan…</option>
-          {scans.map((s) => <option key={s.id} value={s.id}>{s.platformName}</option>)}
-        </select>
-        <span className="text-[12px] text-stone-400">→</span>
-        <select value={platformId} onChange={(e) => setPlatformId(e.target.value)} className="rounded-md border border-stone-200 bg-white px-2 py-1.5 text-[12.5px]">
-          <option value="">Select a platform…</option>
-          {rows.map((r) => <option key={r.platformId} value={r.platformId}>{r.name}</option>)}
-        </select>
-        <Button size="sm" variant="outline" disabled={disabled || !scanId || !platformId}
-          onClick={() => onLink({ type: 'link', platformId, searchEvaluationId: scanId })}>
-          Link
-        </Button>
-      </div>
     </div>
   )
 }

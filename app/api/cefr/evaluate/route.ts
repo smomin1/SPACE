@@ -74,6 +74,26 @@ export async function POST(req: NextRequest) {
     return evaluation
   })
 
+  // Keep the CEFR-track shadow Evaluation in sync so the Evaluations board reflects
+  // the submission — it drives the status badge and the per-evaluator "submitted" flag.
+  const shadow = await prisma.evaluation.findFirst({
+    where: { platformId: parsed.platformId },
+    select: { id: true },
+  })
+  if (shadow) {
+    const completed = parsed.status === 'COMPLETED'
+    await prisma.$transaction([
+      prisma.evaluation.update({
+        where: { id: shadow.id },
+        data: { state: completed ? 'FINALISED' : 'IN_PROGRESS' },
+      }),
+      prisma.evaluatorAssignment.updateMany({
+        where: { evaluationId: shadow.id, evaluatorType: 'CEFR' },
+        data: { hasSubmitted: completed },
+      }),
+    ])
+  }
+
   // Refresh the pipeline so a passing CEFR advances the chain and notifies admins.
   await syncPlatformPipeline(parsed.platformId)
 

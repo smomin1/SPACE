@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
+import { syncPlatformPipeline } from '@/lib/pipeline-server'
 import { z } from 'zod'
 
 const linkSchema = z.object({
@@ -57,6 +58,9 @@ export async function POST(
         })
       }
     })
+    // Linking a scored assessment feeds the VITAL stage immediately so the pipeline
+    // marks VITAL done (and may advance to PRD) without waiting for the next sync.
+    await syncPlatformPipeline(id)
     return Response.json({ ok: true })
   } catch {
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })

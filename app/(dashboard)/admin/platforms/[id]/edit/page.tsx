@@ -57,7 +57,7 @@ export default async function EditPlatformPage({ params }: Props) {
   })
 
   return (
-    <div className="container mx-auto max-w-3xl py-8">
+    <div className="mx-auto max-w-3xl px-6 py-8">
       <div className="mb-6 flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/platforms">← Back</Link>

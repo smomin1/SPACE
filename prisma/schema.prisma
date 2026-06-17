@@ -27,16 +27,19 @@ enum EvaluationState {
 //   TOOL  → the Pedagogy/Technical scoring lifecycle (default, existing flow)
 //   VITAL → the VITAL evaluator fills a linked VitalTool profile; on submit the
 //           recommendation engine is recomputed.
+//   CEFR  → direct CEFR language-alignment evaluation track
 enum EvaluationTrack {
   TOOL
   VITAL
+  CEFR
 }
 
 enum EvaluatorType {
   PEDAGOGY
   TECHNICAL
   BOTH        // Scored by both PEDAGOGY and TECHNICAL evaluators
-  VITAL       // Reserved for future Platform↔VitalTool linkage; standalone VITAL module does not use the scoring lifecycle
+  VITAL       // VITAL evaluator fills the VitalTool profile
+  CEFR        // CEFR evaluator conducts language-alignment evaluation
 }
 
 // Quality ranking (highest → lowest): TRIAL > DEMO > DOCUMENTATION > VENDOR_CLAIM

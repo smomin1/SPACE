@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import type { Role } from '@prisma/client'
 import { cn } from '@/lib/utils'
 import {
@@ -21,7 +21,6 @@ import {
   InboxIcon,
   CompassIcon,
   GraduationCapIcon,
-  ListChecksIcon,
   LanguagesIcon,
   GitBranchIcon,
   BellIcon,
@@ -84,12 +83,6 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
-    href: '/admin/screening-questions',
-    label: 'Screening Questions',
-    icon: ListChecksIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN'],
-  },
-  {
     href: '/admin/contexts',
     label: 'Contexts',
     icon: LayersIcon,
@@ -115,7 +108,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/admin/vital',
-    label: 'Manage VITAL',
+    label: 'Manage VITAL & CEFR',
     icon: GraduationCapIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
@@ -123,18 +116,6 @@ const NAV_ITEMS: NavItem[] = [
     href: '/vital',
     label: 'VITAL Insights',
     icon: CompassIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
-  },
-  {
-    href: '/cefr',
-    label: 'CEFR Evaluation',
-    icon: LanguagesIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
-  },
-  {
-    href: '/notifications',
-    label: 'Notifications',
-    icon: BellIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
@@ -156,9 +137,35 @@ interface SidebarProps {
 
 export function Sidebar({ role, userName, userInitials = '?', roleLabel, pendingAccessRequests = 0, unreadNotifications = 0 }: SidebarProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [collapsed, setCollapsed] = React.useState(false)
 
   const visible = NAV_ITEMS.filter((item) => item.roles.includes(role))
+
+  function isActive(href: string): boolean {
+    const [hrefPath, hrefQuery] = href.split('?')
+    if (hrefQuery) {
+      // href has query params — must match both path and all query params
+      const hrefParams = new URLSearchParams(hrefQuery)
+      for (const [k, v] of hrefParams.entries()) {
+        if (searchParams.get(k) !== v) return false
+      }
+      return pathname === hrefPath
+    }
+    // Plain path — but don't match if the current URL has query params that map to a more specific item
+    // (e.g. /evaluations with track=CEFR should not match the plain /evaluations item)
+    const hasSpecificItem = visible.some((item) => {
+      const [iPath, iQuery] = item.href.split('?')
+      if (!iQuery) return false
+      const iParams = new URLSearchParams(iQuery)
+      for (const [k, v] of iParams.entries()) {
+        if (searchParams.get(k) !== v) return false
+      }
+      return pathname === iPath
+    })
+    if (hasSpecificItem) return false
+    return pathname === href || pathname.startsWith(href + '/')
+  }
 
   return (
     <nav
@@ -218,7 +225,7 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel, pending
         )}
         <ul className="space-y-0.5">
           {visible.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(item.href + '/')
+            const active = isActive(item.href)
             const badgeCount =
               item.href === '/admin/access-requests' ? pendingAccessRequests
               : item.href === '/notifications' ? unreadNotifications

@@ -6,10 +6,25 @@ import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
 import { PlatformForm } from '@/components/admin/platforms/PlatformForm'
 
-export default async function NewPlatformPage() {
+export default async function NewPlatformPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ track?: string }>
+}) {
   const session = await auth()
   if (!session?.user) redirect('/login')
   if (!canDo(session.user.role, 'manage:platform')) redirect('/dashboard')
+
+  const { track: trackParam } = await searchParams
+  const defaultTrack =
+    trackParam === 'CEFR' ? 'CEFR' as const
+    : trackParam === 'VITAL' ? 'VITAL' as const
+    : 'TOOL' as const
+
+  const backHref =
+    defaultTrack === 'CEFR' ? '/admin/platforms?tab=cefr'
+    : defaultTrack === 'VITAL' ? '/admin/platforms?tab=vital'
+    : '/admin/platforms'
 
   const [users, vitalTools] = await Promise.all([
     prisma.user.findMany({
@@ -17,7 +32,6 @@ export default async function NewPlatformPage() {
       orderBy: { name: 'asc' },
       select: { id: true, name: true, email: true, role: true },
     }),
-    // Available VITAL apps to link: only those not yet linked to another platform
     prisma.vitalTool.findMany({
       where: { platformId: null, isAssessmentTool: false },
       orderBy: { name: 'asc' },
@@ -26,10 +40,10 @@ export default async function NewPlatformPage() {
   ])
 
   return (
-    <div className="container mx-auto max-w-3xl py-8">
+    <div className="mx-auto max-w-3xl px-6 py-8">
       <div className="mb-6 flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/admin/platforms">← Back</Link>
+          <Link href={backHref}>← Back</Link>
         </Button>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Register Platform</h1>
@@ -38,7 +52,12 @@ export default async function NewPlatformPage() {
           </p>
         </div>
       </div>
-      <PlatformForm users={users} vitalTools={vitalTools} />
+      <PlatformForm
+        users={users}
+        vitalTools={vitalTools}
+        defaultValues={{ track: defaultTrack }}
+        backHref={backHref}
+      />
     </div>
   )
 }

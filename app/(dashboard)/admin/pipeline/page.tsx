@@ -18,7 +18,7 @@ export default async function PipelinePage() {
   // always reflect the latest evaluations.
   await syncAllPipelines()
 
-  const [config, platforms, unlinkedScans] = await Promise.all([
+  const [config, platforms, unlinkedScans, unlinkedVitalTools] = await Promise.all([
     getOrCreateConfig(),
     prisma.platform.findMany({
       where: { status: { not: 'DISQUALIFIED' } },
@@ -34,6 +34,11 @@ export default async function PipelinePage() {
       where: { platformId: null, status: 'COMPLETED' },
       orderBy: { createdAt: 'desc' },
       select: { id: true, platformName: true, url: true },
+    }),
+    prisma.vitalTool.findMany({
+      where: { platformId: null, v2Percent: { not: null } },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, v2Percent: true },
     }),
   ])
 
@@ -63,7 +68,7 @@ export default async function PipelinePage() {
     <div>
       <PageHeader icon={GitBranchIcon} kicker="Orchestration" title="Evaluation Pipeline" />
       <main className="mx-auto max-w-7xl px-6 py-6">
-        <PipelineBoard rows={rows} config={config} unlinkedScans={unlinkedScans} />
+        <PipelineBoard rows={rows} config={config} unlinkedScans={unlinkedScans} unlinkedVitalTools={unlinkedVitalTools} />
       </main>
     </div>
   )

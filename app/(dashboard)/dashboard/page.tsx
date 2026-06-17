@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const { id: userId, role } = session.user
 
   if (canDo(role, 'access:admin')) {
-    return <AdminDashboard role={role} />
+    return <AdminDashboard role={role} userId={userId} />
   }
 
   if (canDo(role, 'access:evaluate')) {

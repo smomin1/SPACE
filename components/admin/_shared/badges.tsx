@@ -48,6 +48,7 @@ const TYPE_META: Record<EvaluatorType, { tone: Tone; mark: string; label: string
   TECHNICAL: { tone: "forest",  mark: "T", label: "Technical" },
   VITAL:     { tone: "hollow",  mark: "V", label: "VITAL"     },
   BOTH:      { tone: "amber",   mark: "B", label: "Both"      },
+  CEFR:      { tone: "neutral", mark: "C", label: "CEFR"      },
 }
 
 export function TypeBadge({ value }: { value: EvaluatorType }) {

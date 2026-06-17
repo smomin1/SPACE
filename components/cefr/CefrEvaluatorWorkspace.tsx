@@ -120,7 +120,7 @@ export function CefrEvaluatorWorkspace({
       }
       const data = await res.json()
       setStatus('COMPLETED')
-      toast.success(`CEFR evaluation saved — ${Number(data.alignmentPct ?? 0).toFixed(1)}% alignment`)
+      toast.success(`CEFR evaluation submitted — ${Number(data.alignmentPct ?? 0).toFixed(1)}% alignment`)
       router.refresh()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to save')
@@ -143,7 +143,7 @@ export function CefrEvaluatorWorkspace({
           </p>
         </div>
         <Button onClick={handleSubmit} disabled={saving}>
-          {saving ? 'Saving…' : status === 'NONE' ? 'Submit Evaluation' : 'Save Changes'}
+          {saving ? 'Submitting…' : 'Submit Evaluation'}
         </Button>
       </div>
 
@@ -203,7 +203,7 @@ export function CefrEvaluatorWorkspace({
                                 ))}
                               </div>
                               <label className="flex items-center gap-1.5 text-[11px] text-stone-500">
-                                Fit
+                                Confidence Level
                                 <select
                                   value={r.fitConfidence ?? ''}
                                   onChange={(e) => setFit(q.id, e.target.value ? Number(e.target.value) : null)}

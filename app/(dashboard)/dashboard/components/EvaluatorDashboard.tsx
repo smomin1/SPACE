@@ -24,7 +24,7 @@ interface EvaluatorDashboardProps {
 function getNow() { return Date.now() }
 
 // VITAL-track evaluations use a dedicated profile workspace, not /evaluate.
-function hrefFor(track: 'TOOL' | 'VITAL', evaluationId: string) {
+function hrefFor(track: string, evaluationId: string) {
   return track === 'VITAL' ? `/vital-evaluate/${evaluationId}` : `/evaluate/${evaluationId}`
 }
 
@@ -36,7 +36,7 @@ type NotifItem =
       platformName: string
       vendor: string
       evaluationId: string
-      track: 'TOOL' | 'VITAL'
+      track: string
       evaluatorType: EvaluatorType
       isLead: boolean
     }
@@ -49,11 +49,28 @@ type NotifItem =
       evaluationId: string
       content: string
     }
+  | {
+      type: 'pipeline'
+      key: string
+      at: Date
+      title: string
+      body: string | null
+      link: string | null
+      unread: boolean
+    }
 
 export async function EvaluatorDashboard({ userId, role }: EvaluatorDashboardProps) {
   const isVital = role === 'VITAL_EVALUATOR'
   const now = getNow()
   const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000)
+
+  // Pipeline-level notifications (CEFR/VITAL assignments, stage passes)
+  const pipelineNotifications = await prisma.notification.findMany({
+    where: { userId, createdAt: { gte: sevenDaysAgo } },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    select: { id: true, title: true, body: true, link: true, readAt: true, createdAt: true },
+  })
 
   const myAssignments = await prisma.evaluatorAssignment.findMany({
     where: { userId },
@@ -163,6 +180,15 @@ export async function EvaluatorDashboard({ userId, role }: EvaluatorDashboardPro
         evaluationId: t.evaluationId,
         content: t.messages[0].content,
       })),
+    ...pipelineNotifications.map(n => ({
+      type: 'pipeline' as const,
+      key: `notif-${n.id}`,
+      at: n.createdAt,
+      title: n.title,
+      body: n.body,
+      link: n.link,
+      unread: n.readAt === null,
+    })),
   ].sort((a, b) => b.at.getTime() - a.at.getTime())
 
   return (
@@ -213,51 +239,70 @@ export async function EvaluatorDashboard({ userId, role }: EvaluatorDashboardPro
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
-              {notifications.map(n => (
-                <Link
-                  key={n.key}
-                  href={n.type === 'assignment' ? hrefFor(n.track, n.evaluationId) : `/evaluate/${n.evaluationId}`}
-                >
-                  {n.type === 'assignment' ? (
-                    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-stone-200/80 bg-stone-50/60 hover:bg-stone-50 transition-colors">
-                      <ClipboardListIcon className="size-4 text-emerald-700 mt-0.5 shrink-0" />
+              {notifications.map(n => {
+                if (n.type === 'pipeline') {
+                  const inner = (
+                    <div className={`flex items-start gap-3 px-4 py-3 rounded-lg border transition-colors ${n.unread ? 'border-emerald-200/70 bg-emerald-50/40 hover:bg-emerald-50' : 'border-stone-200/80 bg-stone-50/60 hover:bg-stone-50'}`}>
+                      {n.unread && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-emerald-500" />}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="text-[13px] font-medium text-emerald-950 leading-snug">{n.title}</p>
+                        {n.body && <p className="mt-0.5 text-[11.5px] text-stone-500">{n.body}</p>}
+                        <p className="mt-1 text-[11px] text-stone-400">{relativeTime(n.at)}</p>
+                      </div>
+                    </div>
+                  )
+                  return (
+                    <div key={n.key}>
+                      {n.link ? <Link href={n.link} className="block hover:opacity-90">{inner}</Link> : inner}
+                    </div>
+                  )
+                }
+                return (
+                  <Link
+                    key={n.key}
+                    href={n.type === 'assignment' ? hrefFor(n.track, n.evaluationId) : `/evaluate/${n.evaluationId}`}
+                  >
+                    {n.type === 'assignment' ? (
+                      <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-stone-200/80 bg-stone-50/60 hover:bg-stone-50 transition-colors">
+                        <ClipboardListIcon className="size-4 text-emerald-700 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-[13px] font-medium text-emerald-950 truncate">
+                              {n.platformName}
+                            </p>
+                            {n.isLead && (
+                              <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[16px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
+                                Lead
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-stone-400 truncate">New assignment · {n.vendor}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <TypeBadge value={n.evaluatorType} />
+                          <span className="text-[11px] text-stone-400">{relativeTime(n.at)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-200/80 bg-amber-50/60 hover:bg-amber-50 transition-colors">
+                        <MessageSquareIcon className="size-4 text-amber-600 mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-medium text-emerald-950 truncate">
                             {n.platformName}
                           </p>
-                          {n.isLead && (
-                            <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[16px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
-                              Lead
-                            </span>
-                          )}
+                          <p className="text-xs text-stone-500 truncate">{n.requirementTitle}</p>
+                          <p className="text-[11.5px] text-stone-400 truncate mt-0.5 italic">
+                            &ldquo;{n.content.slice(0, 80)}{n.content.length > 80 ? '…' : ''}&rdquo;
+                          </p>
                         </div>
-                        <p className="text-xs text-stone-400 truncate">New assignment · {n.vendor}</p>
+                        <span className="text-[11px] text-stone-400 shrink-0 whitespace-nowrap">
+                          {relativeTime(n.at)}
+                        </span>
                       </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <TypeBadge value={n.evaluatorType} />
-                        <span className="text-[11px] text-stone-400">{relativeTime(n.at)}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-200/80 bg-amber-50/60 hover:bg-amber-50 transition-colors">
-                      <MessageSquareIcon className="size-4 text-amber-600 mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-emerald-950 truncate">
-                          {n.platformName}
-                        </p>
-                        <p className="text-xs text-stone-500 truncate">{n.requirementTitle}</p>
-                        <p className="text-[11.5px] text-stone-400 truncate mt-0.5 italic">
-                          &ldquo;{n.content.slice(0, 80)}{n.content.length > 80 ? '…' : ''}&rdquo;
-                        </p>
-                      </div>
-                      <span className="text-[11px] text-stone-400 shrink-0 whitespace-nowrap">
-                        {relativeTime(n.at)}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-              ))}
+                    )}
+                  </Link>
+                )
+              })}
             </div>
           )}
         </div>

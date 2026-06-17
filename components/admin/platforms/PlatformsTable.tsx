@@ -69,18 +69,20 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { EvalStateBadge } from '@/components/admin/_shared/badges'
+import { EvalStateBadge, StatusChip } from '@/components/admin/_shared/badges'
 import { toast } from 'sonner'
 
 type PlatformRow = {
   id: string
   name: string
   vendor: string
-  track: 'TOOL' | 'VITAL'
+  track: string
   licenceType: LicenceType | null
   trialAvailable: boolean
   evaluatorAssignments: { id: string; evaluatorType: string }[]
   evaluations: { id: string; state: EvaluationState }[]
+  vitalTools?: { id: string; v2Percent: number | null }[]
+  cefrEvaluation?: { status: 'DRAFT' | 'COMPLETED' } | null
 }
 
 const PAGE_SIZE = 25
@@ -284,19 +286,46 @@ function DeleteAction({ platform }: { platform: PlatformRow }) {
   )
 }
 
-function buildColumns(): ColumnDef<PlatformRow>[] {
+// CEFR and VITAL platforms are assigned through the edit page; flag rows with no
+// evaluators so the table prompts an assignment (and links to the edit form).
+function needsEvaluatorAssignment(
+  activeTab: 'tool' | 'vital' | 'cefr',
+  row: PlatformRow,
+): boolean {
+  if (activeTab === 'cefr') {
+    // CEFR is "assigned" once its evaluation exists or a CEFR evaluator is set.
+    if (row.cefrEvaluation) return false
+    return !row.evaluatorAssignments.some((a) => a.evaluatorType === 'CEFR')
+  }
+  if (activeTab === 'vital') {
+    if (row.evaluatorAssignments.some((a) => a.evaluatorType === 'VITAL')) return false
+    // A linked, completed assessment also satisfies the VITAL stage.
+    if ((row.vitalTools?.length ?? 0) > 0) return false
+    return true
+  }
+  // Tool Evaluator needs a Pedagogy/Technical evaluator (e.g. a pipeline-advanced
+  // platform arrives here with none).
+  return !row.evaluatorAssignments.some(
+    (a) => a.evaluatorType === 'PEDAGOGY' || a.evaluatorType === 'TECHNICAL' || a.evaluatorType === 'BOTH',
+  )
+}
+
+function buildColumns(activeTab: 'tool' | 'vital' | 'cefr'): ColumnDef<PlatformRow>[] {
   return [
     {
       accessorKey: 'name',
       header: ({ column }) => <ColHeader column={column} title="Platform" />,
-      cell: ({ row }) => (
-        <Link
-          href={`/admin/platforms/${row.original.id}`}
-          className="font-medium text-emerald-950 decoration-emerald-700/40 underline-offset-2 hover:text-emerald-800 hover:underline"
-        >
-          {row.original.name}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const needsAssignment = needsEvaluatorAssignment(activeTab, row.original)
+        return (
+          <Link
+            href={needsAssignment ? `/admin/platforms/${row.original.id}/edit` : `/admin/platforms/${row.original.id}`}
+            className="font-medium text-emerald-950 decoration-emerald-700/40 underline-offset-2 hover:text-emerald-800 hover:underline"
+          >
+            {row.original.name}
+          </Link>
+        )
+      },
     },
     {
       accessorKey: 'vendor',
@@ -362,55 +391,65 @@ function buildColumns(): ColumnDef<PlatformRow>[] {
       ),
       enableSorting: false,
       cell: ({ row }) => {
-        const latest = row.original.evaluations[0]
-        return <EvalStateBadge value={latest?.state ?? null} />
+        if (needsEvaluatorAssignment(activeTab, row.original)) {
+          return (
+            <span className="inline-flex items-center rounded-full border border-amber-300/60 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+              Assign evaluation
+            </span>
+          )
+        }
+        // CEFR status comes from the CefrEvaluation record (survives the VITAL advance).
+        if (activeTab === 'cefr') {
+          const status = row.original.cefrEvaluation?.status
+          return (
+            <StatusChip tone={status === 'COMPLETED' ? 'forest' : 'emerald'}>
+              {status === 'COMPLETED' ? 'Completed' : 'In progress'}
+            </StatusChip>
+          )
+        }
+        // VITAL satisfied by linking an already-scored assessment → mark Completed.
+        if (activeTab === 'vital') {
+          const linked = row.original.vitalTools?.find((t) => t.v2Percent != null)
+          if (linked) return <StatusChip tone="forest">Completed</StatusChip>
+        }
+        return <EvalStateBadge value={row.original.evaluations[0]?.state ?? null} />
       },
     },
     {
       id: 'actions',
       enableSorting: false,
-      cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-0.5">
-          <Button variant="ghost" size="sm" className="size-7 p-0 text-stone-500 hover:text-emerald-900" asChild>
-            <Link href={`/admin/platforms/${row.original.id}`}>
-              <EyeIcon className="size-3.5" />
-              <span className="sr-only">View</span>
-            </Link>
-          </Button>
-          <DeleteAction platform={row.original} />
-        </div>
-      ),
+      cell: ({ row }) => {
+        const needsAssignment = needsEvaluatorAssignment(activeTab, row.original)
+        return (
+          <div className="flex items-center justify-end gap-0.5">
+            <Button variant="ghost" size="sm" className="size-7 p-0 text-stone-500 hover:text-emerald-900" asChild>
+              <Link href={needsAssignment ? `/admin/platforms/${row.original.id}/edit` : `/admin/platforms/${row.original.id}`}>
+                <EyeIcon className="size-3.5" />
+                <span className="sr-only">View</span>
+              </Link>
+            </Button>
+            <DeleteAction platform={row.original} />
+          </div>
+        )
+      },
     },
   ]
 }
 
 interface PlatformsTableProps {
   initialData: PlatformRow[]
+  activeTab?: 'tool' | 'vital' | 'cefr'
 }
 
-export function PlatformsTable({ initialData }: PlatformsTableProps) {
+export function PlatformsTable({ initialData, activeTab = 'tool' }: PlatformsTableProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = React.useState('')
   const [sorting, setSorting] = React.useState<SortingState>([{ id: 'name', desc: false }])
-  const [activeTrack, setActiveTrack] = React.useState<'TOOL' | 'VITAL'>('TOOL')
 
-  const columns = React.useMemo(buildColumns, [])
-
-  const trackCounts = React.useMemo(
-    () => ({
-      TOOL: initialData.filter((p) => (p.track ?? 'TOOL') === 'TOOL').length,
-      VITAL: initialData.filter((p) => p.track === 'VITAL').length,
-    }),
-    [initialData],
-  )
-
-  const data = React.useMemo(
-    () => initialData.filter((p) => (p.track ?? 'TOOL') === activeTrack),
-    [initialData, activeTrack],
-  )
+  const columns = React.useMemo(() => buildColumns(activeTab), [activeTab])
 
   const table = useReactTable({
-    data,
+    data: initialData,
     columns,
     initialState: { pagination: { pageSize: PAGE_SIZE, pageIndex: 0 } },
     state: { columnFilters, globalFilter, sorting },
@@ -434,35 +473,6 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="inline-flex rounded-lg border border-stone-200/80 bg-white p-1">
-        {([
-          { key: 'TOOL', label: 'Tool Evaluator' },
-          { key: 'VITAL', label: 'VITAL' },
-        ] as const).map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setActiveTrack(t.key)}
-            className={cn(
-              'rounded-md px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors',
-              activeTrack === t.key
-                ? 'bg-emerald-900 text-white'
-                : 'text-stone-600 hover:bg-stone-100',
-            )}
-          >
-            {t.label}
-            <span
-              className={cn(
-                'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[10px] font-semibold',
-                activeTrack === t.key ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500',
-              )}
-            >
-              {trackCounts[t.key]}
-            </span>
-          </button>
-        ))}
-      </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-stone-400" />
@@ -503,10 +513,10 @@ export function PlatformsTable({ initialData }: PlatformsTableProps) {
 
         <div className="ml-auto flex items-center gap-3">
           <span className="hidden text-[12px] text-stone-500 md:inline">
-            <span className="font-mono tabular-nums text-emerald-950">{data.length}</span> platforms
+            <span className="font-mono tabular-nums text-emerald-950">{initialData.length}</span> platforms
           </span>
           <Button size="sm" className="bg-emerald-800 hover:bg-emerald-900 text-white" asChild>
-            <Link href="/admin/platforms/new">
+            <Link href={`/admin/platforms/new?track=${activeTab === 'cefr' ? 'CEFR' : activeTab === 'vital' ? 'VITAL' : 'TOOL'}`}>
               <PlusIcon className="mr-1.5 size-3.5" />
               Register Platform
             </Link>

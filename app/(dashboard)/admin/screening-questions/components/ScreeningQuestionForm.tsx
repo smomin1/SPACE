@@ -35,6 +35,7 @@ interface ScreeningQuestionFormProps {
   defaultValues?: Partial<ScreeningQuestionFormValues>
   id?: string
   categories?: string[]
+  backPath?: string
 }
 
 export function ScreeningQuestionForm({
@@ -42,6 +43,7 @@ export function ScreeningQuestionForm({
   defaultValues,
   id,
   categories = [],
+  backPath = '/admin/screening-questions',
 }: ScreeningQuestionFormProps) {
   const router = useRouter()
 
@@ -78,7 +80,7 @@ export function ScreeningQuestionForm({
       return
     }
 
-    router.push('/admin/screening-questions')
+    router.push(backPath)
     router.refresh()
   }
 

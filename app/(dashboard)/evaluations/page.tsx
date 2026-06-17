@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
-import { EvalStateBadge } from '@/components/admin/_shared/badges'
+import { EvalStateBadge, StatusChip } from '@/components/admin/_shared/badges'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { ArrowRightIcon, ClipboardCheckIcon } from 'lucide-react'
 import type { EvaluationState, EvaluatorType, EvaluationTrack } from '@prisma/client'
@@ -15,12 +15,21 @@ const TYPE_LABEL: Record<EvaluatorType, string> = {
   TECHNICAL: 'Technical',
   VITAL:     'VITAL',
   BOTH:      'Both',
+  CEFR:      'CEFR',
 }
 
 const STATE_ORDER: Record<EvaluationState, number> = {
   IN_PROGRESS: 0,
   MERGED:      1,
   FINALISED:   2,
+}
+
+// Which Evaluations tab an assignment belongs to is driven by its evaluator type,
+// not the platform's current track — a platform that has advanced from CEFR to
+// VITAL keeps its (done) CEFR assignment in the CEFR tab and its new VITAL
+// assignment in the VITAL tab.
+function tabOf(type: EvaluatorType): EvaluationTrack {
+  return type === 'VITAL' ? 'VITAL' : type === 'CEFR' ? 'CEFR' : 'TOOL'
 }
 
 export default async function EvaluationsPage({
@@ -35,78 +44,75 @@ export default async function EvaluationsPage({
   const isAdmin = canDo(role, 'manage:platform')
   const isVitalEvaluator = role === 'VITAL_EVALUATOR'
   const { track: trackParam } = await searchParams
-  const activeTrack: EvaluationTrack = trackParam === 'VITAL' ? 'VITAL' : 'TOOL'
+  const activeTrack: EvaluationTrack = trackParam === 'VITAL' ? 'VITAL' : trackParam === 'CEFR' ? 'CEFR' : 'TOOL'
+
+  const assignmentSelect = {
+    id: true,
+    evaluatorType: true,
+    hasSubmitted: true,
+    isLead: true,
+    evaluation: {
+      select: {
+        id: true,
+        state: true,
+        createdAt: true,
+        platform: {
+          select: {
+            id: true,
+            name: true,
+            vendor: true,
+            track: true,
+            cefrEvaluation: { select: { status: true } },
+          },
+        },
+      },
+    },
+    user: { select: { id: true, name: true } },
+  }
 
   // Admins see all evaluations; evaluators see only their assignments
   const assignments = isAdmin
     ? await prisma.evaluatorAssignment.findMany({
         orderBy: [{ evaluation: { state: 'asc' } }, { createdAt: 'desc' }],
-        select: {
-          id: true,
-          evaluatorType: true,
-          hasSubmitted: true,
-          isLead: true,
-          evaluation: {
-            select: {
-              id: true,
-              state: true,
-              createdAt: true,
-              platform: { select: { id: true, name: true, vendor: true, track: true } },
-            },
-          },
-          user: { select: { id: true, name: true } },
-        },
+        select: assignmentSelect,
       })
     : await prisma.evaluatorAssignment.findMany({
         where: { userId },
         orderBy: [{ evaluation: { state: 'asc' } }, { createdAt: 'desc' }],
-        select: {
-          id: true,
-          evaluatorType: true,
-          hasSubmitted: true,
-          isLead: true,
-          evaluation: {
-            select: {
-              id: true,
-              state: true,
-              createdAt: true,
-              platform: { select: { id: true, name: true, vendor: true, track: true } },
-            },
-          },
-          user: { select: { id: true, name: true } },
-        },
+        select: assignmentSelect,
       })
 
-  // Deduplicate by evaluationId (admins may have multiple assignments per eval)
-  const seen = new Set<string>()
-  const rows = isAdmin
-    ? assignments.filter(a => {
-        if (seen.has(a.evaluation.id)) return false
-        seen.add(a.evaluation.id)
-        return true
-      })
-    : assignments
+  // Bucket each assignment into a tab by its evaluator type. Admins get one row per
+  // evaluation per tab (a TOOL eval has Pedagogy + Technical assignments → one row);
+  // evaluators see each of their own assignments.
+  const byTab: Record<EvaluationTrack, typeof assignments> = { TOOL: [], VITAL: [], CEFR: [] }
+  const seenPerTab: Record<EvaluationTrack, Set<string>> = { TOOL: new Set(), VITAL: new Set(), CEFR: new Set() }
+  for (const a of assignments) {
+    const tab = tabOf(a.evaluatorType)
+    if (isAdmin) {
+      if (seenPerTab[tab].has(a.evaluation.id)) continue
+      seenPerTab[tab].add(a.evaluation.id)
+    }
+    byTab[tab].push(a)
+  }
 
   // Admins switch tracks via tabs; evaluators see all their own assignments.
-  const visible = isAdmin
-    ? rows.filter((a) => (a.evaluation.platform.track ?? 'TOOL') === activeTrack)
-    : rows
+  const visible = isAdmin ? byTab[activeTrack] : assignments
 
   const sorted = [...visible].sort(
     (a, b) => STATE_ORDER[a.evaluation.state] - STATE_ORDER[b.evaluation.state]
   )
 
   const trackCounts = {
-    TOOL: rows.filter((a) => (a.evaluation.platform.track ?? 'TOOL') === 'TOOL').length,
-    VITAL: rows.filter((a) => a.evaluation.platform.track === 'VITAL').length,
+    TOOL: byTab.TOOL.length,
+    VITAL: byTab.VITAL.length,
+    CEFR: byTab.CEFR.length,
   }
 
   // Gap counts: for admin only, compute how many requirements have no scores per TOOL evaluation
   const gapCounts: Record<string, number> = {}
   if (isAdmin) {
-    const toolEvalIds = rows
-      .filter((a) => (a.evaluation.platform.track ?? 'TOOL') === 'TOOL')
-      .map((a) => a.evaluation.id)
+    const toolEvalIds = byTab.TOOL.map((a) => a.evaluation.id)
 
     if (toolEvalIds.length > 0) {
       const [allToolReqs, scoredGroups] = await Promise.all([
@@ -160,6 +166,7 @@ export default async function EvaluationsPage({
           {([
             { key: 'TOOL', label: 'Tool Evaluator' },
             { key: 'VITAL', label: 'VITAL' },
+            { key: 'CEFR', label: 'CEFR Evaluations' },
           ] as const).map((t) => (
             <Link
               key={t.key}
@@ -191,9 +198,13 @@ export default async function EvaluationsPage({
         <div className="rounded-xl border border-stone-200/80 bg-white overflow-hidden divide-y divide-stone-200/60">
           {sorted.map((a) => {
             const ev = a.evaluation
-            const href = ev.platform.track === 'VITAL'
-              ? `/vital-evaluate/${ev.id}`
+            // Route by the assignment's evaluator type (CEFR is platform-scoped).
+            const href =
+              a.evaluatorType === 'VITAL' ? `/vital-evaluate/${ev.id}`
+              : a.evaluatorType === 'CEFR' ? `/cefr-evaluate/${ev.platform.id}`
               : `/evaluate/${ev.id}`
+            const isCefr = a.evaluatorType === 'CEFR'
+            const isToolType = a.evaluatorType === 'PEDAGOGY' || a.evaluatorType === 'TECHNICAL' || a.evaluatorType === 'BOTH'
             const gapCount = gapCounts[ev.id] ?? 0
             return (
               <div key={a.id} className="flex items-center group hover:bg-emerald-900/[0.025] transition-colors">
@@ -229,10 +240,16 @@ export default async function EvaluationsPage({
                       )}
                     </div>
                   </div>
-                  <EvalStateBadge value={ev.state} />
+                  {isCefr ? (
+                    <StatusChip tone={ev.platform.cefrEvaluation?.status === 'COMPLETED' ? 'forest' : 'emerald'}>
+                      {ev.platform.cefrEvaluation?.status === 'COMPLETED' ? 'Completed' : 'In progress'}
+                    </StatusChip>
+                  ) : (
+                    <EvalStateBadge value={ev.state} />
+                  )}
                   <ArrowRightIcon className="size-4 text-stone-300 group-hover:text-emerald-700 transition-colors shrink-0" />
                 </Link>
-                {isAdmin && gapCount > 0 && (
+                {isAdmin && isToolType && gapCount > 0 && (
                   <div className="pr-5">
                     <GapBadge
                       evaluationId={ev.id}

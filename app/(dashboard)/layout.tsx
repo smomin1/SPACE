@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Sidebar } from '@/components/shared/Sidebar'
@@ -33,14 +34,16 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar
-        role={role}
-        userName={name ?? undefined}
-        userInitials={getInitials(name)}
-        roleLabel={roleLabel}
-        pendingAccessRequests={pendingAccessRequests}
-        unreadNotifications={unreadNotifications}
-      />
+      <Suspense fallback={null}>
+        <Sidebar
+          role={role}
+          userName={name ?? undefined}
+          userInitials={getInitials(name)}
+          roleLabel={roleLabel}
+          pendingAccessRequests={pendingAccessRequests}
+          unreadNotifications={unreadNotifications}
+        />
+      </Suspense>
       <main className="flex-1 overflow-y-auto">
         <div className="min-h-[520px]">{children}</div>
         <Footer />

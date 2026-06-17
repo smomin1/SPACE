@@ -140,6 +140,8 @@ interface PlatformFormProps {
   vitalTools?: VitalToolOption[]
   /** ID of the VITAL tool already linked to this platform (edit mode) */
   linkedVitalToolId?: string | null
+  /** Where to redirect after save (defaults to /evaluations for new, /admin/platforms for edit) */
+  backHref?: string
 }
 
 export function PlatformForm({
@@ -149,6 +151,7 @@ export function PlatformForm({
   users,
   vitalTools = [],
   linkedVitalToolId = null,
+  backHref,
 }: PlatformFormProps) {
   const router = useRouter()
   const isEdit = !!platformId
@@ -168,12 +171,14 @@ export function PlatformForm({
   const trialAvailable = watch('trialAvailable')
   const track = watch('track') ?? EvaluationTrack.TOOL
   const isVital = track === EvaluationTrack.VITAL
+  const isCefr = track === EvaluationTrack.CEFR
 
   const [evaluators, setEvaluators] = React.useState<EvaluatorAssignment[]>(initialEvaluators)
   const [evalError, setEvalError] = React.useState<string | null>(null)
   const [pedagogyOpen, setPedagogyOpen] = React.useState(false)
   const [technicalOpen, setTechnicalOpen] = React.useState(false)
   const [vitalOpen, setVitalOpen] = React.useState(false)
+  const [cefrOpen, setCefrOpen] = React.useState(false)
   const [vitalToolId, setVitalToolId] = React.useState<string | null>(linkedVitalToolId)
 
   function addEvaluator(user: UserOption, type: EvaluatorType) {
@@ -214,9 +219,19 @@ export function PlatformForm({
 
   function validateEvaluators(): boolean {
     if (isVital) {
+      // A VITAL platform is satisfied by EITHER an assigned evaluator (who fills the
+      // profile) OR a linked existing VITAL assessment that's already been completed.
       const hasVital = evaluators.some((e) => e.evaluatorType === EvaluatorType.VITAL)
-      if (!hasVital) {
-        setEvalError('At least one VITAL evaluator is required.')
+      if (!hasVital && !vitalToolId) {
+        setEvalError('Assign at least one VITAL evaluator, or link an existing VITAL assessment.')
+        return false
+      }
+      return true
+    }
+    if (isCefr) {
+      const hasCefr = evaluators.some((e) => e.evaluatorType === EvaluatorType.CEFR)
+      if (!hasCefr) {
+        setEvalError('At least one CEFR evaluator is required.')
         return false
       }
       return true
@@ -276,6 +291,15 @@ export function PlatformForm({
       })
     }
 
+    // On create with CEFR track, initialise a CefrEvaluation record
+    if (!isEdit && isCefr) {
+      await fetch('/api/cefr/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platformId: pid }),
+      })
+    }
+
     // On create, auto-create an Evaluation with all assigned evaluators
     if (!isEdit) {
       await fetch('/api/evaluations', {
@@ -292,8 +316,8 @@ export function PlatformForm({
       })
     }
 
-    // Sync VITAL app link (Tool track only; field is only shown when vitalTools.length > 0)
-    if (!isVital && vitalTools.length > 0) {
+    // Sync VITAL app link (Tool + VITAL tracks; field is only shown when vitalTools.length > 0)
+    if (!isCefr && vitalTools.length > 0) {
       await fetch(`/api/platforms/${pid}/vital-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -301,7 +325,8 @@ export function PlatformForm({
       })
     }
 
-    router.push(isEdit ? '/admin/platforms' : '/evaluations')
+    const destination = backHref ?? (isEdit ? '/admin/platforms' : '/evaluations')
+    router.push(destination)
     router.refresh()
   }
 
@@ -322,18 +347,19 @@ export function PlatformForm({
           <Label>Evaluation track</Label>
           {isEdit ? (
             <div className="flex h-9 w-fit items-center rounded-md border border-stone-200 bg-stone-50 px-3 text-[13px] text-stone-700">
-              {isVital ? 'VITAL' : 'Tool Evaluator'}
+              {isVital ? 'VITAL' : isCefr ? 'CEFR Evaluations' : 'Tool Evaluator'}
             </div>
           ) : (
             <div className="inline-flex rounded-md border border-stone-200 p-0.5">
               {[
                 { value: EvaluationTrack.TOOL, label: 'Tool Evaluator' },
                 { value: EvaluationTrack.VITAL, label: 'VITAL' },
+                { value: EvaluationTrack.CEFR, label: 'CEFR Evaluations' },
               ].map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => { setValue('track', opt.value); setEvalError(null) }}
+                  onClick={() => { setValue('track', opt.value); setEvaluators([]); setEvalError(null) }}
                   className={cn(
                     'rounded px-3 h-8 text-[13px] font-medium transition-colors',
                     track === opt.value
@@ -349,6 +375,8 @@ export function PlatformForm({
           <p className="text-xs text-muted-foreground">
             {isVital
               ? 'A VITAL evaluator fills the tool profile; the recommendation engine reruns on submit.'
+              : isCefr
+              ? 'A CEFR evaluator conducts the language-alignment evaluation.'
               : 'Scored independently by Pedagogy and Technical evaluators.'}
           </p>
         </div>
@@ -391,10 +419,11 @@ export function PlatformForm({
           <Label htmlFor="trialAvailable">Trial available</Label>
         </div>
 
-        {/* VITAL app link - only for Tool Evaluator track and when VITAL tools exist */}
-        {!isVital && vitalTools.length > 0 && (
+        {/* VITAL app link - Tool track (enrich Results) and VITAL track (use an
+            already-completed assessment instead of assigning a fresh evaluator). */}
+        {!isCefr && vitalTools.length > 0 && (
           <div className="space-y-1.5">
-            <Label>Linked VITAL app</Label>
+            <Label>{isVital ? 'Link an existing VITAL assessment' : 'Linked VITAL app'}</Label>
             <Select
               value={vitalToolId ?? '__none__'}
               onValueChange={(v) => setVitalToolId(v === '__none__' ? null : v)}
@@ -410,7 +439,9 @@ export function PlatformForm({
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Link this platform to its VITAL catalogue entry so VITAL attributes appear in Results.
+              {isVital
+                ? 'Optional: link a VITAL assessment that has already been completed instead of assigning an evaluator. Its score feeds the pipeline directly.'
+                : 'Link this platform to its VITAL catalogue entry so VITAL attributes appear in Results.'}
             </p>
           </div>
         )}
@@ -424,11 +455,12 @@ export function PlatformForm({
         <p className="text-sm text-muted-foreground">
           {isVital
             ? 'Assign at least one VITAL evaluator. They fill the VITAL profile after registration.'
+            : isCefr
+            ? 'Assign at least one CEFR evaluator to conduct the language-alignment evaluation.'
             : 'Assign at least one Pedagogy and one Technical evaluator.'}
         </p>
 
         {isVital ? (
-          /* VITAL */
           <EvaluatorSection
             label="VITAL"
             type={EvaluatorType.VITAL}
@@ -440,9 +472,20 @@ export function PlatformForm({
             onRemove={removeEvaluator}
             onToggleLead={toggleLead}
           />
+        ) : isCefr ? (
+          <EvaluatorSection
+            label="CEFR Evaluator"
+            type={EvaluatorType.CEFR}
+            evaluators={evaluators}
+            available={vitalUsers.filter((u) => !assignedUserIds.has(u.id))}
+            open={cefrOpen}
+            onOpenChange={setCefrOpen}
+            onAdd={(u) => { addEvaluator(u, EvaluatorType.CEFR); setCefrOpen(false) }}
+            onRemove={removeEvaluator}
+            onToggleLead={toggleLead}
+          />
         ) : (
           <>
-            {/* Pedagogy */}
             <EvaluatorSection
               label="Pedagogy"
               type={EvaluatorType.PEDAGOGY}
@@ -454,8 +497,6 @@ export function PlatformForm({
               onRemove={removeEvaluator}
               onToggleLead={toggleLead}
             />
-
-            {/* Technical */}
             <EvaluatorSection
               label="Technical"
               type={EvaluatorType.TECHNICAL}

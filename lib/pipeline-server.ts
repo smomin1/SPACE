@@ -122,15 +122,50 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
   if (newlyPassed.length > 0) {
     const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { name: true } })
     const name = platform?.name ?? 'A platform'
+    const NEXT_STAGE_LINK: Record<string, string> = {
+      CEFR: '/admin/platforms?tab=cefr',
+      VITAL: '/admin/platforms?tab=vital',
+      PRD: '/admin/platforms',
+    }
     for (const r of newlyPassed) {
       const next = nextStage(r.stage)
       const score = r.score != null ? ` (${r.score.toFixed(0)}%)` : ''
+      const link = next ? (NEXT_STAGE_LINK[next] ?? '/admin/pipeline') : '/results/final'
       await notifyAdmins({
         type: 'STAGE_PASSED',
         title: `${name} passed ${STAGE_LABELS[r.stage]}${score}`,
-        body: next ? `Assign the ${STAGE_LABELS[next]} stage to continue the pipeline.` : 'All stages cleared — ready for the Final Report.',
-        link: '/admin/pipeline',
+        body: next ? `Assign the ${STAGE_LABELS[next]} evaluator to continue the pipeline.` : 'All stages cleared — ready for the Final Report.',
+        link,
       })
+    }
+  }
+
+  // Linear stage hand-off (AI → CEFR → VITAL → Tool Evaluator). When a stage passes,
+  // flip the platform onto the next track so it surfaces in that track's assignment
+  // tab, and reopen the shadow Evaluation (downstream submit routes require state
+  // IN_PROGRESS). Prior-stage records (CefrEvaluation, VitalTool, assignments) are
+  // left intact, so completed work stays visible in its own tab. The CEFR check runs
+  // before the VITAL check so a platform that clears several stages at once chains all
+  // the way through in a single sync. Each flip is guarded on the current track, so it
+  // runs once and never pulls a TOOL-native platform backwards.
+  const reopenShadow = async () => {
+    const shadow = await prisma.evaluation.findFirst({ where: { platformId }, select: { id: true } })
+    if (shadow) await prisma.evaluation.update({ where: { id: shadow.id }, data: { state: 'IN_PROGRESS' } })
+  }
+
+  if (newlyPassed.some((r) => r.stage === 'CEFR')) {
+    const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { track: true } })
+    if (platform?.track === 'CEFR') {
+      await prisma.platform.update({ where: { id: platformId }, data: { track: 'VITAL' } })
+      await reopenShadow()
+    }
+  }
+
+  if (newlyPassed.some((r) => r.stage === 'VITAL')) {
+    const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { track: true } })
+    if (platform?.track === 'VITAL') {
+      await prisma.platform.update({ where: { id: platformId }, data: { track: 'TOOL' } })
+      await reopenShadow()
     }
   }
 
@@ -139,8 +174,54 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
 
 /** Sync every platform (used by the admin board). */
 export async function syncAllPipelines(): Promise<void> {
+  await autoLinkUnlinkedScans()
+  // Fix any notifications that still point to the old /cefr route.
+  await prisma.notification.updateMany({
+    where: { link: '/cefr' },
+    data: { link: '/admin/platforms?tab=cefr' },
+  })
   const platforms = await prisma.platform.findMany({ select: { id: true } })
   for (const p of platforms) await syncPlatformPipeline(p.id)
+}
+
+/**
+ * Find completed AI scans with no platformId and auto-create / link a Platform
+ * for each one so they feed the pipeline without requiring manual admin action.
+ */
+async function autoLinkUnlinkedScans(): Promise<void> {
+  const unlinked = await prisma.searchEvaluation.findMany({
+    where: { status: 'COMPLETED', platformId: null },
+    select: { id: true, platformName: true, url: true },
+  })
+  for (const scan of unlinked) {
+    try {
+      const domain = (() => {
+        try { return new URL(scan.url).hostname.replace(/^www\./, '') } catch { return scan.platformName }
+      })()
+      let platform = await prisma.platform.findFirst({ where: { name: scan.platformName }, select: { id: true } })
+      if (!platform) {
+        platform = await prisma.platform.create({ data: { name: scan.platformName, vendor: domain, track: 'CEFR' } })
+      }
+      await prisma.searchEvaluation.update({ where: { id: scan.id }, data: { platformId: platform.id } })
+    } catch (err) {
+      console.error(`[pipeline] auto-link failed for scan ${scan.id}:`, err)
+    }
+  }
+
+  // Migrate any TOOL-track platforms that were auto-created from AI scans (no evaluators, no evaluations)
+  // to CEFR track so they appear in the CEFR Evaluations tab.
+  const autoCreated = await prisma.platform.findMany({
+    where: {
+      track: 'TOOL',
+      evaluatorAssignments: { none: {} },
+      evaluations: { none: {} },
+      searchEvaluations: { some: { status: 'COMPLETED' } },
+    },
+    select: { id: true },
+  })
+  for (const p of autoCreated) {
+    await prisma.platform.update({ where: { id: p.id }, data: { track: 'CEFR' } }).catch(() => {})
+  }
 }
 
 /** Manually skip (or un-skip) a stage, then re-sync. */
@@ -156,5 +237,11 @@ export async function setStageSkipped(platformId: string, stage: PipelineStage, 
 /** Attach an existing AI screening run to a platform so it feeds the AI stage. */
 export async function linkSearchEvaluation(platformId: string, searchEvaluationId: string) {
   await prisma.searchEvaluation.update({ where: { id: searchEvaluationId }, data: { platformId } })
+  return syncPlatformPipeline(platformId)
+}
+
+/** Attach an existing VitalTool to a platform so it feeds the VITAL stage. */
+export async function linkVitalTool(platformId: string, vitalToolId: string) {
+  await prisma.vitalTool.update({ where: { id: vitalToolId }, data: { platformId } })
   return syncPlatformPipeline(platformId)
 }

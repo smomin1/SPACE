@@ -32,7 +32,13 @@ const HARD_FAIL_LABEL: Record<ScreeningHardFail, string> = {
   IF_NO: 'Hard-fail if No',
 }
 
-export function ScreeningQuestionsTable({ initialData }: { initialData: Question[] }) {
+export function ScreeningQuestionsTable({
+  initialData,
+  basePath = '/admin/screening-questions',
+}: {
+  initialData: Question[]
+  basePath?: string
+}) {
   const router = useRouter()
   const [deleteTarget, setDeleteTarget] = React.useState<Question | null>(null)
   const [deleting, setDeleting] = React.useState(false)
@@ -66,7 +72,7 @@ export function ScreeningQuestionsTable({ initialData }: { initialData: Question
           Tool Scanner
         </p>
         <Button asChild size="sm">
-          <Link href="/admin/screening-questions/new">
+          <Link href={`${basePath}/new`}>
             <PlusIcon className="mr-1.5 size-3.5" />
             New question
           </Link>
@@ -112,7 +118,7 @@ export function ScreeningQuestionsTable({ initialData }: { initialData: Question
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
                         <Button asChild variant="ghost" size="sm" className="h-7 px-2">
-                          <Link href={`/admin/screening-questions/${q.id}/edit`}>
+                          <Link href={`${basePath}/${q.id}/edit`}>
                             <PencilIcon className="size-3.5 text-stone-500" />
                           </Link>
                         </Button>

@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { runToolScanEvaluation } from '@/lib/claude-tool-scanner'
+import { syncPlatformPipeline } from '@/lib/pipeline-server'
 import type {
   ScreeningQuestionInput,
   ScreeningResult,
@@ -144,6 +145,21 @@ async function runOne(ev: {
         },
       }),
     ])
+
+    // Auto-link: find or create a Platform for this scan so it feeds the pipeline immediately.
+    // Only do this if the scan isn't already linked.
+    const fresh = await prisma.searchEvaluation.findUnique({ where: { id: ev.id }, select: { platformId: true } })
+    if (!fresh?.platformId) {
+      const domain = (() => { try { return new URL(ev.url).hostname.replace(/^www\./, '') } catch { return ev.platformName } })()
+      let platform = await prisma.platform.findFirst({ where: { name: ev.platformName }, select: { id: true } })
+      if (!platform) {
+        platform = await prisma.platform.create({ data: { name: ev.platformName, vendor: domain, track: 'CEFR' } })
+      }
+      await prisma.searchEvaluation.update({ where: { id: ev.id }, data: { platformId: platform.id } })
+      await syncPlatformPipeline(platform.id).catch((err) =>
+        console.error('[tool-scanner] pipeline sync failed after auto-link:', err),
+      )
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error during scan'
 

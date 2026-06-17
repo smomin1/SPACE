@@ -7,15 +7,17 @@ import {
   syncAllPipelines,
   setStageSkipped,
   linkSearchEvaluation,
+  linkVitalTool,
 } from '@/lib/pipeline-server'
 
 export const runtime = 'nodejs'
 
 const schema = z.object({
-  type: z.enum(['sync', 'sync-all', 'skip', 'unskip', 'link']),
+  type: z.enum(['sync', 'sync-all', 'skip', 'unskip', 'link', 'link-vital']),
   platformId: z.string().optional(),
   stage: z.enum(['AI_SCREENING', 'CEFR', 'VITAL', 'PRD']).optional(),
   searchEvaluationId: z.string().optional(),
+  vitalToolId: z.string().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -54,6 +56,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           ok: true,
           results: await linkSearchEvaluation(body.platformId, body.searchEvaluationId),
+        })
+      case 'link-vital':
+        if (!body.platformId || !body.vitalToolId) return badRequest('platformId and vitalToolId required')
+        return NextResponse.json({
+          ok: true,
+          results: await linkVitalTool(body.platformId, body.vitalToolId),
         })
     }
   } catch (err) {

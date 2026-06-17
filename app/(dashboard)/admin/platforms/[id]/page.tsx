@@ -37,7 +37,7 @@ export default async function PlatformDetailPage({ params }: Props) {
   if (!platform) notFound()
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="mx-auto max-w-4xl px-6 py-8">
       <div className="mb-6">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/platforms">

@@ -11,6 +11,7 @@ const ALLOWED_ROLES_FOR_TYPE: Record<EvaluatorType, Role[]> = {
   TECHNICAL: ['TECHNICAL_EVALUATOR', 'ADMIN'],
   VITAL:     ['VITAL_EVALUATOR', 'ADMIN'],
   BOTH:      ['PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'ADMIN'],
+  CEFR:      ['VITAL_EVALUATOR', 'ADMIN'],
 }
 
 export async function GET(
@@ -78,6 +79,13 @@ export async function POST(
   const { userId, evaluatorType, isLead, action } = parsed.data
 
   try {
+    const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { name: true, track: true } })
+    // Every track needs a shadow Evaluation + EvaluatorAssignment so the platform
+    // surfaces in the assignee's Evaluations tab. This matters in particular when a
+    // platform is assigned via the edit page (e.g. a pipeline-advanced TOOL platform),
+    // where the create-time /api/evaluations call doesn't run.
+    const needsShadowEvaluation = !!platform
+
     if (action === 'assign') {
       // Validate the user's actual role is compatible with the requested evaluatorType
       const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
@@ -104,16 +112,34 @@ export async function POST(
         update: { evaluatorType, isLead },
         include: { user: { select: { id: true, name: true, email: true, role: true } } },
       })
-      // Notify the evaluator on a NEW assignment. CEFR & VITAL evaluators (type
-      // VITAL) own the CEFR + VITAL stages, so link them to the CEFR workspace.
+
+      // Keep the Evaluation + EvaluatorAssignment layer in sync so the platform appears
+      // in the Evaluations tab for the assigned evaluator.
+      if (needsShadowEvaluation) {
+        let evaluation = await prisma.evaluation.findFirst({ where: { platformId }, select: { id: true } })
+        if (!evaluation) {
+          evaluation = await prisma.evaluation.create({
+            data: { platformId, assignments: { create: [{ userId, evaluatorType, isLead }] } },
+            select: { id: true },
+          })
+        } else {
+          await prisma.evaluatorAssignment.upsert({
+            where: { evaluationId_userId: { evaluationId: evaluation.id, userId } },
+            create: { evaluationId: evaluation.id, userId, evaluatorType, isLead },
+            update: { evaluatorType, isLead },
+          })
+        }
+      }
+
+      // Notify the evaluator on a NEW assignment. CEFR opens its platform-scoped
+      // workspace directly; VITAL is reached through the Evaluations tab (workspace
+      // is keyed by evaluationId).
       if (!wasAssigned) {
-        const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { name: true } })
-        const isCefrVital = evaluatorType === 'VITAL'
         await notifyUser(userId, {
           type: 'STAGE_ASSIGNED',
-          title: `You've been assigned ${isCefrVital ? 'CEFR & VITAL' : evaluatorType.toLowerCase()} evaluation`,
+          title: `You've been assigned ${evaluatorType === 'CEFR' ? 'CEFR' : evaluatorType === 'VITAL' ? 'VITAL' : evaluatorType.toLowerCase()} evaluation`,
           body: `${platform?.name ?? 'A platform'} is ready for your evaluation.`,
-          link: isCefrVital ? `/cefr-evaluate/${platformId}` : `/evaluations`,
+          link: evaluatorType === 'CEFR' ? `/cefr-evaluate/${platformId}` : `/evaluations`,
         })
       }
       return Response.json({ assignment }, { status: 201 })
@@ -132,6 +158,14 @@ export async function POST(
         )
       }
       await prisma.platformEvaluatorAssignment.deleteMany({ where: { platformId, userId } })
+
+      // For CEFR/VITAL-track platforms, also remove from the Evaluation's assignments.
+      if (needsShadowEvaluation) {
+        const evaluation = await prisma.evaluation.findFirst({ where: { platformId }, select: { id: true } })
+        if (evaluation) {
+          await prisma.evaluatorAssignment.deleteMany({ where: { evaluationId: evaluation.id, userId } })
+        }
+      }
       return Response.json({ removed: true })
     }
   } catch {

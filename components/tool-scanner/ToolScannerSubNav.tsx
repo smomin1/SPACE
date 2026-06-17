@@ -6,22 +6,26 @@ import { cn } from '@/lib/utils'
 
 // Reserved tab slugs: a single-segment route that is NOT one of these is an
 // evaluation detail page (/tool-scanner/{id}), which highlights the Evaluator tab.
-const RESERVED = ['/tool-scanner/best-fit', '/tool-scanner/rankings', '/tool-scanner/matrix', '/tool-scanner/analysis']
+const RESERVED = ['/tool-scanner/best-fit', '/tool-scanner/rankings', '/tool-scanner/matrix', '/tool-scanner/analysis', '/tool-scanner/screening']
 
-const TABS = [
+type Tab = { href: string; label: string; match: (p: string) => boolean; adminOnly?: boolean }
+
+const TABS: Tab[] = [
   { href: '/tool-scanner', label: 'Evaluator', match: (p: string) => p === '/tool-scanner' || (/^\/tool-scanner\/[^/]+$/.test(p) && !RESERVED.includes(p)) },
   { href: '/tool-scanner/best-fit', label: 'Best Fit', match: (p: string) => p.startsWith('/tool-scanner/best-fit') },
   { href: '/tool-scanner/rankings', label: 'Rankings', match: (p: string) => p.startsWith('/tool-scanner/rankings') },
   { href: '/tool-scanner/matrix', label: 'Scoring Matrix', match: (p: string) => p.startsWith('/tool-scanner/matrix') },
   { href: '/tool-scanner/analysis', label: 'Categorical Analysis', match: (p: string) => p.startsWith('/tool-scanner/analysis') },
+  { href: '/tool-scanner/screening', label: 'Screening Questions', match: (p: string) => p === '/tool-scanner/screening' || p.startsWith('/tool-scanner/screening/'), adminOnly: true },
 ]
 
-export function ToolScannerSubNav() {
+export function ToolScannerSubNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname() ?? ''
+  const visibleTabs = TABS.filter((t) => !t.adminOnly || isAdmin)
   return (
     <div className="border-b border-stone-200/70 bg-white/80">
       <div className="mx-auto flex max-w-7xl items-center gap-1 px-6">
-        {TABS.map((tab) => {
+        {visibleTabs.map((tab) => {
           const active = tab.match(pathname)
           return (
             <Link

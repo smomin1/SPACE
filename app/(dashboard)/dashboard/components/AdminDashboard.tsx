@@ -9,6 +9,7 @@ import {
   PlusIcon,
   BarChart2Icon,
   InboxIcon,
+  BellIcon,
 } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { cn, relativeTime } from '@/lib/utils'
@@ -18,9 +19,9 @@ import { EvalStateBadge } from '@/components/admin/_shared/badges'
 
 function getNow() { return Date.now() }
 
-export async function AdminDashboard({ role }: { role: string }) {
+export async function AdminDashboard({ role, userId }: { role: string; userId: string }) {
   const now = getNow()
-  const [stateCounts, activeEvaluations, recentMessages, recentSubmissions, platformCount, pendingAccessRequests] =
+  const [stateCounts, activeEvaluations, recentMessages, recentSubmissions, platformCount, pendingAccessRequests, recentNotifications] =
     await Promise.all([
       prisma.evaluation.groupBy({
         by: ['state'],
@@ -72,6 +73,12 @@ export async function AdminDashboard({ role }: { role: string }) {
       }),
       prisma.platform.count(),
       prisma.accessRequest.count({ where: { status: 'PENDING' } }),
+      prisma.notification.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 8,
+        select: { id: true, title: true, body: true, link: true, readAt: true, createdAt: true },
+      }),
     ])
 
   const inProgressCount = stateCounts.find(r => r.state === 'IN_PROGRESS')?._count.id ?? 0
@@ -318,37 +325,84 @@ export async function AdminDashboard({ role }: { role: string }) {
           )}
         </div>
 
-        {/* Activity feed */}
-        <div className="xl:col-span-1 rounded-xl border border-stone-200/80 bg-white p-5">
-          <h2 className="text-sm font-semibold text-emerald-950 mb-4">Recent Activity</h2>
-          {activityFeed.length === 0 ? (
-            <p className="text-sm text-stone-400 py-4 text-center">No recent activity.</p>
+        {/* Notifications panel */}
+        <div className="xl:col-span-1 rounded-xl border border-stone-200/80 bg-white p-5 flex flex-col">
+          <div className="flex items-center gap-2 mb-4 shrink-0">
+            <BellIcon className="size-4 text-stone-400" />
+            <h2 className="text-sm font-semibold text-emerald-950">Notifications</h2>
+            {recentNotifications.some(n => !n.readAt) && (
+              <span className="inline-flex items-center justify-center rounded-full bg-amber-100 text-amber-700 text-[11px] font-semibold w-5 h-5 ring-1 ring-amber-200">
+                {recentNotifications.filter(n => !n.readAt).length}
+              </span>
+            )}
+            <Link href="/notifications" className="ml-auto text-[11px] text-stone-400 hover:text-emerald-700 transition-colors">
+              View all
+            </Link>
+          </div>
+          {recentNotifications.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 py-8">
+              <BellIcon className="size-5 text-stone-300" />
+              <p className="text-sm text-stone-400">No notifications yet.</p>
+            </div>
           ) : (
-            <div className="space-y-3">
-              {activityFeed.map(item => (
-                <Link key={item.key} href={item.track === 'VITAL' ? `/vital-evaluate/${item.evalId}` : `/evaluate/${item.evalId}`}>
-                  <div className="flex items-start gap-3 py-2 rounded-md hover:bg-stone-50 px-2 transition-colors">
-                    <div className={cn(
-                      'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full ring-1',
-                      item.type === 'message'
-                        ? 'bg-amber-50 ring-amber-200 text-amber-600'
-                        : 'bg-emerald-50 ring-emerald-200 text-emerald-700',
-                    )}>
-                      {item.type === 'message'
-                        ? <MessageSquareIcon className="size-3" />
-                        : <CheckIcon className="size-3" />
-                      }
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[12.5px] text-emerald-950 leading-snug">{item.label}</p>
-                      <p className="text-[11px] text-stone-400 mt-0.5">{relativeTime(item.at)}</p>
+            <div className="space-y-2 overflow-y-auto">
+              {recentNotifications.map(n => {
+                const inner = (
+                  <div className={cn(
+                    'flex items-start gap-3 rounded-lg border px-3 py-2.5 transition-colors',
+                    n.readAt ? 'border-stone-200/70 bg-white' : 'border-emerald-200/70 bg-emerald-50/40',
+                  )}>
+                    {!n.readAt && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-emerald-500" />}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12.5px] font-medium text-emerald-950 leading-snug">{n.title}</p>
+                      {n.body && <p className="mt-0.5 text-[11.5px] text-stone-500 leading-snug">{n.body}</p>}
+                      <p className="mt-1 text-[10.5px] text-stone-400">{relativeTime(n.createdAt)}</p>
                     </div>
                   </div>
-                </Link>
-              ))}
+                )
+                return (
+                  <div key={n.id}>
+                    {n.link ? (
+                      <Link href={n.link} className="block hover:opacity-90">{inner}</Link>
+                    ) : inner}
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Activity feed */}
+      <div className="rounded-xl border border-stone-200/80 bg-white p-5">
+        <h2 className="text-sm font-semibold text-emerald-950 mb-4">Recent Activity</h2>
+        {activityFeed.length === 0 ? (
+          <p className="text-sm text-stone-400 py-4 text-center">No recent activity.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+            {activityFeed.map(item => (
+              <Link key={item.key} href={item.track === 'VITAL' ? `/vital-evaluate/${item.evalId}` : `/evaluate/${item.evalId}`}>
+                <div className="flex items-start gap-3 py-2 rounded-md hover:bg-stone-50 px-2 transition-colors">
+                  <div className={cn(
+                    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full ring-1',
+                    item.type === 'message'
+                      ? 'bg-amber-50 ring-amber-200 text-amber-600'
+                      : 'bg-emerald-50 ring-emerald-200 text-emerald-700',
+                  )}>
+                    {item.type === 'message'
+                      ? <MessageSquareIcon className="size-3" />
+                      : <CheckIcon className="size-3" />
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12.5px] text-emerald-950 leading-snug">{item.label}</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">{relativeTime(item.at)}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <ToolPicker />

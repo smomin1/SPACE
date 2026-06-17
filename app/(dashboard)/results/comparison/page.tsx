@@ -31,7 +31,7 @@ export type PlatformRow = {
   recommendation: ReturnType<typeof getRecommendedAction> | 'DISQUALIFIED' | null
   vital: {
     verdict: VitalVerdict | null
-    score10: number | null
+    score50: number | null
     risk: VitalRisk | null
   } | null
   agreedAgeRange: { ageMin: number; ageMax: number } | null
@@ -221,7 +221,7 @@ export default async function ComparisonPage({
   const vitalOf = (id: string): PlatformRow['vital'] => {
     const prof = vitalProfiles.get(id)
     if (!prof) return null
-    return { verdict: prof.verdict, score10: prof.vitalScore10, risk: prof.deFactoRisk }
+    return { verdict: prof.verdict, score50: prof.v2Score50, risk: prof.deFactoRisk }
   }
 
   const rows: PlatformRow[] = platforms.map(p => {

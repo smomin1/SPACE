@@ -74,8 +74,8 @@ export default function ComparisonTable({
         av = a.overallPct
         bv = b.overallPct
       } else if (sortKey === 'vital') {
-        av = a.vital?.score10 ?? null
-        bv = b.vital?.score10 ?? null
+        av = a.vital?.score50 ?? null
+        bv = b.vital?.score50 ?? null
       } else {
         av = a.categoryScores[sortKey] ?? null
         bv = b.categoryScores[sortKey] ?? null
@@ -332,8 +332,8 @@ function VitalCell({ vital }: { vital: PlatformRow['vital'] }) {
         <span className="text-stone-300 text-xs">No verdict</span>
       )}
       <div className="flex items-center gap-1.5 text-[11px]">
-        {vital.score10 != null && (
-          <span className="font-semibold tabular-nums text-emerald-900">{vital.score10}/10</span>
+        {vital.score50 != null && (
+          <span className="font-semibold tabular-nums text-emerald-900">{vital.score50}/50</span>
         )}
         {vital.risk && (
           <span className={cn('inline-flex items-center rounded px-1.5 py-0 text-[10px] font-medium ring-1', RISK_CLASS[vital.risk])}>

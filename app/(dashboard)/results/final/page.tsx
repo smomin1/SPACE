@@ -10,6 +10,7 @@ import {
 import { evaluatePlatformPipeline, getOrCreateConfig } from '@/lib/pipeline-server'
 import { alignmentPercent } from '@/lib/cefr'
 import type { CefrAnswer } from '@prisma/client'
+import { PipelineBarChart, AggregateBarChart, type PipelineRow } from './PipelineChart'
 
 // Map individual skill names → one of 4 display buckets
 const SKILL_BUCKET: Record<string, 'SL' | 'RV' | 'G' | 'W'> = {
@@ -86,6 +87,19 @@ export default async function FinalReportPage() {
   const completed = rows.filter((r) => r.complete).sort((a, b) => b.aggregate - a.aggregate)
   const inProgress = rows.filter((r) => !r.complete)
 
+  // Chart data — all platforms with at least one stage score
+  const chartRows: PipelineRow[] = rows
+    .filter((r) => r.stages.some((s) => s.score != null))
+    .sort((a, b) => b.aggregate - a.aggregate)
+    .map((r) => ({
+      name: r.name,
+      'AI Screening': r.stages.find((s) => s.stage === 'AI_SCREENING')?.score ?? null,
+      'CEFR':         r.stages.find((s) => s.stage === 'CEFR')?.score ?? null,
+      'VITAL':        r.stages.find((s) => s.stage === 'VITAL')?.score ?? null,
+      'Tool Eval':    r.stages.find((s) => s.stage === 'PRD')?.score ?? null,
+      aggregate:      r.aggregate,
+    }))
+
   const microLevels = await buildCefrMicroLevels()
 
   return (
@@ -156,6 +170,30 @@ export default async function FinalReportPage() {
           </p>
         )}
       </section>
+
+      {/* ── Pipeline score breakdown ──────────────────────────────────────── */}
+      {chartRows.length > 0 && (
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-serif text-[18px] tracking-tight text-emerald-950">Score by Evaluation Stage</h2>
+            <p className="mt-0.5 text-[12px] text-stone-500">
+              How each platform performed across all four stages of the pipeline.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Stage breakdown grouped bar */}
+            <div className="rounded-xl border border-stone-200/80 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-4">Stage Scores</p>
+              <PipelineBarChart rows={chartRows} />
+            </div>
+            {/* Aggregate ranked bar */}
+            <div className="rounded-xl border border-stone-200/80 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-4">Aggregate Score Ranking</p>
+              <AggregateBarChart rows={chartRows} />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── CEFR micro-level recommendations ──────────────────────────────── */}
       <section className="space-y-4">

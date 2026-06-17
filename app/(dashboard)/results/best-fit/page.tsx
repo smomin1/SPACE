@@ -11,6 +11,8 @@ import {
   matchesVitalFilter,
 } from '@/lib/vital/profile'
 import { FullscreenWrapper } from '@/components/ui/fullscreen-wrapper'
+import { evaluatePlatformPipeline, getOrCreateConfig } from '@/lib/pipeline-server'
+import { aggregateFromScores, type StageScoreMap, STAGE_ORDER } from '@/lib/pipeline'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -60,6 +62,7 @@ type EvalRow = {
 type SetMember = {
   id: string; name: string; vendor: string
   overallPct: number | null
+  pipelineAggregate: number | null
   marginalGainPct: number
   topCategories: { category: string; pct: number }[]
 }
@@ -223,6 +226,7 @@ function buildCombinedAnalysis(
   platforms: PlatformRow[],
   requirements: RawReq[],
   platformScores: Map<string, Map<string, number>>,
+  pipelineAggregates: Map<string, number> = new Map(),
 ): CombinedAnalysis {
   const platformById = new Map(platforms.map(p => [p.id, p]))
 
@@ -262,6 +266,7 @@ function buildCombinedAnalysis(
     return {
       id: pid, name: p.name, vendor: p.vendor,
       overallPct,
+      pipelineAggregate: pipelineAggregates.get(pid) ?? null,
       marginalGainPct: marginalGains.get(pid) ?? 0,
       topCategories,
     }
@@ -666,9 +671,24 @@ export default async function BestFitPage({
   const { selectedIds, bestPerReq, marginalGains } = greedySetCover(
     platformsWithData, allRequirements, overviewScores,
   )
+
+  // Fetch pipeline aggregate for each platform in the recommended set so the
+  // card can show the cross-stage composite score alongside the PRD score.
+  const pipelineConfig = await getOrCreateConfig()
+  const pipelineAggregates = new Map<string, number>()
+  await Promise.all(
+    selectedIds.map(async (pid) => {
+      const { derived } = await evaluatePlatformPipeline(pid, pipelineConfig)
+      const scoreMap = Object.fromEntries(
+        STAGE_ORDER.map((s) => [s, derived[s].score]),
+      ) as StageScoreMap
+      pipelineAggregates.set(pid, aggregateFromScores(scoreMap, pipelineConfig))
+    }),
+  )
+
   const analysis = buildCombinedAnalysis(
     selectedIds, bestPerReq, marginalGains,
-    platformsWithData, allRequirements, overviewScores,
+    platformsWithData, allRequirements, overviewScores, pipelineAggregates,
   )
 
   return (
@@ -773,7 +793,24 @@ function SetMemberCard({
           <p className="text-sm text-stone-500 truncate">{m.vendor}</p>
         </div>
         <div className="text-right shrink-0">
-          {m.overallPct !== null && (
+          {m.pipelineAggregate !== null ? (
+            <>
+              <p className={`text-xl font-bold tabular-nums ${scoreColor(m.pipelineAggregate)}`}>
+                {m.pipelineAggregate.toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-stone-400 mt-0.5">pipeline</p>
+              {m.overallPct !== null && (
+                <p className="text-[11px] tabular-nums text-stone-400 mt-0.5">
+                  PRD: {m.overallPct.toFixed(0)}%
+                </p>
+              )}
+              {tierLabel && (
+                <span className={`inline-flex mt-1 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white ${tierColor(tier!)}`}>
+                  {tierLabel}
+                </span>
+              )}
+            </>
+          ) : m.overallPct !== null ? (
             <>
               <p className={`text-xl font-bold tabular-nums ${scoreColor(m.overallPct)}`}>
                 {m.overallPct.toFixed(1)}%
@@ -784,15 +821,16 @@ function SetMemberCard({
                 </span>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
-      {m.overallPct !== null && (
+      {/* Progress bar uses pipeline aggregate when available, else PRD */}
+      {(m.pipelineAggregate !== null || m.overallPct !== null) && (
         <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
           <div
             className={`h-full rounded-full ${isPrimary ? 'bg-emerald-600' : 'bg-stone-400'}`}
-            style={{ width: `${Math.min(100, m.overallPct)}%` }}
+            style={{ width: `${Math.min(100, m.pipelineAggregate ?? m.overallPct ?? 0)}%` }}
           />
         </div>
       )}

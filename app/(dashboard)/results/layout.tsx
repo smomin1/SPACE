@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { ResultsNav } from './components/ResultsNav'
 import { FilterBar } from './components/FilterBar'
+import { DataScopeNote } from './components/DataScopeNote'
 import { ExportButtons } from '@/components/export/ExportButtons'
 
 export default async function ResultsLayout({
@@ -71,6 +72,7 @@ export default async function ResultsLayout({
 
       {/* Scrollable content */}
       <main className="container mx-auto max-w-7xl px-6 py-6">
+        <DataScopeNote />
         {children}
       </main>
     </div>

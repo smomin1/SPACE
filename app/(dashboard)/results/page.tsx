@@ -17,8 +17,8 @@ export default async function ResultsPage({
   }
 
   const target = qs.size > 0
-    ? `/results/comparison?${qs.toString()}`
-    : '/results/comparison'
+    ? `/results/final?${qs.toString()}`
+    : '/results/final'
 
   redirect(target)
 }

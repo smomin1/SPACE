@@ -5,11 +5,11 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const TABS = [
+  { href: '/results/final',           label: 'Final Report' },
   { href: '/results/comparison',      label: 'Comparison' },
   { href: '/results/breakdown',       label: 'Categories' },
   { href: '/results/best-fit',        label: 'Best Fit' },
   { href: '/results/build-readiness', label: 'Build Readiness' },
-  { href: '/results/final',           label: 'Final Report' },
 ]
 
 export function ResultsNav() {

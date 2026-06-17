@@ -10,7 +10,7 @@ import {
 import { evaluatePlatformPipeline, getOrCreateConfig } from '@/lib/pipeline-server'
 import { alignmentPercent } from '@/lib/cefr'
 import type { CefrAnswer } from '@prisma/client'
-import { PipelineBarChart, AggregateBarChart, type PipelineRow } from './PipelineChart'
+import { PipelineHeatmap, AggregateBarChart, type PipelineRow } from './PipelineChart'
 
 // Map individual skill names → one of 4 display buckets
 const SKILL_BUCKET: Record<string, 'SL' | 'RV' | 'G' | 'W'> = {
@@ -181,16 +181,8 @@ export default async function FinalReportPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Stage breakdown grouped bar */}
-            <div className="rounded-xl border border-stone-200/80 bg-white p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-4">Stage Scores</p>
-              <PipelineBarChart rows={chartRows} />
-            </div>
-            {/* Aggregate ranked bar */}
-            <div className="rounded-xl border border-stone-200/80 bg-white p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-4">Aggregate Score Ranking</p>
-              <AggregateBarChart rows={chartRows} />
-            </div>
+            <PipelineHeatmap rows={chartRows} />
+            <AggregateBarChart rows={chartRows} />
           </div>
         </section>
       )}

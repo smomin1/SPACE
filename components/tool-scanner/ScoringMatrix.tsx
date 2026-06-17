@@ -4,8 +4,8 @@ import * as React from 'react'
 import * as XLSX from 'xlsx'
 import { DownloadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
 import { ScreeningAnswerBadge } from '@/components/tool-scanner/ScreeningAnswerBadge'
+import { MultiSelect } from '@/components/tool-scanner/MultiSelect'
 import type { ScreeningAnswer } from '@prisma/client'
 
 interface MatrixPlatform {
@@ -48,16 +48,6 @@ export function ScoringMatrix({
   const visiblePlatforms = platforms.filter((p) => selectedPlatforms.includes(p.id))
   const visibleQuestions = questions.filter((q) => selectedCategories.includes(q.category))
 
-  function togglePlatform(id: string) {
-    setSelectedPlatforms((cur) =>
-      cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id],
-    )
-  }
-  function toggleCategory(cat: string) {
-    setSelectedCategories((cur) =>
-      cur.includes(cat) ? cur.filter((x) => x !== cat) : [...cur, cat],
-    )
-  }
 
   function downloadExcel() {
     const header = ['#', 'Question', 'Category', ...visiblePlatforms.map((p) => p.platformName)]
@@ -88,45 +78,19 @@ export function ScoringMatrix({
   return (
     <div className="space-y-5">
       {/* Filters */}
-      <div className="grid gap-4 rounded-lg border border-stone-200/80 bg-white p-4 shadow-sm md:grid-cols-2">
-        <div>
-          <Label className="text-[12px] text-stone-600">Platforms</Label>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {platforms.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => togglePlatform(p.id)}
-                className={
-                  'h-7 rounded-md px-2.5 text-[12px] font-medium transition-colors ' +
-                  (selectedPlatforms.includes(p.id)
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200')
-                }
-              >
-                {p.platformName}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <Label className="text-[12px] text-stone-600">Categories</Label>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {allCategories.map((c) => (
-              <button
-                key={c}
-                onClick={() => toggleCategory(c)}
-                className={
-                  'h-7 rounded-md px-2.5 text-[12px] font-medium transition-colors ' +
-                  (selectedCategories.includes(c)
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200')
-                }
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="grid gap-3 rounded-lg border border-stone-200/80 bg-white p-4 shadow-sm sm:grid-cols-2">
+        <MultiSelect
+          label="Platforms"
+          options={platforms.map((p) => ({ value: p.id, label: p.platformName }))}
+          selected={selectedPlatforms}
+          onChange={setSelectedPlatforms}
+        />
+        <MultiSelect
+          label="Categories"
+          options={allCategories.map((c) => ({ value: c, label: c }))}
+          selected={selectedCategories}
+          onChange={setSelectedCategories}
+        />
       </div>
 
       <div className="flex items-center justify-between">

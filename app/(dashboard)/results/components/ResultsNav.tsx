@@ -9,6 +9,7 @@ const TABS = [
   { href: '/results/breakdown',       label: 'Categories' },
   { href: '/results/best-fit',        label: 'Best Fit' },
   { href: '/results/build-readiness', label: 'Build Readiness' },
+  { href: '/results/final',           label: 'Final Report' },
 ]
 
 export function ResultsNav() {

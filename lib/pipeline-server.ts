@@ -69,14 +69,18 @@ export async function getOrCreateConfig() {
   return existing ?? prisma.pipelineConfig.create({ data: { id: 'singleton' } })
 }
 
-/** Recompute and persist a platform's stage runs from current source data. */
-export async function syncPlatformPipeline(platformId: string): Promise<StageResult[]> {
-  const [config, derived, existing] = await Promise.all([
-    getOrCreateConfig(),
+type PipelineConfigRow = Awaited<ReturnType<typeof getOrCreateConfig>>
+
+/**
+ * Read-only: derive a platform's stage scores and compute its stage statuses
+ * (honouring manual skips) without writing. Shared by the sync and the report.
+ */
+export async function evaluatePlatformPipeline(platformId: string, config?: PipelineConfigRow) {
+  const cfg = config ?? (await getOrCreateConfig())
+  const [derived, existing] = await Promise.all([
     deriveStageScores(platformId),
     prisma.pipelineStageRun.findMany({ where: { platformId } }),
   ])
-
   const skipped = new Set(existing.filter((r) => r.status === 'SKIPPED').map((r) => r.stage))
   const scoreMap: StageScoreMap = {
     AI_SCREENING: derived.AI_SCREENING.score,
@@ -84,7 +88,13 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
     VITAL: derived.VITAL.score,
     PRD: derived.PRD.score,
   }
-  const results = computePipeline(scoreMap, config, skipped)
+  const results = computePipeline(scoreMap, cfg, skipped)
+  return { results, derived, existing, config: cfg }
+}
+
+/** Recompute and persist a platform's stage runs from current source data. */
+export async function syncPlatformPipeline(platformId: string): Promise<StageResult[]> {
+  const { results, derived, existing } = await evaluatePlatformPipeline(platformId)
   const byStage = new Map(existing.map((r) => [r.stage, r]))
 
   for (const r of results) {

@@ -87,9 +87,9 @@ export default async function FinalReportPage() {
   const completed = rows.filter((r) => r.complete).sort((a, b) => b.aggregate - a.aggregate)
   const inProgress = rows.filter((r) => !r.complete)
 
-  // Chart data — all platforms with at least one stage score
+  // Chart data — only platforms that cleared all pipeline stages
   const chartRows: PipelineRow[] = rows
-    .filter((r) => r.stages.some((s) => s.score != null))
+    .filter((r) => r.complete)
     .sort((a, b) => b.aggregate - a.aggregate)
     .map((r) => ({
       name: r.name,

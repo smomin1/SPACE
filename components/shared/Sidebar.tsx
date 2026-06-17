@@ -65,12 +65,6 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN'],
   },
   {
-    href: '/admin/requirements',
-    label: 'Requirements',
-    icon: ClipboardListIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN'],
-  },
-  {
     href: '/admin/pipeline',
     label: 'Pipeline',
     icon: GitBranchIcon,
@@ -81,12 +75,6 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Tool Scanner',
     icon: SparklesIcon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
-  },
-  {
-    href: '/admin/contexts',
-    label: 'Contexts',
-    icon: LayersIcon,
-    roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
     href: '/admin/platforms',
@@ -101,12 +89,6 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR'],
   },
   {
-    href: '/results',
-    label: 'Results',
-    icon: BarChart2Icon,
-    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
-  },
-  {
     href: '/admin/vital',
     label: 'Manage VITAL & CEFR',
     icon: GraduationCapIcon,
@@ -116,6 +98,18 @@ const NAV_ITEMS: NavItem[] = [
     href: '/vital',
     label: 'VITAL Insights',
     icon: CompassIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
+    href: '/admin/requirements',
+    label: 'Requirements',
+    icon: ClipboardListIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+  },
+  {
+    href: '/results',
+    label: 'Results',
+    icon: BarChart2Icon,
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {

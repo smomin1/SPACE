@@ -5,6 +5,7 @@ import { vitalToolSchema } from "@/lib/vital/schema";
 import { writeToolProfile } from "@/lib/vital/responses-server";
 import { recomputeRecommendations } from "@/lib/vital/derive-server";
 import { transitionEvaluation } from "@/lib/evaluation-state";
+import { syncPlatformPipeline } from "@/lib/pipeline-server";
 
 // A VITAL evaluator fills the platform's VitalTool profile and submits.
 // One VitalTool is linked to the platform (upsert by platformId). On submit we
@@ -155,6 +156,9 @@ export async function POST(
 
   // Catalogue changed → rebuild the recommendation matrix from it.
   const { changed, created } = await recomputeRecommendations();
+
+  // Refresh the pipeline so a passing VITAL advances the chain and notifies admins.
+  await syncPlatformPipeline(platformId);
 
   return Response.json({
     ok: true,

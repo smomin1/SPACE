@@ -24,6 +24,7 @@ import {
   ListChecksIcon,
   LanguagesIcon,
   GitBranchIcon,
+  BellIcon,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import {
@@ -131,6 +132,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
   },
   {
+    href: '/notifications',
+    label: 'Notifications',
+    icon: BellIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN', 'PEDAGOGY_EVALUATOR', 'TECHNICAL_EVALUATOR', 'VITAL_EVALUATOR', 'VIEWER'],
+  },
+  {
     href: '/faq',
     label: 'FAQ',
     icon: HelpCircleIcon,
@@ -144,9 +151,10 @@ interface SidebarProps {
   userInitials?: string
   roleLabel?: string
   pendingAccessRequests?: number
+  unreadNotifications?: number
 }
 
-export function Sidebar({ role, userName, userInitials = '?', roleLabel, pendingAccessRequests = 0 }: SidebarProps) {
+export function Sidebar({ role, userName, userInitials = '?', roleLabel, pendingAccessRequests = 0, unreadNotifications = 0 }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = React.useState(false)
 
@@ -211,6 +219,10 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel, pending
         <ul className="space-y-0.5">
           {visible.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + '/')
+            const badgeCount =
+              item.href === '/admin/access-requests' ? pendingAccessRequests
+              : item.href === '/notifications' ? unreadNotifications
+              : 0
             return (
               <li key={item.href} className="relative">
                 <Link
@@ -231,14 +243,14 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel, pending
                     )}
                   />
                   {!collapsed && <span className="truncate flex-1">{item.label}</span>}
-                  {item.href === '/admin/access-requests' && pendingAccessRequests > 0 && (
+                  {badgeCount > 0 && (
                     collapsed ? (
                       <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-bold text-emerald-950">
-                        {pendingAccessRequests > 9 ? '9+' : pendingAccessRequests}
+                        {badgeCount > 9 ? '9+' : badgeCount}
                       </span>
                     ) : (
                       <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-[10px] font-bold text-emerald-950">
-                        {pendingAccessRequests > 99 ? '99+' : pendingAccessRequests}
+                        {badgeCount > 99 ? '99+' : badgeCount}
                       </span>
                     )
                   )}

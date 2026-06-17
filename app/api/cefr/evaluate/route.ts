@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { canDo } from '@/lib/permissions'
 import { alignmentPercent } from '@/lib/cefr'
+import { syncPlatformPipeline } from '@/lib/pipeline-server'
 
 export const runtime = 'nodejs'
 
@@ -72,6 +73,9 @@ export async function POST(req: NextRequest) {
     })
     return evaluation
   })
+
+  // Refresh the pipeline so a passing CEFR advances the chain and notifies admins.
+  await syncPlatformPipeline(parsed.platformId)
 
   return NextResponse.json({ id: saved.id, alignmentPct: saved.alignmentPct, status: saved.status })
 }

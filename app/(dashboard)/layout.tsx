@@ -20,9 +20,12 @@ export default async function DashboardLayout({
 
   const { role, baseRole, isAdmin, name } = session.user
 
-  const pendingAccessRequests = role === 'SUPER_ADMIN'
-    ? await prisma.accessRequest.count({ where: { status: 'PENDING' } })
-    : 0
+  const [pendingAccessRequests, unreadNotifications] = await Promise.all([
+    role === 'SUPER_ADMIN'
+      ? prisma.accessRequest.count({ where: { status: 'PENDING' } })
+      : Promise.resolve(0),
+    prisma.notification.count({ where: { userId: session.user.id, readAt: null } }),
+  ])
 
   // Label reflects the true base role; an additive grant appends "+ Admin".
   const showAdminSuffix = isAdmin && baseRole !== 'ADMIN' && baseRole !== 'SUPER_ADMIN'
@@ -36,6 +39,7 @@ export default async function DashboardLayout({
         userInitials={getInitials(name)}
         roleLabel={roleLabel}
         pendingAccessRequests={pendingAccessRequests}
+        unreadNotifications={unreadNotifications}
       />
       <main className="flex-1 overflow-y-auto">
         <div className="min-h-[520px]">{children}</div>

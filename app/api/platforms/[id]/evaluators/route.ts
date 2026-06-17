@@ -3,6 +3,7 @@ import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { EvaluatorType, type Role } from '@prisma/client'
+import { notifyUser } from '@/lib/notifications'
 
 // Roles permitted to be assigned as each evaluator type
 const ALLOWED_ROLES_FOR_TYPE: Record<EvaluatorType, Role[]> = {
@@ -93,12 +94,28 @@ export async function POST(
         )
       }
 
+      const wasAssigned = await prisma.platformEvaluatorAssignment.findUnique({
+        where: { platformId_userId: { platformId, userId } },
+        select: { id: true },
+      })
       const assignment = await prisma.platformEvaluatorAssignment.upsert({
         where: { platformId_userId: { platformId, userId } },
         create: { platformId, userId, evaluatorType, isLead },
         update: { evaluatorType, isLead },
         include: { user: { select: { id: true, name: true, email: true, role: true } } },
       })
+      // Notify the evaluator on a NEW assignment. CEFR & VITAL evaluators (type
+      // VITAL) own the CEFR + VITAL stages, so link them to the CEFR workspace.
+      if (!wasAssigned) {
+        const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { name: true } })
+        const isCefrVital = evaluatorType === 'VITAL'
+        await notifyUser(userId, {
+          type: 'STAGE_ASSIGNED',
+          title: `You've been assigned ${isCefrVital ? 'CEFR & VITAL' : evaluatorType.toLowerCase()} evaluation`,
+          body: `${platform?.name ?? 'A platform'} is ready for your evaluation.`,
+          link: isCefrVital ? `/cefr-evaluate/${platformId}` : `/evaluations`,
+        })
+      }
       return Response.json({ assignment }, { status: 201 })
     } else {
       // Verify removing this evaluator won't drop below the minimum (1 per type)

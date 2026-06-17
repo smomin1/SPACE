@@ -2,7 +2,8 @@ import type { PipelineStage } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { coveragePercent } from '@/lib/screening'
 import { calculateWeightedPercentage, type Requirement, type Score } from '@/lib/scoring'
-import { computePipeline, type StageScoreMap, type StageResult } from '@/lib/pipeline'
+import { computePipeline, nextStage, STAGE_LABELS, type StageScoreMap, type StageResult } from '@/lib/pipeline'
+import { notifyAdmins } from '@/lib/notifications'
 
 // ─── Pipeline orchestration (DB) ────────────────────────────────────────────────
 // Derives each stage's score from its source module and syncs the per-platform
@@ -97,9 +98,13 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
   const { results, derived, existing } = await evaluatePlatformPipeline(platformId)
   const byStage = new Map(existing.map((r) => [r.stage, r]))
 
+  // Stages that newly reach PASSED this sync — used to notify admins once.
+  const newlyPassed: StageResult[] = []
+
   for (const r of results) {
     const prev = byStage.get(r.stage)
     const passedAt = r.status === 'PASSED' ? prev?.passedAt ?? new Date() : null
+    if (r.status === 'PASSED' && prev?.status !== 'PASSED') newlyPassed.push(r)
     await prisma.pipelineStageRun.upsert({
       where: { platformId_stage: { platformId, stage: r.stage } },
       update: { status: r.status, score: r.score, sourceId: derived[r.stage].sourceId, passedAt },
@@ -113,6 +118,22 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
       },
     })
   }
+
+  if (newlyPassed.length > 0) {
+    const platform = await prisma.platform.findUnique({ where: { id: platformId }, select: { name: true } })
+    const name = platform?.name ?? 'A platform'
+    for (const r of newlyPassed) {
+      const next = nextStage(r.stage)
+      const score = r.score != null ? ` (${r.score.toFixed(0)}%)` : ''
+      await notifyAdmins({
+        type: 'STAGE_PASSED',
+        title: `${name} passed ${STAGE_LABELS[r.stage]}${score}`,
+        body: next ? `Assign the ${STAGE_LABELS[next]} stage to continue the pipeline.` : 'All stages cleared — ready for the Final Report.',
+        link: '/admin/pipeline',
+      })
+    }
+  }
+
   return results
 }
 

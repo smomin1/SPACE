@@ -267,6 +267,11 @@ enum PipelineStageStatus {
   SKIPPED
 }
 
+enum NotificationType {
+  STAGE_ASSIGNED   // an evaluator was assigned a platform
+  STAGE_PASSED     // a pipeline stage passed its threshold (prompt to assign next)
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -300,6 +305,7 @@ model User {
   closedAgeRangeConflicts    AgeRangeConflict[]          @relation("AgeRangeConflictClosedBy")
   ageRangeConflictMessages   AgeRangeConflictMessage[]   @relation("AgeRangeConflictMessageAuthor")
   cefrEvaluations            CefrEvaluation[]
+  notifications              Notification[]
 }
 
 model Platform {
@@ -660,6 +666,23 @@ model PipelineConfig {
   vitalWeight   Float    @default(30)
   prdWeight     Float    @default(10)
   updatedAt     DateTime @updatedAt
+}
+
+// In-app notification (e.g. an evaluator was assigned, or a stage passed and the
+// next one needs assigning). Surfaced as a sidebar badge + a notifications list.
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
 }
 
 // Access request submitted by someone who wants an account.

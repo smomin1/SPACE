@@ -164,9 +164,9 @@ export default async function EvaluationsPage({
       {isAdmin && (
         <div className="mb-5 inline-flex rounded-lg border border-stone-200/80 bg-white p-1">
           {([
-            { key: 'TOOL', label: 'Tool Evaluator' },
-            { key: 'VITAL', label: 'VITAL' },
             { key: 'CEFR', label: 'CEFR Evaluations' },
+            { key: 'VITAL', label: 'VITAL' },
+            { key: 'TOOL', label: 'Tool Evaluator' },
           ] as const).map((t) => (
             <Link
               key={t.key}

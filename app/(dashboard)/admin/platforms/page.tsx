@@ -86,9 +86,9 @@ export default async function PlatformsPage({
   ])
 
   const tabs = [
-    { key: 'tool', label: 'Tool Evaluator', count: toolPlatforms.length, icon: MonitorIcon, href: '/admin/platforms' },
-    { key: 'vital', label: 'VITAL', count: vitalPlatforms.length, icon: CompassIcon, href: '/admin/platforms?tab=vital' },
     { key: 'cefr', label: 'CEFR Evaluations', count: cefrPlatforms.length, icon: MilestoneIcon, href: '/admin/platforms?tab=cefr' },
+    { key: 'vital', label: 'VITAL', count: vitalPlatforms.length, icon: CompassIcon, href: '/admin/platforms?tab=vital' },
+    { key: 'tool', label: 'Tool Evaluator', count: toolPlatforms.length, icon: MonitorIcon, href: '/admin/platforms' },
   ] as const
 
   const activeData =

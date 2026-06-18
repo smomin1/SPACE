@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { GraduationCapIcon, LanguagesIcon } from "lucide-react";
+import { GraduationCapIcon, MilestoneIcon } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { canDo } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
@@ -92,7 +92,7 @@ export default async function VitalAdminPage({
                 : "border-transparent text-stone-500 hover:text-emerald-700",
             )}
           >
-            <LanguagesIcon className="size-3.5" />
+            <MilestoneIcon className="size-3.5" />
             CEFR Questions
           </Link>
         </div>

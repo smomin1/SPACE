@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation'
-import { LanguagesIcon } from 'lucide-react'
+import { MilestoneIcon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
@@ -42,7 +42,7 @@ export default async function CefrEvaluatePage({
 
   return (
     <div>
-      <PageHeader icon={LanguagesIcon} kicker="CEFR Evaluation" title={platform.name} />
+      <PageHeader icon={MilestoneIcon} kicker="CEFR Evaluation" title={platform.name} />
       <main className="mx-auto max-w-7xl px-6 py-6">
         <CefrEvaluatorWorkspace
           platformId={platform.id}

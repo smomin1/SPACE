@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { MonitorIcon, LanguagesIcon, CompassIcon } from 'lucide-react'
+import { MonitorIcon, MilestoneIcon, CompassIcon } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
@@ -88,7 +88,7 @@ export default async function PlatformsPage({
   const tabs = [
     { key: 'tool', label: 'Tool Evaluator', count: toolPlatforms.length, icon: MonitorIcon, href: '/admin/platforms' },
     { key: 'vital', label: 'VITAL', count: vitalPlatforms.length, icon: CompassIcon, href: '/admin/platforms?tab=vital' },
-    { key: 'cefr', label: 'CEFR Evaluations', count: cefrPlatforms.length, icon: LanguagesIcon, href: '/admin/platforms?tab=cefr' },
+    { key: 'cefr', label: 'CEFR Evaluations', count: cefrPlatforms.length, icon: MilestoneIcon, href: '/admin/platforms?tab=cefr' },
   ] as const
 
   const activeData =

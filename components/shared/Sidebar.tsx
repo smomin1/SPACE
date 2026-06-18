@@ -20,7 +20,7 @@ import {
   HelpCircleIcon,
   InboxIcon,
   CompassIcon,
-  GraduationCapIcon,
+  MilestoneIcon,
   LanguagesIcon,
   GitBranchIcon,
   BellIcon,
@@ -91,7 +91,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     href: '/admin/vital',
     label: 'Manage VITAL & CEFR',
-    icon: GraduationCapIcon,
+    icon: MilestoneIcon,
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {

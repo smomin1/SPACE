@@ -83,6 +83,7 @@ type PlatformRow = {
   evaluations: { id: string; state: EvaluationState }[]
   vitalTools?: { id: string; v2Percent: number | null }[]
   cefrEvaluation?: { status: 'DRAFT' | 'COMPLETED' } | null
+  pipelineStages?: { status: string; score: number | null }[]
 }
 
 const PAGE_SIZE = 25
@@ -399,12 +400,26 @@ function buildColumns(activeTab: 'tool' | 'vital' | 'cefr'): ColumnDef<PlatformR
           )
         }
         // CEFR status comes from the CefrEvaluation record (survives the VITAL advance).
+        // Platforms that passed AI Screening but haven't started CEFR show "Not started"
+        // with the AI score as context.
         if (activeTab === 'cefr') {
-          const status = row.original.cefrEvaluation?.status
+          const cefrStatus = row.original.cefrEvaluation?.status
+          if (cefrStatus) {
+            return (
+              <StatusChip tone={cefrStatus === 'COMPLETED' ? 'forest' : 'emerald'}>
+                {cefrStatus === 'COMPLETED' ? 'Completed' : 'In progress'}
+              </StatusChip>
+            )
+          }
+          const aiStage = row.original.pipelineStages?.[0]
+          const aiScore = aiStage?.score != null ? `${Math.round(aiStage.score)}%` : null
           return (
-            <StatusChip tone={status === 'COMPLETED' ? 'forest' : 'emerald'}>
-              {status === 'COMPLETED' ? 'Completed' : 'In progress'}
-            </StatusChip>
+            <div className="flex flex-col gap-0.5">
+              <StatusChip tone="neutral">Not started</StatusChip>
+              {aiScore && (
+                <span className="text-[10.5px] text-stone-400 tabular-nums">AI: {aiScore}</span>
+              )}
+            </div>
           )
         }
         // VITAL satisfied by linking an already-scored assessment → mark Completed.

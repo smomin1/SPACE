@@ -44,6 +44,12 @@ export default async function PlatformsPage({
     // The CEFR record lives here, independent of track - a platform that has
     // advanced to VITAL still carries its completed CefrEvaluation.
     cefrEvaluation: { select: { status: true } },
+    // AI Screening score: used to surface qualifying platforms on the CEFR tab
+    // before any CEFR evaluation has been started.
+    pipelineStages: {
+      where: { stage: 'AI_SCREENING' as const },
+      select: { status: true, score: true },
+    },
   }
 
   const [toolPlatforms, vitalPlatforms, cefrPlatforms] = await Promise.all([
@@ -59,10 +65,21 @@ export default async function PlatformsPage({
       orderBy: { name: 'asc' },
       select: platformSelect,
     }),
-    // CEFR tab is keyed off the CefrEvaluation record (not track), so an advanced
-    // platform keeps showing its completed CEFR evaluation here.
+    // CEFR tab: show platforms that already have a CEFR evaluation (locked in
+    // regardless of threshold changes) OR platforms that have passed AI Screening
+    // but have not yet started their CEFR evaluation. Threshold changes only
+    // affect the second group - the first stays pinned.
     prisma.platform.findMany({
-      where: { cefrEvaluation: { isNot: null } },
+      where: {
+        status: { not: 'DISQUALIFIED' },
+        OR: [
+          { cefrEvaluation: { isNot: null } },
+          {
+            cefrEvaluation: null,
+            pipelineStages: { some: { stage: 'AI_SCREENING', status: 'PASSED' } },
+          },
+        ],
+      },
       orderBy: { name: 'asc' },
       select: platformSelect,
     }),

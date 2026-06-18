@@ -143,6 +143,45 @@ export async function sendTemporaryPassword(to: string, name: string, tempPasswo
   })
 }
 
+export async function sendTemporaryPasswordReset(to: string, name: string, tempPassword: string) {
+  await sendEmail({
+    to,
+    subject: `Your SPACE password has been reset`,
+    html: layout(`
+      <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:15px;color:#333;">Hi ${name},</p>
+      <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:15px;color:#333;">
+        An administrator has reset your SPACE password. Use the temporary password below to sign in.
+      </p>
+      <div style="background:#f5f5f0;border:1px solid #e5e2dc;border-radius:6px;padding:16px 24px;margin:24px 0;text-align:center;">
+        <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#888;">Temporary password</p>
+        <p style="margin:0;font-family:Courier New,monospace;font-size:22px;letter-spacing:0.12em;color:#1a5c43;font-weight:bold;">${tempPassword}</p>
+      </div>
+      <p style="margin:0 0 24px;font-family:Arial,sans-serif;font-size:14px;color:#666;">
+        You will be prompted to set a new permanent password immediately after signing in.
+      </p>
+      <table cellpadding="0" cellspacing="0"><tr><td style="background:#1a5c43;border-radius:6px;">
+        <a href="${APP_URL}/login" style="display:inline-block;padding:12px 28px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">
+          Sign in to SPACE
+        </a>
+      </td></tr></table>
+      <p style="margin:24px 0 0;font-family:Arial,sans-serif;font-size:12px;color:#aaa;">
+        If you did not expect this reset, contact your system administrator immediately.
+      </p>
+    `),
+    text: baseText([
+      `Hi ${name},`,
+      '',
+      'An administrator has reset your SPACE password. Use the temporary password below to sign in.',
+      '',
+      `Temporary password: ${tempPassword}`,
+      '',
+      'You will be prompted to set a new permanent password immediately after signing in.',
+      '',
+      `Sign in here: ${APP_URL}/login`,
+    ]),
+  })
+}
+
 export async function sendPasswordResetEmail(to: string, name: string, resetToken: string) {
   const link = `${APP_URL}/reset-password?token=${resetToken}`
   await sendEmail({

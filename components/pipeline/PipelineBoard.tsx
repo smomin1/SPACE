@@ -7,6 +7,7 @@ import type { PipelineStage, PipelineStageStatus } from '@prisma/client'
 import { STAGE_ORDER, STAGE_LABELS } from '@/lib/pipeline'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { PipelineDiagram } from './PipelineDiagram'
 
 type StageView = {
   stage: PipelineStage

@@ -1,7 +1,10 @@
 // Canonical VITAL reference data + normalisers.
 // Used by both the seed generator and the live xlsx upload, so parsing stays
-// consistent. The level codes use the U+2212 minus sign (−), NOT a hyphen.
+// consistent. Level codes are plain ASCII ("A1-", "B1.5+"); the canonical level
+// list comes from the shared source (lib/cefr-levels.ts) so VITAL and the CEFR
+// stage share one scale.
 
+import { CANONICAL_CEFR_LEVELS } from "../cefr-levels";
 import type {
   VitalAnswer,
   VitalCoverage,
@@ -58,7 +61,7 @@ export function canonicalSkill(raw: string): string | null {
   return SKILL_BY_ALIAS.get(raw.trim().toLowerCase()) ?? null;
 }
 
-// ─── Levels (22 canonical + 1 assessment-only) ──────────────────────────────────
+// ─── Levels (25 canonical) ──────────────────────────────────────────────────────
 export interface CanonicalLevel {
   code: string;
   label: string;
@@ -70,59 +73,25 @@ export interface CanonicalLevel {
   assessmentOnly: boolean;
 }
 
-const STANDARD = "Standard CEFR";
-const NONCEFR = "Non-CEFR (school-defined)";
-
-// The 22 canonical sub-levels exactly as the LevelData sheet (U+2212 minus).
-export const CANONICAL_LEVELS: CanonicalLevel[] = [
-  { code: "A0", scoreBand: "Pre-emergent", cefrStatus: NONCEFR, bandGroup: "A0", isPreEmergent: true },
-  { code: "A1−", scoreBand: "Up to 33%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "A1", scoreBand: "34%-66%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "A1+", scoreBand: "67%-100%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "A2−", scoreBand: "Up to 33%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "A2", scoreBand: "34%-66%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "A2+", scoreBand: "67%-100%", cefrStatus: STANDARD, bandGroup: "A" },
-  { code: "B1−", scoreBand: "Up to 33%", cefrStatus: STANDARD, bandGroup: "B1" },
-  { code: "B1", scoreBand: "34%-66%", cefrStatus: STANDARD, bandGroup: "B1" },
-  { code: "B1+", scoreBand: "67%-100%", cefrStatus: STANDARD, bandGroup: "B1" },
-  { code: "B1.5−", scoreBand: "Up to 33%", cefrStatus: NONCEFR, bandGroup: "B1.5" },
-  { code: "B1.5", scoreBand: "34%-66%", cefrStatus: NONCEFR, bandGroup: "B1.5" },
-  { code: "B1.5+", scoreBand: "67%-100%", cefrStatus: NONCEFR, bandGroup: "B1.5" },
-  { code: "B2−", scoreBand: "Up to 33%", cefrStatus: STANDARD, bandGroup: "B2" },
-  { code: "B2", scoreBand: "34%-66%", cefrStatus: STANDARD, bandGroup: "B2" },
-  { code: "B2+", scoreBand: "67%-100%", cefrStatus: STANDARD, bandGroup: "B2" },
-  { code: "B2.5−", scoreBand: "Up to 33%", cefrStatus: NONCEFR, bandGroup: "B2.5" },
-  { code: "B2.5", scoreBand: "34%-66%", cefrStatus: NONCEFR, bandGroup: "B2.5" },
-  { code: "B2.5+", scoreBand: "67%-100%", cefrStatus: NONCEFR, bandGroup: "B2.5" },
-  { code: "C1−", scoreBand: "Up to 33%", cefrStatus: STANDARD, bandGroup: "C1" },
-  { code: "C1", scoreBand: "34%-66%", cefrStatus: STANDARD, bandGroup: "C1" },
-  { code: "C1+", scoreBand: "67%-100%", cefrStatus: STANDARD, bandGroup: "C1" },
-].map((l, i) => ({
-  ...l,
-  label: l.code,
-  order: i + 1,
-  isPreEmergent: l.isPreEmergent ?? false,
+// The 25 canonical sub-levels, derived from the shared CEFR scale (plain ASCII).
+export const CANONICAL_LEVELS: CanonicalLevel[] = CANONICAL_CEFR_LEVELS.map((l) => ({
+  code: l.code,
+  label: l.label,
+  order: l.order,
+  scoreBand: l.scoreBand,
+  cefrStatus: l.cefrStatus,
+  bandGroup: l.bandGroup,
+  isPreEmergent: l.isPreEmergent,
   assessmentOnly: false,
 }));
 
-// The 23rd column the Assessment Landscape splits out before A0.
-export const ASSESSMENT_ONLY_LEVEL: CanonicalLevel = {
-  code: "A0 (Pre)",
-  label: "A0 (Pre)",
-  order: 0,
-  scoreBand: "Pre-emergent",
-  cefrStatus: NONCEFR,
-  bandGroup: "A0",
-  isPreEmergent: true,
-  assessmentOnly: true,
-};
+export const ALL_LEVELS: CanonicalLevel[] = CANONICAL_LEVELS;
 
-export const ALL_LEVELS: CanonicalLevel[] = [ASSESSMENT_ONLY_LEVEL, ...CANONICAL_LEVELS];
-
-// Header order used by the CEFR mapping matrix (22 canonical, no "A0 (Pre)").
+// Header order used by the CEFR mapping matrix (the 25 canonical levels).
 export const CEFR_MAP_LEVEL_CODES = CANONICAL_LEVELS.map((l) => l.code);
-// Header order used by the Assessment Landscape (23, including "A0 (Pre)").
-export const ASSESSMENT_LEVEL_CODES = [ASSESSMENT_ONLY_LEVEL.code, ...CEFR_MAP_LEVEL_CODES];
+// Header order used by the Assessment Landscape (the same 25 canonical levels;
+// the old assessment-only "A0 (Pre)" column was dropped as a duplicate of A0).
+export const ASSESSMENT_LEVEL_CODES = CEFR_MAP_LEVEL_CODES;
 
 // ─── Normalisers ─────────────────────────────────────────────────────────────
 export function normCoverage(raw: unknown): VitalCoverage | null {

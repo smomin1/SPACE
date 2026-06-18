@@ -252,7 +252,7 @@ function parseToolLandscape(wb: XLSX.WorkBook): ParsedTool[] {
       );
       return { skill: s.name, idx };
     });
-    // level columns: the 23 codes (A0 (Pre) + 22), located by header text.
+    // level columns: the 25 canonical codes, located by header text.
     const levelCols = ASSESSMENT_LEVEL_CODES.map((code) => {
       const idx = header.findIndex(
         (c) => typeof c === "string" && c.trim() === code

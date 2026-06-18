@@ -90,8 +90,8 @@ export async function seedVital(prisma: PrismaClient) {
     (await prisma.vitalSkill.findMany()).map((s) => [s.name, s.id])
   );
 
-  // ── Levels (22 canonical + assessment-only "A0 (Pre)") ──
-  // LevelData fixture cross-checks score band / cefr status for the 22 canonical.
+  // ── Levels (25 canonical) ──
+  // LevelData fixture cross-checks score band / cefr status for the canonical set.
   const bandByCode = new Map(levelData.map((l) => [l.code, l]));
   for (const lvl of ALL_LEVELS) {
     const src = bandByCode.get(lvl.code);
@@ -124,6 +124,10 @@ export async function seedVital(prisma: PrismaClient) {
       },
     });
   }
+  // Prune orphaned levels (e.g. old superscript/minus codes superseded by plain
+  // ASCII). Cascades their mappings/recommendations. No-op once codes are unified.
+  const canonicalLevelCodes = ALL_LEVELS.map((l) => l.code);
+  await prisma.vitalLevel.deleteMany({ where: { code: { notIn: canonicalLevelCodes } } });
   const levelIdByCode = new Map(
     (await prisma.vitalLevel.findMany()).map((l) => [l.code, l.id])
   );
@@ -230,7 +234,7 @@ export async function seedVital(prisma: PrismaClient) {
     (await prisma.vitalTool.findMany()).map((t) => [t.name, t.id])
   );
 
-  // ── Recommendations (132 = 6 skills × 22 levels) ──
+  // ── Recommendations (150 = 6 skills × 25 levels; C2 cells are placeholders) ──
   for (const r of recommendations) {
     const skillId = skillIdByName.get(r.skill);
     const levelId = levelIdByCode.get(r.levelCode);
@@ -311,11 +315,14 @@ export async function seedVital(prisma: PrismaClient) {
       create: { key: s.key, order: s.order, pillars: s.pillars },
     });
   }
+  // Prune orphaned stages (e.g. old em-dash keys "Core — X" superseded by the
+  // hyphen keys "Core - X"). Cascades their stage recommendations.
+  await prisma.vitalStage.deleteMany({ where: { key: { notIn: STAGES.map((s) => s.key) } } });
   const stageIdByKey = new Map(
     (await prisma.vitalStage.findMany()).map((s) => [s.key, s.id]),
   );
 
-  // ── Stage recommendations (9 stages × 22 levels = 198 authored cells) ──
+  // ── Stage recommendations (9 stages × 25 levels = 225 cells; C2 are placeholders) ──
   for (const r of stagesFile.stageRecommendations) {
     const stageId = stageIdByKey.get(r.stage);
     const levelId = levelIdByCode.get(r.level);
@@ -352,13 +359,13 @@ export async function seedVital(prisma: PrismaClient) {
       prisma.vitalGradeBand.count(),
     ]);
   assert(skillCount === 6, `expected 6 skills, got ${skillCount}`);
-  assert(levelCount === 23, `expected 23 levels (22 + A0 (Pre)), got ${levelCount}`);
+  assert(levelCount === 25, `expected 25 levels, got ${levelCount}`);
   assert(toolCount === 27, `expected 27 teaching tools, got ${toolCount}`);
   assert(asmCount === 11, `expected 11 assessment tools, got ${asmCount}`);
-  assert(recCount === 132, `expected 132 recommendations, got ${recCount}`);
+  assert(recCount === 150, `expected 150 recommendations, got ${recCount}`);
   assert(qCount === 25, `expected 25 questions, got ${qCount}`);
   assert(stageCount === 9, `expected 9 stages, got ${stageCount}`);
-  assert(stageRecCount === 198, `expected 198 stage recommendations, got ${stageRecCount}`);
+  assert(stageRecCount === 225, `expected 225 stage recommendations, got ${stageRecCount}`);
   assert(gbCount === 10, `expected 10 grade bands, got ${gbCount}`);
 
   console.log(

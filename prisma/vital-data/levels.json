@@ -5,108 +5,123 @@
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
-    "code": "A1−",
+    "code": "A1-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "A1",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "A1+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Standard CEFR"
   },
   {
-    "code": "A2−",
+    "code": "A2-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "A2",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "A2+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Standard CEFR"
   },
   {
-    "code": "B1−",
+    "code": "B1-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "B1",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "B1+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Standard CEFR"
   },
   {
-    "code": "B1.5−",
+    "code": "B1.5-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
     "code": "B1.5",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
     "code": "B1.5+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
-    "code": "B2−",
+    "code": "B2-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "B2",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "B2+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Standard CEFR"
   },
   {
-    "code": "B2.5−",
+    "code": "B2.5-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
     "code": "B2.5",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
     "code": "B2.5+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Non-CEFR (school-defined)"
   },
   {
-    "code": "C1−",
+    "code": "C1-",
     "scoreBand": "Up to 33%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "C1",
-    "scoreBand": "34%–66%",
+    "scoreBand": "34%-66%",
     "cefrStatus": "Standard CEFR"
   },
   {
     "code": "C1+",
-    "scoreBand": "67%–100%",
+    "scoreBand": "67%-100%",
+    "cefrStatus": "Standard CEFR"
+  },
+  {
+    "code": "C2-",
+    "scoreBand": "Up to 33%",
+    "cefrStatus": "Standard CEFR"
+  },
+  {
+    "code": "C2",
+    "scoreBand": "34%-66%",
+    "cefrStatus": "Standard CEFR"
+  },
+  {
+    "code": "C2+",
+    "scoreBand": "67%-100%",
     "cefrStatus": "Standard CEFR"
   }
 ]

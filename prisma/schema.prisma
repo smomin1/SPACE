@@ -783,20 +783,20 @@ model VitalSkill {
   recommendations VitalRecommendation[]
 }
 
-// The 22-point CEFR sub-level scale (A0 + 21) plus the assessment-only "A0 (Pre)" row.
-// scoreBand: "Pre-emergent" | "Up to 33%" | "34%–66%" | "67%–100%".
+// The 25-level CEFR micro-scale (A0 .. C2+), shared with the CEFR stage via lib/cefr-levels.ts.
+// scoreBand: "Pre-emergent" | "Up to 33%" | "34%-66%" | "67%-100%".
 // cefrStatus: "Standard CEFR" | "Non-CEFR (school-defined)".
-// bandGroup: A0 | A | B1 | B1.5 | B2 | B2.5 | C1.
+// bandGroup: A0 | A | B1 | B1.5 | B2 | B2.5 | C1 | C2.
 model VitalLevel {
   id             String   @id @default(cuid())
-  code           String   @unique // e.g. "A1−" (U+2212 minus), "B1.5+", "A0 (Pre)"
+  code           String   @unique // plain ASCII, e.g. "A1-", "B1.5+", "C2+"
   label          String
   order          Int      @default(0)
   scoreBand      String
   cefrStatus     String
   bandGroup      String
   isPreEmergent  Boolean  @default(false)
-  assessmentOnly Boolean  @default(false) // true only for the "A0 (Pre)" assessment-landscape column
+  assessmentOnly Boolean  @default(false) // retained flag; no level currently sets it
 
   levelMappings        VitalToolLevelMapping[]
   recommendations      VitalRecommendation[]

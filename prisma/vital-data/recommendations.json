@@ -18,7 +18,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -31,7 +31,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at A1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Vocabulary at A1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Vocabulary",
@@ -69,7 +69,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -82,7 +82,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at A2−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Vocabulary at A2-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Vocabulary",
@@ -120,7 +120,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -133,7 +133,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Vocabulary at B1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Vocabulary",
@@ -171,7 +171,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -184,7 +184,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B1.5−: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Vocabulary at B1.5-: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Vocabulary",
@@ -201,7 +201,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Vocabulary at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Vocabulary",
@@ -218,11 +218,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Vocabulary at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -235,7 +235,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B2−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Vocabulary at B2-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Vocabulary",
@@ -273,7 +273,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -286,7 +286,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at B2.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Vocabulary at B2.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Vocabulary",
@@ -324,7 +324,7 @@
   },
   {
     "skill": "Vocabulary",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -337,7 +337,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Vocabulary at C1−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Vocabulary at C1-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Vocabulary",
@@ -392,7 +392,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -405,7 +405,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at A1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Listening at A1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Listening",
@@ -443,7 +443,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -456,7 +456,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at A2−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Listening at A2-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Listening",
@@ -494,7 +494,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -507,7 +507,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Listening at B1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Listening",
@@ -545,7 +545,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -558,7 +558,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B1.5−: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Listening at B1.5-: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Listening",
@@ -575,7 +575,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Listening at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Listening",
@@ -592,11 +592,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Listening at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Listening",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -609,7 +609,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B2−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Listening at B2-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Listening",
@@ -647,7 +647,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -660,7 +660,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at B2.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Listening at B2.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Listening",
@@ -698,7 +698,7 @@
   },
   {
     "skill": "Listening",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -711,7 +711,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Listening at C1−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Listening at C1-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Listening",
@@ -766,7 +766,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -779,7 +779,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at A1−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Speaking at A1-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Speaking",
@@ -817,7 +817,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -830,7 +830,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at A2−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Speaking at A2-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Speaking",
@@ -868,7 +868,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -881,7 +881,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B1−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Speaking at B1-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Speaking",
@@ -919,7 +919,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -932,7 +932,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B1.5−: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Speaking at B1.5-: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Speaking",
@@ -949,7 +949,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Speaking at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Speaking",
@@ -966,11 +966,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Speaking at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Speaking",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -983,7 +983,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B2−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Speaking at B2-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Speaking",
@@ -1021,7 +1021,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1034,7 +1034,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at B2.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Speaking at B2.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Speaking",
@@ -1072,7 +1072,7 @@
   },
   {
     "skill": "Speaking",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1085,7 +1085,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Speaking at C1−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Speaking at C1-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Speaking",
@@ -1140,7 +1140,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1153,7 +1153,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at A1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Reading at A1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Reading",
@@ -1191,7 +1191,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1204,7 +1204,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at A2−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Reading at A2-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Reading",
@@ -1242,7 +1242,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1255,7 +1255,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Reading at B1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Reading",
@@ -1293,7 +1293,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1306,7 +1306,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B1.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Reading at B1.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Reading",
@@ -1323,7 +1323,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B1.5: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Reading at B1.5: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Reading",
@@ -1340,11 +1340,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B1.5+: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Reading at B1.5+: core=Nearpod, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Reading",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1357,7 +1357,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B2−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Reading at B2-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Reading",
@@ -1395,7 +1395,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1408,7 +1408,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at B2.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Reading at B2.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Reading",
@@ -1446,7 +1446,7 @@
   },
   {
     "skill": "Reading",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -1459,7 +1459,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Reading at C1−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Reading at C1-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Reading",
@@ -1514,7 +1514,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1527,7 +1527,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at A1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Writing at A1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Writing",
@@ -1565,7 +1565,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1578,7 +1578,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at A2−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Writing at A2-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Writing",
@@ -1616,7 +1616,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1629,7 +1629,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Writing at B1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Writing",
@@ -1667,7 +1667,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Write & Improve",
     "suppTool": "Off2Class",
     "coreDependency": "BLENDED",
@@ -1680,7 +1680,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B1.5−: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Writing at B1.5-: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Writing",
@@ -1697,7 +1697,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B1.5: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Writing at B1.5: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Writing",
@@ -1714,11 +1714,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B1.5+: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Writing at B1.5+: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Writing",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Write & Improve",
     "suppTool": "Off2Class",
     "coreDependency": "BLENDED",
@@ -1731,7 +1731,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B2−: core=Write & Improve, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Writing at B2-: core=Write & Improve, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Writing",
@@ -1769,7 +1769,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Write & Improve",
     "suppTool": "Off2Class",
     "coreDependency": "BLENDED",
@@ -1782,7 +1782,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at B2.5−: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Writing at B2.5-: core=Write & Improve, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Writing",
@@ -1820,7 +1820,7 @@
   },
   {
     "skill": "Writing",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Write & Improve",
     "suppTool": "Off2Class",
     "coreDependency": "BLENDED",
@@ -1833,7 +1833,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Writing at C1−: core=Write & Improve, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Writing at C1-: core=Write & Improve, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Writing",
@@ -1888,7 +1888,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "A1−",
+    "levelCode": "A1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1901,7 +1901,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at A1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Grammar at A1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Grammar",
@@ -1939,7 +1939,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "A2−",
+    "levelCode": "A2-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -1952,7 +1952,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at A2−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
+    "deploymentNote": "Grammar at A2-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. A-band: heavy scaffolding required. Sentence frames visible. No tool runs unsupported."
   },
   {
     "skill": "Grammar",
@@ -1990,7 +1990,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "B1−",
+    "levelCode": "B1-",
     "coreTool": "Learning Upgrade",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -2003,7 +2003,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B1−: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
+    "deploymentNote": "Grammar at B1-: core=Learning Upgrade, supp=Off2Class. Minus level: heavy scaffolding. B1-band: inference emerging. Teacher models first. Withdraw scaffolding progressively."
   },
   {
     "skill": "Grammar",
@@ -2041,7 +2041,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "B1.5−",
+    "levelCode": "B1.5-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -2054,7 +2054,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B1.5−: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5−). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Grammar at B1.5-: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5-). Minus level: heavy scaffolding. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Grammar",
@@ -2071,7 +2071,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Grammar at B1.5: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5). B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Grammar",
@@ -2088,11 +2088,11 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1–B2. Monitor independence carefully."
+    "deploymentNote": "Grammar at B1.5+: core=Elsaspeak, supp=Off2Class. Non-CEFR school band (B1.5+). Plus level: withdraw scaffolds. B1.5 non-CEFR school band: bridging B1-B2. Monitor independence carefully."
   },
   {
     "skill": "Grammar",
-    "levelCode": "B2−",
+    "levelCode": "B2-",
     "coreTool": "Elsaspeak",
     "suppTool": "Off2Class",
     "coreDependency": "MOSTLY_INDEPENDENT",
@@ -2105,7 +2105,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B2−: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
+    "deploymentNote": "Grammar at B2-: core=Elsaspeak, supp=Off2Class. Minus level: heavy scaffolding. B2-band: analytical mode. Challenge without scaffolding."
   },
   {
     "skill": "Grammar",
@@ -2143,7 +2143,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "B2.5−",
+    "levelCode": "B2.5-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -2156,7 +2156,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at B2.5−: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5−). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
+    "deploymentNote": "Grammar at B2.5-: core=Nearpod, supp=Off2Class. Non-CEFR school band (B2.5-). Minus level: heavy scaffolding. B2.5 non-CEFR school band: near C1. Corpus tools and annotation appropriate."
   },
   {
     "skill": "Grammar",
@@ -2194,7 +2194,7 @@
   },
   {
     "skill": "Grammar",
-    "levelCode": "C1−",
+    "levelCode": "C1-",
     "coreTool": "Nearpod",
     "suppTool": "Off2Class",
     "coreDependency": "FULLY_TEACHER_LED",
@@ -2207,7 +2207,7 @@
     "pillarA": "FULL",
     "pillarL": "FULL",
     "status": "COMPLIANT",
-    "deploymentNote": "Grammar at C1−: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
+    "deploymentNote": "Grammar at C1-: core=Nearpod, supp=Off2Class. Minus level: heavy scaffolding. C1-band: metalinguistic reflection. Teacher as coach only."
   },
   {
     "skill": "Grammar",
@@ -2242,5 +2242,311 @@
     "pillarL": "FULL",
     "status": "COMPLIANT",
     "deploymentNote": "Grammar at C1+: core=Nearpod, supp=Off2Class. Plus level: withdraw scaffolds. C1-band: metalinguistic reflection. Teacher as coach only."
+  },
+  {
+    "skill": "Speaking",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Listening",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Writing",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Reading",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Grammar",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Vocabulary",
+    "levelCode": "C2-",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Speaking",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Listening",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Writing",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Reading",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Grammar",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Vocabulary",
+    "levelCode": "C2",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Speaking",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Listening",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Writing",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Reading",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Grammar",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
+  },
+  {
+    "skill": "Vocabulary",
+    "levelCode": "C2+",
+    "coreTool": null,
+    "suppTool": null,
+    "coreDependency": null,
+    "suppDependency": null,
+    "coreRisk": null,
+    "suppRisk": null,
+    "pillarV": "NA",
+    "pillarI": "NA",
+    "pillarT": "NA",
+    "pillarA": "NA",
+    "pillarL": "NA",
+    "status": "MULTI_GAP",
+    "deploymentNote": "To be filled."
   }
 ]

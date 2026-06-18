@@ -21,7 +21,6 @@ import {
   FilterXIcon,
   PencilIcon,
   Trash2Icon,
-  KeyRoundIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
@@ -294,67 +293,6 @@ function DeleteAction({ user, disabled }: { user: UserRow; disabled: boolean }) 
   )
 }
 
-function ResetPasswordAction({ user, disabled }: { user: UserRow; disabled: boolean }) {
-  const [busy, setBusy] = React.useState(false)
-  const [open, setOpen] = React.useState(false)
-
-  async function handleReset() {
-    setBusy(true)
-    try {
-      const res = await fetch(`/api/users/${user.id}/reset-password`, { method: 'POST' })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        toast.error(data.error ?? 'Reset failed.')
-        return
-      }
-      toast.success(
-        `Password reset for "${user.name}". Temporary password: ${data.tempPassword}`,
-        { duration: 12000 },
-      )
-      setOpen(false)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-7 p-0 text-stone-500 hover:bg-sky-50 hover:text-sky-700 disabled:opacity-30"
-          disabled={disabled}
-          title={disabled ? "You can't reset your own password here" : 'Reset password'}
-        >
-          <KeyRoundIcon className="size-3.5" />
-          <span className="sr-only">Reset password</span>
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Reset password?</AlertDialogTitle>
-          <AlertDialogDescription>
-            A new temporary password will be generated and emailed to{' '}
-            <strong>{user.name}</strong> ({user.email}). They will be required to set a new
-            password on their next login.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-sky-700 text-sky-50 hover:bg-sky-800"
-            onClick={(e) => { e.preventDefault(); handleReset() }}
-            disabled={busy}
-          >
-            {busy ? 'Sending…' : 'Reset password'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
-
 function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
   return [
     {
@@ -461,7 +399,6 @@ function buildColumns(currentUserId: string): ColumnDef<UserRow>[] {
                 <span className="sr-only">Edit</span>
               </Link>
             </Button>
-            <ResetPasswordAction user={row.original} disabled={isSelf} />
             <DeleteAction user={row.original} disabled={isSelf} />
           </div>
         )

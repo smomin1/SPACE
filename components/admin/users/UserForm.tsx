@@ -9,8 +9,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ALL_ROLE_OPTIONS } from '@/lib/roles'
 
@@ -57,11 +68,31 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
   const [password, setPassword] = React.useState('')
   const [showPwd,  setShowPwd]  = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
+  const [resetting,  setResetting]  = React.useState(false)
 
   // ADMIN cannot assign or see the SUPER_ADMIN option
   const roleOptions = currentUserRole === 'SUPER_ADMIN'
     ? ALL_ROLE_OPTIONS
     : ALL_ROLE_OPTIONS.filter(o => o.value !== 'SUPER_ADMIN')
+
+  async function handleResetPassword() {
+    if (!user) return
+    setResetting(true)
+    try {
+      const res = await fetch(`/api/users/${user.id}/reset-password`, { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(data.error ?? 'Reset failed.')
+        return
+      }
+      toast.success(
+        `Temporary password sent to ${user.email}. Password: ${data.tempPassword}`,
+        { duration: 12000 },
+      )
+    } finally {
+      setResetting(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -239,6 +270,52 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
               {showPwd ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
             </button>
           </div>
+        </div>
+      )}
+
+      {mode === 'edit' && !isSelf && (
+        <div className="flex items-center justify-between rounded-md border border-stone-200/80 px-4 py-3">
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium text-stone-700">Send temporary password</p>
+            <p className="text-[11px] text-stone-400">
+              Generates a new temporary password, emails it to the user, and requires them to
+              change it on next login. Use when a user has lost access or forgotten their password.
+            </p>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="ml-4 shrink-0 gap-1.5"
+                disabled={resetting}
+              >
+                <KeyRoundIcon className="size-3.5" />
+                Reset password
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset password?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  A new temporary password will be generated and emailed to{' '}
+                  <strong>{user?.name}</strong> ({user?.email}). They will be required to set a
+                  new password on their next login.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={resetting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-sky-700 text-sky-50 hover:bg-sky-800"
+                  onClick={(e) => { e.preventDefault(); handleResetPassword() }}
+                  disabled={resetting}
+                >
+                  {resetting ? 'Sending…' : 'Reset password'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
 

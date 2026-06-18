@@ -5,6 +5,7 @@ import { AuthError } from 'next-auth'
 import { z } from 'zod'
 import { headers } from 'next/headers'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { prisma } from '@/lib/prisma'
 
 const schema = z.object({
   email: z.string().email('Invalid email address'),
@@ -35,11 +36,20 @@ export async function loginAction(
     return parsed.error.issues[0].message
   }
 
+  // Check mustChangePassword before signing in so we can redirect directly
+  // to /change-password without a middleware double-hop (which is unreliable
+  // in the App Router's soft-navigation path from server actions).
+  const user = await prisma.user.findUnique({
+    where: { email: parsed.data.email },
+    select: { mustChangePassword: true },
+  })
+  const redirectTo = user?.mustChangePassword ? '/change-password' : '/dashboard'
+
   try {
     await signIn('credentials', {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: '/dashboard',
+      redirectTo,
     })
   } catch (error) {
     if (error instanceof AuthError) {

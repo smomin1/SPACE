@@ -35,7 +35,7 @@ export default async function VitalAssessmentPage() {
           <span className="font-semibold text-amber-500">~</span> Partial coverage
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="text-stone-300">–</span> Not covered
+          <span className="text-stone-300">-</span> Not covered
         </span>
       </div>
 

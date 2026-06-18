@@ -90,7 +90,7 @@ export function isPipelineComplete(results: StageResult[]): boolean {
   return results.every((r) => r.status === 'PASSED' || r.status === 'SKIPPED')
 }
 
-/** Weighted aggregate (0–100) from the per-stage scores and config weights. */
+/** Weighted aggregate (0-100) from the per-stage scores and config weights. */
 export function aggregateFromScores(scores: StageScoreMap, config: PipelineConfigLike): number {
   const s: StageScores = {
     ai: scores.AI_SCREENING,

@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ScreeningAnswer } from '@prisma/client'
 
-// maxRetries: 0 — a slow scan must NOT be silently retried (each retry is another
+// maxRetries: 0 - a slow scan must NOT be silently retried (each retry is another
 // paid web-search call). timeout caps a single call so a hung request fails fast
 // instead of running for many minutes and burning credits.
 const anthropic = new Anthropic({
@@ -14,7 +14,7 @@ const MODEL = 'claude-sonnet-4-6'
 
 // Anthropic server-side web search: the model actually browses live sources and
 // the API runs the search loop internally, returning the final answer in one call.
-// max_uses caps searches per request — one comprehensive pass covers all 50
+// max_uses caps searches per request - one comprehensive pass covers all 50
 // questions, so this is also the per-scan search ceiling (≈$0.01/search).
 const WEB_SEARCH_TOOL: Anthropic.Messages.MessageCreateParams['tools'] = [
   { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },

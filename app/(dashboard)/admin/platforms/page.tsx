@@ -41,7 +41,7 @@ export default async function PlatformsPage({
       take: 1,
       select: { id: true, v2Percent: true },
     },
-    // The CEFR record lives here, independent of track — a platform that has
+    // The CEFR record lives here, independent of track - a platform that has
     // advanced to VITAL still carries its completed CefrEvaluation.
     cefrEvaluation: { select: { status: true } },
   }

@@ -139,7 +139,7 @@ export function PipelineBoard({
                           {STATUS_LABEL[st.status]}
                         </span>
                         <div className="mt-1 font-mono text-[11px] tabular-nums text-stone-500">
-                          {st.score != null ? `${st.score.toFixed(0)}%` : '—'}
+                          {st.score != null ? `${st.score.toFixed(0)}%` : '-'}
                         </div>
                         <div className="mt-0.5 flex items-center justify-center gap-2">
                           <button
@@ -178,7 +178,7 @@ export function PipelineBoard({
                   </td>
                 </tr>
 
-                {/* Inline link panel — rendered as a full-width row when open */}
+                {/* Inline link panel - rendered as a full-width row when open */}
                 {row.stages.map((st) => {
                   const linkKey = `${row.platformId}-${st.stage}`
                   if (openLink !== linkKey) return null
@@ -198,7 +198,7 @@ export function PipelineBoard({
                             label="Link an existing VITAL assessment"
                             options={unlinkedVitalTools.map((v) => ({
                               id: v.id,
-                              label: `${v.name}${v.v2Percent != null ? ` — ${v.v2Percent}%` : ''}`,
+                              label: `${v.name}${v.v2Percent != null ? ` (${v.v2Percent}%)` : ''}`,
                             }))}
                             disabled={busy}
                             onLink={(sourceId) => act({ type: 'link-vital', platformId: row.platformId, vitalToolId: sourceId })}

@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Deterministic date format (fixed locale + UTC) so server and client render the
-// same string — avoids React hydration mismatches in client components. Produces
+// same string - avoids React hydration mismatches in client components. Produces
 // e.g. "4 Jun 2026".
 const DATE_FMT = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',

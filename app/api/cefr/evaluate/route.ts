@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
   })
 
   // Keep the CEFR-track shadow Evaluation in sync so the Evaluations board reflects
-  // the submission — it drives the status badge and the per-evaluator "submitted" flag.
+  // the submission - it drives the status badge and the per-evaluator "submitted" flag.
   const shadow = await prisma.evaluation.findFirst({
     where: { platformId: parsed.platformId },
     select: { id: true },

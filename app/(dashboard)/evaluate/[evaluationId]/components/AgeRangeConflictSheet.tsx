@@ -194,7 +194,7 @@ export function AgeRangeConflictSheet({
                 {r.evaluatorType.toLowerCase()}
               </span>
               <span className="text-[12px] font-medium text-blue-700 bg-blue-50 rounded px-2 py-0.5 ring-1 ring-inset ring-blue-200">
-                {ageLabel(r.ageMin)} – {ageLabel(r.ageMax)}
+                {ageLabel(r.ageMin)} - {ageLabel(r.ageMax)}
               </span>
             </div>
           ))}

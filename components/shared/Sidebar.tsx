@@ -139,14 +139,14 @@ export function Sidebar({ role, userName, userInitials = '?', roleLabel, pending
   function isActive(href: string): boolean {
     const [hrefPath, hrefQuery] = href.split('?')
     if (hrefQuery) {
-      // href has query params — must match both path and all query params
+      // href has query params - must match both path and all query params
       const hrefParams = new URLSearchParams(hrefQuery)
       for (const [k, v] of hrefParams.entries()) {
         if (searchParams.get(k) !== v) return false
       }
       return pathname === hrefPath
     }
-    // Plain path — but don't match if the current URL has query params that map to a more specific item
+    // Plain path - but don't match if the current URL has query params that map to a more specific item
     // (e.g. /evaluations with track=CEFR should not match the plain /evaluations item)
     const hasSpecificItem = visible.some((item) => {
       const [iPath, iQuery] = item.href.split('?')

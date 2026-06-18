@@ -55,7 +55,7 @@ function HeatmapTable({ rows }: { rows: PipelineRow[] }) {
             {STAGES.map(s => (
               <td key={s} className="py-2.5 px-2 text-center">
                 <span className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 text-[11px] font-medium tabular-nums min-w-[42px] ${cellStyle(row[s])}`}>
-                  {row[s] != null ? `${row[s]!.toFixed(0)}%` : '—'}
+                  {row[s] != null ? `${row[s]!.toFixed(0)}%` : '-'}
                 </span>
               </td>
             ))}
@@ -97,7 +97,7 @@ export function PipelineHeatmap({ rows }: { rows: PipelineRow[] }) {
             <button onClick={() => setOpen(true)} className="text-emerald-700 hover:underline">view all</button>
           </p>
         )}
-        <p className="mt-2 text-[10.5px] text-stone-400">Green ≥ 70% · Amber 50–69% · Red &lt; 50%</p>
+        <p className="mt-2 text-[10.5px] text-stone-400">Green ≥ 70% · Amber 50-69% · Red &lt; 50%</p>
       </div>
 
       {open && (
@@ -108,7 +108,7 @@ export function PipelineHeatmap({ rows }: { rows: PipelineRow[] }) {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 shrink-0">
               <div>
-                <p className="font-semibold text-emerald-950">Stage scores — all platforms</p>
+                <p className="font-semibold text-emerald-950">Stage scores: all platforms</p>
                 <p className="text-[12px] text-stone-400 mt-0.5">{rows.length} pipeline-complete platforms</p>
               </div>
               <button
@@ -196,7 +196,7 @@ export function AggregateBarChart({ rows }: { rows: PipelineRow[] }) {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 shrink-0">
               <div>
-                <p className="font-semibold text-emerald-950">Aggregate score ranking — all platforms</p>
+                <p className="font-semibold text-emerald-950">Aggregate score ranking: all platforms</p>
                 <p className="text-[12px] text-stone-400 mt-0.5">{rows.length} pipeline-complete platforms, ranked by weighted aggregate</p>
               </div>
               <button

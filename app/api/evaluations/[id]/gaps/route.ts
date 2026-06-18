@@ -6,7 +6,7 @@ import type { EvidenceType } from '@prisma/client'
 
 // ─── GET /api/evaluations/[id]/gaps ──────────────────────────────────────────
 // Returns requirements that have zero scores in this evaluation (gap requirements).
-// Admin-only — used to identify new requirements added after an evaluation was created.
+// Admin-only - used to identify new requirements added after an evaluation was created.
 
 export async function GET(
   _req: Request,

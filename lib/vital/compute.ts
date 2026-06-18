@@ -63,7 +63,7 @@ export function vitalTotals(pillars: PillarScore[]): VitalTotals {
 }
 
 // Verdict from the raw total /50 (matches the V2 sheet's Verdict row):
-// ≥35 STRONG · 25–34 GOOD · 15–24 PARTIAL · <15 POOR.
+// ≥35 STRONG · 25-34 GOOD · 15-24 PARTIAL · <15 POOR.
 export function verdictFromTotal50(total: number): VitalVerdict {
   if (total >= 35) return "STRONG_FIT";
   if (total >= 25) return "GOOD_FIT";

@@ -120,7 +120,7 @@ export function CefrEvaluatorWorkspace({
       }
       const data = await res.json()
       setStatus('COMPLETED')
-      toast.success(`CEFR evaluation submitted — ${Number(data.alignmentPct ?? 0).toFixed(1)}% alignment`)
+      toast.success(`CEFR evaluation submitted: ${Number(data.alignmentPct ?? 0).toFixed(1)}% alignment`)
       router.refresh()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to save')
@@ -209,7 +209,7 @@ export function CefrEvaluatorWorkspace({
                                   onChange={(e) => setFit(q.id, e.target.value ? Number(e.target.value) : null)}
                                   className="rounded-md border border-stone-200 bg-white px-1.5 py-1 text-[11.5px]"
                                 >
-                                  <option value="">—</option>
+                                  <option value="">-</option>
                                   {[1, 2, 3, 4, 5].map((n) => (
                                     <option key={n} value={n}>{n}</option>
                                   ))}

@@ -66,7 +66,7 @@ export function calculateWeightedScore(scores: Score[], requirements: Requiremen
 }
 
 /**
- * Returns the weighted percentage (0–100).
+ * Returns the weighted percentage (0-100).
  * Formula: sum(combinedAvg × multiplier) / sum(4 × multiplier) × 100
  * Only requirements with ≥1 scored value contribute to the denominator.
  * Returns 0 when no requirement has any non-N/A score.
@@ -152,8 +152,8 @@ export type StageScores = {
 export const DEFAULT_STAGE_WEIGHTS: StageWeights = { ai: 20, cefr: 40, vital: 30, prd: 10 }
 
 /**
- * Weighted aggregate (0–100) across the four pipeline stages. Each component is a
- * 0–100 score; missing components are excluded and the remaining weights are
+ * Weighted aggregate (0-100) across the four pipeline stages. Each component is a
+ * 0-100 score; missing components are excluded and the remaining weights are
  * renormalised over the present ones, so a partially-evaluated tool still gets a
  * fair provisional aggregate. Returns 0 when nothing is scored.
  */

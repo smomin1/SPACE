@@ -681,7 +681,7 @@ export function RequirementsTable({ initialData }: RequirementsTableProps) {
         <span>
           {totalRows === 0
             ? 'No results'
-            : `${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, totalRows)} of ${totalRows}`}
+            : `${pageIndex * pageSize + 1}-${Math.min((pageIndex + 1) * pageSize, totalRows)} of ${totalRows}`}
         </span>
         <div className="flex items-center gap-1">
           <Button

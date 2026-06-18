@@ -325,7 +325,7 @@ export function MergedView({
                   <span key={r.userId} className="inline-flex items-center gap-1.5 rounded-md ring-1 ring-inset ring-blue-200 bg-white px-2.5 py-1 text-[12px]">
                     <span className="text-stone-500">{r.user.name ?? '?'}:</span>
                     <span className="font-medium text-blue-700">
-                      {ageLabel(r.ageMin)}–{ageLabel(r.ageMax)}
+                      {ageLabel(r.ageMin)}-{ageLabel(r.ageMax)}
                     </span>
                     <span className="text-stone-400">({gradeRangeLabel(r.ageMin, r.ageMax)})</span>
                   </span>

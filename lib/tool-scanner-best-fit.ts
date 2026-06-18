@@ -6,7 +6,7 @@ import { ANSWER_POINTS } from '@/lib/screening'
 // Goal: find the fewest tools that, combined, cover the most screening questions
 // at the highest score. Adapts the weighted requirement set-cover from the Results
 // Best Fit page to UNWEIGHTED screening answers (YES=2, PARTIAL=1, NO=0, UNKNOWN
-// excluded — see ANSWER_POINTS in lib/screening.ts).
+// excluded - see ANSWER_POINTS in lib/screening.ts).
 //
 // A question is "satisfied" once some tool in the set answers YES (the max of 2,
 // i.e. the same 75%-of-max bar the Results page uses). Pure functions, no DB.
@@ -294,7 +294,7 @@ export function buildCombinedAnalysis(
       partialCount += 1
     }
 
-    if (pts >= SATISFIED) continue // satisfied — not a gap
+    if (pts >= SATISFIED) continue // satisfied - not a gap
 
     // Tools outside the set that score better on this question
     const helperTools = tools

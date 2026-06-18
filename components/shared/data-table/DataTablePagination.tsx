@@ -37,7 +37,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
           <>
             Showing{" "}
             <span className="font-mono text-emerald-950 tabular-nums">{from}</span>
-            –<span className="font-mono text-emerald-950 tabular-nums">{to}</span> of{" "}
+-<span className="font-mono text-emerald-950 tabular-nums">{to}</span> of{" "}
             <span className="font-mono text-emerald-950 tabular-nums">{totalRows}</span>
           </>
         )}

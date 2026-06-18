@@ -25,7 +25,7 @@ const STATE_ORDER: Record<EvaluationState, number> = {
 }
 
 // Which Evaluations tab an assignment belongs to is driven by its evaluator type,
-// not the platform's current track — a platform that has advanced from CEFR to
+// not the platform's current track - a platform that has advanced from CEFR to
 // VITAL keeps its (done) CEFR assignment in the CEFR tab and its new VITAL
 // assignment in the VITAL tab.
 function tabOf(type: EvaluatorType): EvaluationTrack {

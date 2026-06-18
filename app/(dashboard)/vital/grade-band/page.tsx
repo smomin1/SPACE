@@ -11,7 +11,7 @@ import {
 export default async function VitalGradeBandPage() {
   const bands = await prisma.vitalGradeBand.findMany({ orderBy: { order: "asc" } });
 
-  // Group by grade band (K–5 / 6–8 / 9–12), preserving order.
+  // Group by grade band (K-5 / 6-8 / 9-12), preserving order.
   const grouped: { band: string; rows: typeof bands }[] = [];
   for (const b of bands) {
     const last = grouped[grouped.length - 1];

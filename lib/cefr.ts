@@ -71,7 +71,7 @@ export function alignmentBySkill(
 }
 
 /**
- * Alignment % per CEFR level split by skill group (LS vs RWVG) — the basis for the
+ * Alignment % per CEFR level split by skill group (LS vs RWVG) - the basis for the
  * "2 tools per CEFR micro-level (L&S + RWV&G)" final output.
  */
 export function alignmentByLevelAndGroup(

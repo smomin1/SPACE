@@ -252,7 +252,7 @@ export function PipelineDiagram({ config }: { config: Config }) {
             textAnchor="middle" fontSize="11" fontWeight="600"
             fill="#dc2626" fontFamily="system-ui,sans-serif"
           >
-            Disqualified — removed from pipeline
+            Disqualified: removed from pipeline
           </text>
         </svg>
       </div>

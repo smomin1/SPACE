@@ -98,7 +98,7 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
   const { results, derived, existing } = await evaluatePlatformPipeline(platformId)
   const byStage = new Map(existing.map((r) => [r.stage, r]))
 
-  // Stages that newly reach PASSED this sync — used to notify admins once.
+  // Stages that newly reach PASSED this sync - used to notify admins once.
   const newlyPassed: StageResult[] = []
 
   for (const r of results) {
@@ -134,7 +134,7 @@ export async function syncPlatformPipeline(platformId: string): Promise<StageRes
       await notifyAdmins({
         type: 'STAGE_PASSED',
         title: `${name} passed ${STAGE_LABELS[r.stage]}${score}`,
-        body: next ? `Assign the ${STAGE_LABELS[next]} evaluator to continue the pipeline.` : 'All stages cleared — ready for the Final Report.',
+        body: next ? `Assign the ${STAGE_LABELS[next]} evaluator to continue the pipeline.` : 'All stages cleared - ready for the Final Report.',
         link,
       })
     }

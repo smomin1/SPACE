@@ -566,8 +566,7 @@ export function PlatformsTable({ initialData, activeTab = 'tool' }: PlatformsTab
         <p className="text-[12px] text-stone-500">
           {totalRows === 0 ? 'No results' : (
             <>
-              Showing <span className="font-mono tabular-nums text-emerald-950">{from}</span>–
-              <span className="font-mono tabular-nums text-emerald-950">{to}</span> of{' '}
+              Showing <span className="font-mono tabular-nums text-emerald-950">{from}</span>-<span className="font-mono tabular-nums text-emerald-950">{to}</span> of{' '}
               <span className="font-mono tabular-nums text-emerald-950">{totalRows}</span>
             </>
           )}

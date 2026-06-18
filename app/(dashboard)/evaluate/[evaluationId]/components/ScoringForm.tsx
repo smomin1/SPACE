@@ -117,7 +117,7 @@ export function ScoringForm({
 
   const isPedagogy = assignment.evaluatorType === 'PEDAGOGY'
 
-  // After submitting, hide requirements that have no score — these are gap requirements added
+  // After submitting, hide requirements that have no score - these are gap requirements added
   // after the user submitted and can only be handled via the admin gap panel or a reopen.
   const visibleRequirements = assignment.hasSubmitted
     ? requirements.filter(r => scores.has(r.id))

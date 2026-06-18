@@ -87,7 +87,7 @@ export default async function FinalReportPage() {
   const completed = rows.filter((r) => r.complete).sort((a, b) => b.aggregate - a.aggregate)
   const inProgress = rows.filter((r) => !r.complete)
 
-  // Chart data — only platforms that cleared all pipeline stages
+  // Chart data - only platforms that cleared all pipeline stages
   const chartRows: PipelineRow[] = rows
     .filter((r) => r.complete)
     .sort((a, b) => b.aggregate - a.aggregate)
@@ -146,7 +146,7 @@ export default async function FinalReportPage() {
                       </td>
                       {row.stages.map((st) => (
                         <td key={st.stage} className="px-3 py-2.5 text-center font-mono text-[12px] tabular-nums text-stone-600">
-                          {st.score != null ? `${st.score.toFixed(0)}%` : st.status === 'SKIPPED' ? '—' : '·'}
+                          {st.score != null ? `${st.score.toFixed(0)}%` : st.status === 'SKIPPED' ? '-' : '·'}
                         </td>
                       ))}
                       <td className="px-3 py-2.5 text-right">
@@ -235,7 +235,7 @@ export default async function FinalReportPage() {
 }
 
 function PickList({ picks }: { picks: { name: string; pct: number }[] }) {
-  if (picks.length === 0) return <span className="text-[12px] text-stone-300">—</span>
+  if (picks.length === 0) return <span className="text-[12px] text-stone-300">-</span>
   return (
     <div className="flex flex-wrap gap-1.5">
       {picks.map((p, i) => (

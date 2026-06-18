@@ -3,7 +3,7 @@ import type { Role } from '@prisma/client'
 // ─── Role display: single source of truth ───────────────────────────────────────
 //
 // The Role ENUM VALUES (PEDAGOGY_EVALUATOR, TECHNICAL_EVALUATOR, VITAL_EVALUATOR, …)
-// are stored in the database and never change here — only the human-readable labels
+// are stored in the database and never change here - only the human-readable labels
 // do. The pipeline rebrand maps:
 //   PEDAGOGY_EVALUATOR  → "PRD - Pedagogical Evaluator"
 //   TECHNICAL_EVALUATOR → "PRD - Technical Evaluator"

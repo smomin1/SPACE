@@ -111,7 +111,7 @@ export default function ComparisonTable({
                 className="w-52 sticky left-0 bg-stone-50/95 z-10"
               />
               <SortTh
-                label="Compliance"
+                label="Compliance Gate"
                 sortKey="compliance"
                 current={sortKey}
                 dir={sortDir}

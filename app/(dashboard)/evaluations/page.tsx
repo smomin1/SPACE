@@ -207,18 +207,18 @@ export default async function EvaluationsPage({
             const isToolType = a.evaluatorType === 'PEDAGOGY' || a.evaluatorType === 'TECHNICAL' || a.evaluatorType === 'BOTH'
             const gapCount = gapCounts[ev.id] ?? 0
             return (
-              <div key={a.id} className="flex items-center group hover:bg-emerald-900/[0.025] transition-colors">
-                <Link
-                  href={href}
-                  className="flex flex-1 items-center gap-4 px-5 py-4 min-w-0"
-                >
+              <div key={a.id} className="relative flex items-center group hover:bg-emerald-900/[0.025] transition-colors">
+                <div className="flex flex-1 items-center gap-4 px-5 py-4 min-w-0">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[13px] font-medium text-emerald-950">
+                      <Link
+                        href={href}
+                        className="text-[13px] font-medium text-emerald-950 after:absolute after:inset-0 after:content-['']"
+                      >
                         {ev.platform.name}
-                      </span>
+                      </Link>
                       {!isAdmin && a.isLead && (
-                        <span className="inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
+                        <span className="relative z-10 inline-flex items-center rounded-md bg-amber-50 ring-1 ring-inset ring-amber-300/60 px-1.5 h-[18px] text-[10px] font-semibold text-amber-700 uppercase tracking-wider">
                           Lead
                         </span>
                       )}
@@ -248,9 +248,9 @@ export default async function EvaluationsPage({
                     <EvalStateBadge value={ev.state} />
                   )}
                   <ArrowRightIcon className="size-4 text-stone-300 group-hover:text-emerald-700 transition-colors shrink-0" />
-                </Link>
+                </div>
                 {isAdmin && isToolType && gapCount > 0 && (
-                  <div className="pr-5">
+                  <div className="relative z-10 pr-5">
                     <GapBadge
                       evaluationId={ev.id}
                       gapCount={gapCount}

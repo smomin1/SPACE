@@ -99,6 +99,12 @@ export default async function EvaluationWorkspacePage({
                 ))}
               </div>
             </div>
+            <div className="px-5 py-3 bg-stone-50/60">
+              <p className="text-xs text-stone-400">
+                Scores are hidden until all evaluators on both teams have submitted independently.
+                Once the evaluation moves to Merged, you can review scores and resolve conflicts here.
+              </p>
+            </div>
           </div>
         </main>
       )

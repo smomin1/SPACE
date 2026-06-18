@@ -47,6 +47,16 @@ export default async function VitalLevelStackPage({
 
   const byStage = new Map(recs.map((r) => [r.stageId, r]));
 
+  // Deduplicate stages whose keys differ only by dash variant (em dash vs hyphen).
+  // Keeps the first occurrence by order so recommendations map correctly.
+  const seenKeys = new Set<string>()
+  const uniqueStages = stages.filter((s) => {
+    const norm = s.key.replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim().toLowerCase()
+    if (seenKeys.has(norm)) return false
+    seenKeys.add(norm)
+    return true
+  })
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -84,7 +94,7 @@ export default async function VitalLevelStackPage({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stages.map((s) => {
+              {uniqueStages.map((s) => {
                 const r = byStage.get(s.id);
                 return (
                   <TableRow key={s.id}>

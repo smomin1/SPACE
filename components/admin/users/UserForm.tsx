@@ -85,10 +85,7 @@ export function UserForm({ mode, user, isSelf = false, currentUserRole }: UserFo
         toast.error(data.error ?? 'Reset failed.')
         return
       }
-      toast.success(
-        `Temporary password sent to ${user.email}. Password: ${data.tempPassword}`,
-        { duration: 12000 },
-      )
+      toast.success(`Temporary password sent to ${user.email}.`)
     } finally {
       setResetting(false)
     }

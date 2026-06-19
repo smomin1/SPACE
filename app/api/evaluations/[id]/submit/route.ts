@@ -59,19 +59,22 @@ export async function POST(
     )
   }
 
-  // All requirements for this evaluator's type must be scored (non-null value)
+  // Every requirement in this evaluator's set (their type + shared BOTH) must be
+  // answered. "Answered" = a Score row exists, INCLUDING N/A (value null), which is
+  // a deliberate answer in the UI. This mirrors the workspace progress counter and
+  // the GET set (evaluatorType in [type, BOTH]) exactly, so the gate can't disagree.
   const [requirements, scores] = await Promise.all([
     prisma.requirement.findMany({
-      where: { evaluatorType: assignment.evaluatorType },
+      where: { evaluatorType: { in: [assignment.evaluatorType, 'BOTH'] } },
       select: { id: true },
     }),
     prisma.score.findMany({
       where: { evaluationId, userId: session.user.id },
-      select: { requirementId: true, value: true },
+      select: { requirementId: true },
     }),
   ])
 
-  const scoredIds = new Set(scores.filter(s => s.value !== null).map(s => s.requirementId))
+  const scoredIds = new Set(scores.map(s => s.requirementId))
   const unscoredCount = requirements.filter(r => !scoredIds.has(r.id)).length
 
   if (unscoredCount > 0) {

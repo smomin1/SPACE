@@ -16,15 +16,15 @@ export default async function ToolScannerEditScreeningQuestionPage({
   if (!canDo(session.user.role, 'manage:screening')) redirect('/tool-scanner')
 
   const { id } = await params
-  const [question, categoryRows] = await Promise.all([
-    prisma.screeningQuestion.findUnique({ where: { id } }),
-    prisma.screeningQuestion.findMany({
-      select: { category: true },
-      distinct: ['category'],
-      orderBy: { category: 'asc' },
-    }),
-  ])
+  const question = await prisma.screeningQuestion.findUnique({ where: { id } })
   if (!question) notFound()
+
+  const categoryRows = await prisma.screeningQuestion.findMany({
+    where: { requirementSetId: question.requirementSetId },
+    select: { category: true },
+    distinct: ['category'],
+    orderBy: { category: 'asc' },
+  })
   const categories = categoryRows.map((r) => r.category)
 
   return (
@@ -50,6 +50,7 @@ export default async function ToolScannerEditScreeningQuestionPage({
           hardFail: question.hardFail,
         }}
         backPath="/tool-scanner/screening"
+        requirementSetId={question.requirementSetId}
       />
     </div>
   )

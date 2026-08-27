@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import type { ScreeningHardFail } from '@prisma/client'
+import { BulkImportScreeningQuestionsDialog } from './BulkImportScreeningQuestionsDialog'
 
 type Question = {
   id: string
@@ -35,10 +36,17 @@ const HARD_FAIL_LABEL: Record<ScreeningHardFail, string> = {
 export function ScreeningQuestionsTable({
   initialData,
   basePath = '/admin/screening-questions',
+  activeSetKey,
+  activeSetId,
+  activeSetName,
 }: {
   initialData: Question[]
   basePath?: string
+  activeSetKey: string
+  activeSetId: string
+  activeSetName: string
 }) {
+  const setQuery = `?set=${encodeURIComponent(activeSetKey)}`
   const router = useRouter()
   const [deleteTarget, setDeleteTarget] = React.useState<Question | null>(null)
   const [deleting, setDeleting] = React.useState(false)
@@ -71,12 +79,19 @@ export function ScreeningQuestionsTable({
           {initialData.length} screening question{initialData.length !== 1 ? 's' : ''} used by the
           Tool Scanner
         </p>
-        <Button asChild size="sm">
-          <Link href={`${basePath}/new`}>
-            <PlusIcon className="mr-1.5 size-3.5" />
-            New question
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <BulkImportScreeningQuestionsDialog
+            requirementSetId={activeSetId}
+            requirementSetName={activeSetName}
+            onSuccess={() => router.refresh()}
+          />
+          <Button asChild size="sm">
+            <Link href={`${basePath}/new${setQuery}`}>
+              <PlusIcon className="mr-1.5 size-3.5" />
+              New question
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {initialData.length === 0 ? (
@@ -118,7 +133,7 @@ export function ScreeningQuestionsTable({
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
                         <Button asChild variant="ghost" size="sm" className="h-7 px-2">
-                          <Link href={`${basePath}/${q.id}/edit`}>
+                          <Link href={`${basePath}/${q.id}/edit${setQuery}`}>
                             <PencilIcon className="size-3.5 text-stone-500" />
                           </Link>
                         </Button>

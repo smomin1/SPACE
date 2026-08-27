@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { ScreeningHardFail } from '@prisma/client'
 
 export const screeningQuestionBaseSchema = z.object({
+  requirementSetId: z.string().min(1, 'Requirement set is required'),
   num: z.number().int('Number must be a whole number').min(1, 'Number must be 1 or greater'),
   category: z
     .string()

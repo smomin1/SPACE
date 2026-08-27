@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
   }
 
-  let body: { platformName?: string; url?: string }
+  let body: { platformName?: string; url?: string; requirementSetId?: string }
   try {
     body = await req.json()
   } catch {
@@ -20,9 +20,10 @@ export async function POST(req: NextRequest) {
 
   const platformName = body.platformName?.trim()
   const url = body.url?.trim()
-  if (!platformName || !url) {
+  const requirementSetId = body.requirementSetId?.trim()
+  if (!platformName || !url || !requirementSetId) {
     return NextResponse.json(
-      { error: 'platformName and url are required', code: 'BAD_REQUEST' },
+      { error: 'platformName, url, and requirementSetId are required', code: 'BAD_REQUEST' },
       { status: 400 },
     )
   }
@@ -34,12 +35,20 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const requirementSet = await prisma.requirementSet.findUnique({ where: { id: requirementSetId } })
+  if (!requirementSet || !requirementSet.isActive) {
+    return NextResponse.json(
+      { error: 'Unknown or inactive requirement set', code: 'BAD_REQUEST' },
+      { status: 400 },
+    )
+  }
+
   // Fail fast with a clear message rather than queueing a scan that can't run.
-  const questionCount = await prisma.screeningQuestion.count()
+  const questionCount = await prisma.screeningQuestion.count({ where: { requirementSetId } })
   if (questionCount === 0) {
     return NextResponse.json(
       {
-        error: 'No screening questions exist. Seed or create screening questions first.',
+        error: `No screening questions exist for ${requirementSet.name}. Seed or create screening questions first.`,
         code: 'NO_QUESTIONS',
       },
       { status: 400 },
@@ -51,6 +60,7 @@ export async function POST(req: NextRequest) {
       platformName,
       url,
       userId: session.user.id as string,
+      requirementSetId,
     })
     return NextResponse.json({ id, status: 'QUEUED' }, { status: 202 })
   } catch (err) {

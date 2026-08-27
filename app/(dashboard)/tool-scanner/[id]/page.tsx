@@ -12,15 +12,17 @@ export default async function ToolScannerResultPage({
 }) {
   const { id } = await params
 
-  const [evaluation, questions] = await Promise.all([
-    prisma.searchEvaluation.findUnique({
-      where: { id },
-      include: { responses: true },
-    }),
-    prisma.screeningQuestion.findMany({ orderBy: { num: 'asc' } }),
-  ])
+  const evaluation = await prisma.searchEvaluation.findUnique({
+    where: { id },
+    include: { responses: true },
+  })
 
   if (!evaluation) notFound()
+
+  const questions = await prisma.screeningQuestion.findMany({
+    where: { requirementSetId: evaluation.requirementSetId },
+    orderBy: { num: 'asc' },
+  })
 
   const metadata = evaluation.metadata as {
     Target_Audience?: string

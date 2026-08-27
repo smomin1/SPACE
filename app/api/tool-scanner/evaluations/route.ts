@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { coveragePercent } from '@/lib/screening'
 import { kickWorker } from '@/lib/tool-scanner-queue'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
@@ -13,7 +13,10 @@ export async function GET() {
   // Idempotent: resumes the queue if the process restarted with work outstanding.
   kickWorker()
 
+  const requirementSetId = req.nextUrl.searchParams.get('requirementSetId')
+
   const evaluations = await prisma.searchEvaluation.findMany({
+    where: requirementSetId ? { requirementSetId } : undefined,
     orderBy: { createdAt: 'desc' },
     include: { responses: { select: { answer: true } } },
   })

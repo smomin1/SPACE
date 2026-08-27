@@ -6,6 +6,13 @@ import { SparklesIcon, AlertTriangleIcon, GlobeIcon, CheckCircle2Icon } from 'lu
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type FormState =
   | { stage: 'idle' }
@@ -13,16 +20,25 @@ type FormState =
   | { stage: 'queued'; platformName: string }
   | { stage: 'error'; message: string }
 
-export function ToolScannerForm({ onQueued }: { onQueued?: () => void }) {
+export function ToolScannerForm({
+  onQueued,
+  requirementSets,
+  defaultRequirementSetId,
+}: {
+  onQueued?: () => void
+  requirementSets: { id: string; key: string; name: string }[]
+  defaultRequirementSetId: string
+}) {
   const [platformName, setPlatformName] = React.useState('')
   const [url, setUrl] = React.useState('')
+  const [requirementSetId, setRequirementSetId] = React.useState(defaultRequirementSetId)
   const [state, setState] = React.useState<FormState>({ stage: 'idle' })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const name = platformName.trim()
     const link = url.trim()
-    if (!name || !link) return
+    if (!name || !link || !requirementSetId) return
 
     setState({ stage: 'submitting' })
 
@@ -31,7 +47,7 @@ export function ToolScannerForm({ onQueued }: { onQueued?: () => void }) {
       res = await fetch('/api/tool-scanner/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platformName: name, url: link }),
+        body: JSON.stringify({ platformName: name, url: link, requirementSetId }),
       })
     } catch (err) {
       setState({ stage: 'error', message: err instanceof Error ? err.message : 'Network error' })
@@ -64,12 +80,29 @@ export function ToolScannerForm({ onQueued }: { onQueued?: () => void }) {
           Run a new evaluation
         </h2>
         <p className="mt-0.5 text-[12.5px] text-stone-500">
-          AI investigates public web sources and screens against the 50-point AI screening checklist.
+          AI investigates public web sources and screens against the selected requirement set&apos;s checklist.
           Scans run in the background and are queued one at a time.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
+        {requirementSets.length > 1 && (
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] text-emerald-950">Requirement Set</Label>
+            <Select value={requirementSetId} onValueChange={setRequirementSetId} disabled={isSubmitting}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a domain" />
+              </SelectTrigger>
+              <SelectContent>
+                {requirementSets.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="space-y-1.5">
           <Label htmlFor="platformName" className="text-[12.5px] text-emerald-950">
             Platform Name
@@ -117,7 +150,10 @@ export function ToolScannerForm({ onQueued }: { onQueued?: () => void }) {
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isSubmitting || !platformName.trim() || !url.trim()}>
+        <Button
+          type="submit"
+          disabled={isSubmitting || !platformName.trim() || !url.trim() || !requirementSetId}
+        >
           <SparklesIcon className="mr-1.5 size-3.5" />
           {isSubmitting ? 'Adding…' : 'Add to Queue'}
         </Button>

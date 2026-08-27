@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { runToolScanEvaluation } from '@/lib/claude-tool-scanner'
 import { syncPlatformPipeline } from '@/lib/pipeline-server'
+import { ESL_REQUIREMENT_SET_KEY } from '@/lib/requirement-sets'
 import type {
   ScreeningQuestionInput,
   ScreeningResult,
@@ -39,6 +40,7 @@ export async function enqueueScan(input: {
   platformName: string
   url: string
   userId: string
+  requirementSetId: string
 }): Promise<{ id: string }> {
   const existing = await prisma.searchEvaluation.findFirst({
     where: { url: input.url },
@@ -52,6 +54,7 @@ export async function enqueueScan(input: {
       url: input.url,
       status: 'QUEUED',
       createdById: input.userId,
+      requirementSetId: input.requirementSetId,
     },
     select: { id: true },
   })
@@ -86,7 +89,7 @@ async function processLoop(): Promise<void> {
     const next = await prisma.searchEvaluation.findFirst({
       where: { status: 'QUEUED' },
       orderBy: { createdAt: 'asc' },
-      select: { id: true, platformName: true, url: true, attempts: true },
+      select: { id: true, platformName: true, url: true, attempts: true, requirementSetId: true },
     })
     if (!next) break
     await runOne(next)
@@ -98,6 +101,7 @@ async function runOne(ev: {
   platformName: string
   url: string
   attempts: number
+  requirementSetId: string
 }): Promise<void> {
   const attempt = ev.attempts + 1
 
@@ -108,6 +112,7 @@ async function runOne(ev: {
 
   try {
     const questions: ScreeningQuestionInput[] = await prisma.screeningQuestion.findMany({
+      where: { requirementSetId: ev.requirementSetId },
       orderBy: { num: 'asc' },
       select: { id: true, num: true, category: true, question: true, whatToLookFor: true },
     })
@@ -146,19 +151,27 @@ async function runOne(ev: {
       }),
     ])
 
-    // Auto-link: find or create a Platform for this scan so it feeds the pipeline immediately.
+    // Auto-link into the ESL AI_SCREENING → CEFR → VITAL → PRD pipeline. This is
+    // ESL-pipeline-specific behavior with no equivalent stage for other domains
+    // yet, so it must only fire for scans run under the "esl" RequirementSet.
     // Only do this if the scan isn't already linked.
-    const fresh = await prisma.searchEvaluation.findUnique({ where: { id: ev.id }, select: { platformId: true } })
-    if (!fresh?.platformId) {
-      const domain = (() => { try { return new URL(ev.url).hostname.replace(/^www\./, '') } catch { return ev.platformName } })()
-      let platform = await prisma.platform.findFirst({ where: { name: ev.platformName }, select: { id: true } })
-      if (!platform) {
-        platform = await prisma.platform.create({ data: { name: ev.platformName, vendor: domain, track: 'CEFR' } })
+    const requirementSet = await prisma.requirementSet.findUnique({
+      where: { id: ev.requirementSetId },
+      select: { key: true },
+    })
+    if (requirementSet?.key === ESL_REQUIREMENT_SET_KEY) {
+      const fresh = await prisma.searchEvaluation.findUnique({ where: { id: ev.id }, select: { platformId: true } })
+      if (!fresh?.platformId) {
+        const domain = (() => { try { return new URL(ev.url).hostname.replace(/^www\./, '') } catch { return ev.platformName } })()
+        let platform = await prisma.platform.findFirst({ where: { name: ev.platformName }, select: { id: true } })
+        if (!platform) {
+          platform = await prisma.platform.create({ data: { name: ev.platformName, vendor: domain, track: 'CEFR' } })
+        }
+        await prisma.searchEvaluation.update({ where: { id: ev.id }, data: { platformId: platform.id } })
+        await syncPlatformPipeline(platform.id).catch((err) =>
+          console.error('[tool-scanner] pipeline sync failed after auto-link:', err),
+        )
       }
-      await prisma.searchEvaluation.update({ where: { id: ev.id }, data: { platformId: platform.id } })
-      await syncPlatformPipeline(platform.id).catch((err) =>
-        console.error('[tool-scanner] pipeline sync failed after auto-link:', err),
-      )
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error during scan'

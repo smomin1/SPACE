@@ -516,40 +516,75 @@ model ConflictMessage {
 // Layer 1 Tool Scanner: AI screening of any platform from public web sources.
 // One scan answers the ScreeningQuestion set; answers are stored as ScreeningResponse rows.
 model SearchEvaluation {
-  id           String     @id @default(cuid())
-  platformName String
-  url          String
-  metadata     Json?      // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
-  status       ScanStatus @default(COMPLETED) // backfills existing rows as COMPLETED; new rows start QUEUED
-  error        String?    // failure message when status = FAILED
-  attempts     Int        @default(0)         // run count; supports a single auto-retry
-  startedAt    DateTime?  // when the worker began scanning
-  completedAt  DateTime?  // when it reached COMPLETED or FAILED
-  createdAt    DateTime   @default(now())
-  createdById  String
+  id               String     @id @default(cuid())
+  platformName     String
+  url              String
+  metadata         Json?      // { Target_Audience: string, Fluency_Levels: string[], Grade_Levels: string[] }
+  status           ScanStatus @default(COMPLETED) // backfills existing rows as COMPLETED; new rows start QUEUED
+  error            String?    // failure message when status = FAILED
+  attempts         Int        @default(0)         // run count; supports a single auto-retry
+  startedAt        DateTime?  // when the worker began scanning
+  completedAt      DateTime?  // when it reached COMPLETED or FAILED
+  createdAt        DateTime   @default(now())
+  createdById      String
   // Optional link into the pipeline: a screening run can be attached to a Platform
   // so its coverage feeds the AI_SCREENING stage. Nullable — standalone scans stay
   // unlinked and untouched.
-  platformId   String?
+  platformId       String?
+  // Which domain's checklist this scan ran against. Scoping the scan itself (not
+  // just deriving it from platform) keeps its question set stable even if the
+  // platform is later scanned under a different domain.
+  requirementSetId String
 
-  createdBy User                @relation(fields: [createdById], references: [id])
-  platform   Platform?           @relation(fields: [platformId], references: [id])
-  responses  ScreeningResponse[]
+  createdBy       User            @relation(fields: [createdById], references: [id])
+  platform        Platform?       @relation(fields: [platformId], references: [id])
+  requirementSet  RequirementSet  @relation(fields: [requirementSetId], references: [id])
+  responses       ScreeningResponse[]
+
+  @@index([requirementSetId])
 }
 
 // The Tool Scanner's own question set (independent of the evaluator Requirement table).
-// Seeded from the AI Screening checklist; admin-editable.
+// Seeded from the AI Screening checklist; admin-editable. Scoped to a RequirementSet
+// so different domains (ESL, LMS, Internet Devices, ...) keep independent checklists.
 model ScreeningQuestion {
-  id            String             @id @default(cuid())
-  num           Int                // 1-50, canonical number + display order
-  category      String
-  question      String
-  whatToLookFor String?
-  hardFail      ScreeningHardFail? // null = not a hard-fail question
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id                String             @id @default(cuid())
+  num               Int                // 1-50, canonical number + display order
+  category          String
+  question          String
+  whatToLookFor     String?
+  hardFail          ScreeningHardFail? // null = not a hard-fail question
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  requirementSetId  String
 
-  responses ScreeningResponse[]
+  requirementSet RequirementSet     @relation(fields: [requirementSetId], references: [id])
+  responses      ScreeningResponse[]
+
+  @@index([requirementSetId])
+}
+
+// A named checklist domain for the Tool Scanner (e.g. "ESL Platforms", "LMS",
+// "Internet Devices"). Each set owns its own ScreeningQuestions and scans, so a
+// Platform can be scanned under multiple domains in parallel with no cross-
+// contamination of questions or results.
+//
+// Deliberately generic (not "ToolScannerDomain"): a future phase extends manual
+// evaluation (Requirement/Context/Evaluation/PlatformEvaluatorAssignment) to point
+// at this same table via requirementSetId, reusing this model rather than adding a
+// parallel one.
+model RequirementSet {
+  id          String   @id @default(cuid())
+  key         String   @unique // slug, e.g. "esl", "lms", "internet_devices"
+  name        String              // display name, e.g. "ESL Platforms"
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  screeningQuestions ScreeningQuestion[]
+  searchEvaluations  SearchEvaluation[]
 }
 
 // One answer to one screening question within one scan.

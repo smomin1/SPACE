@@ -1,23 +1,17 @@
-import { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { canDo } from '@/lib/permissions'
 import { prisma } from '@/lib/prisma'
-import { screeningQuestionBaseSchema } from '@/lib/screening-schema'
+import { requirementSetBaseSchema } from '@/lib/requirement-set-schema'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await auth()
   if (!session?.user) {
     return Response.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
   }
 
-  const requirementSetId = req.nextUrl.searchParams.get('requirementSetId')
-
   try {
-    const questions = await prisma.screeningQuestion.findMany({
-      where: requirementSetId ? { requirementSetId } : undefined,
-      orderBy: { num: 'asc' },
-    })
-    return Response.json({ questions })
+    const sets = await prisma.requirementSet.findMany({ orderBy: { order: 'asc' } })
+    return Response.json({ requirementSets: sets })
   } catch {
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })
   }
@@ -28,7 +22,7 @@ export async function POST(request: Request) {
   if (!session?.user) {
     return Response.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
   }
-  if (!canDo(session.user.role, 'manage:screening')) {
+  if (!canDo(session.user.role, 'manage:requirement_sets')) {
     return Response.json({ error: 'Forbidden', code: 'FORBIDDEN' }, { status: 403 })
   }
 
@@ -39,7 +33,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid JSON', code: 'INVALID_JSON' }, { status: 400 })
   }
 
-  const parsed = screeningQuestionBaseSchema.safeParse(body)
+  const parsed = requirementSetBaseSchema.safeParse(body)
   if (!parsed.success) {
     return Response.json(
       { error: 'Bad Request', code: 'VALIDATION_ERROR', details: parsed.error.flatten() },
@@ -48,9 +42,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const question = await prisma.screeningQuestion.create({ data: parsed.data })
-    return Response.json({ question }, { status: 201 })
-  } catch {
+    const set = await prisma.requirementSet.create({ data: parsed.data })
+    return Response.json({ requirementSet: set }, { status: 201 })
+  } catch (err: unknown) {
+    if (err !== null && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'P2002') {
+      return Response.json(
+        { error: 'A requirement set with this key already exists', code: 'DUPLICATE_KEY' },
+        { status: 409 },
+      )
+    }
     return Response.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR' }, { status: 500 })
   }
 }

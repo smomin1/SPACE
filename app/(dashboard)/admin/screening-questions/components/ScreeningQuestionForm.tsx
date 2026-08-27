@@ -36,6 +36,7 @@ interface ScreeningQuestionFormProps {
   id?: string
   categories?: string[]
   backPath?: string
+  requirementSetId: string
 }
 
 export function ScreeningQuestionForm({
@@ -44,6 +45,7 @@ export function ScreeningQuestionForm({
   id,
   categories = [],
   backPath = '/admin/screening-questions',
+  requirementSetId,
 }: ScreeningQuestionFormProps) {
   const router = useRouter()
 
@@ -71,7 +73,7 @@ export function ScreeningQuestionForm({
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
+      body: JSON.stringify({ ...values, requirementSetId }),
     })
 
     if (!res.ok) {

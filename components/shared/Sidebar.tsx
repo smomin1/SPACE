@@ -107,6 +107,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
+    href: '/admin/requirement-sets',
+    label: 'Requirement Sets',
+    icon: LayersIcon,
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+  },
+  {
     href: '/results',
     label: 'Results',
     icon: BarChart2Icon,

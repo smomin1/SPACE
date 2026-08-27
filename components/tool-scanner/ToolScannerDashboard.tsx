@@ -31,17 +31,28 @@ function hostname(url: string): string {
   }
 }
 
-export function ToolScannerDashboard({ initialRows }: { initialRows: ScanRow[] }) {
+export function ToolScannerDashboard({
+  initialRows,
+  requirementSets,
+  activeRequirementSetId,
+}: {
+  initialRows: ScanRow[]
+  requirementSets: { id: string; key: string; name: string }[]
+  activeRequirementSetId: string
+}) {
   const [rows, setRows] = React.useState<ScanRow[]>(initialRows)
 
   const refetch = React.useCallback(async () => {
     try {
-      const res = await fetch('/api/tool-scanner/evaluations', { cache: 'no-store' })
+      const res = await fetch(
+        `/api/tool-scanner/evaluations?requirementSetId=${encodeURIComponent(activeRequirementSetId)}`,
+        { cache: 'no-store' },
+      )
       if (res.ok) setRows((await res.json()) as ScanRow[])
     } catch {
       // transient network error; next poll will retry
     }
-  }, [])
+  }, [activeRequirementSetId])
 
   const active = rows.filter((r) => r.status === 'QUEUED' || r.status === 'SCANNING')
   const failed = rows.filter((r) => r.status === 'FAILED')
@@ -58,7 +69,11 @@ export function ToolScannerDashboard({ initialRows }: { initialRows: ScanRow[] }
 
   return (
     <div className="space-y-6">
-      <ToolScannerForm onQueued={refetch} />
+      <ToolScannerForm
+        onQueued={refetch}
+        requirementSets={requirementSets}
+        defaultRequirementSetId={activeRequirementSetId}
+      />
 
       {/* Active queue: visible to everyone so the same app isn't started twice */}
       {active.length > 0 && (

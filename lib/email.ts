@@ -68,30 +68,29 @@ const baseText = (lines: string[]) =>
   [`${APP_NAME} - Software Platform Analysis, Comparison & Evaluation`, '', ...lines, '', '---', 'This is an automated message. Please do not reply.'].join('\n')
 
 async function sendEmail(payload: EmailPayload): Promise<void> {
-  const sendgridKey = process.env.SENDGRID_API_KEY
+  const brevoKey = process.env.BREVO_API_KEY
   const fromRaw = process.env.EMAIL_FROM ?? `${APP_NAME} <noreply@space-eval.app>`
   const from = parseFrom(fromRaw)
 
-  if (sendgridKey) {
-    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  if (brevoKey) {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${sendgridKey}`,
+        'api-key': brevoKey,
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
       body: JSON.stringify({
-        from,
-        personalizations: [{ to: [{ email: payload.to }] }],
+        sender: from,
+        to: [{ email: payload.to }],
         subject: payload.subject,
-        content: [
-          { type: 'text/plain', value: payload.text },
-          { type: 'text/html',  value: payload.html },
-        ],
+        htmlContent: payload.html,
+        textContent: payload.text,
       }),
     })
     if (!res.ok) {
       const body = await res.text()
-      throw new Error(`SendGrid error ${res.status}: ${body}`)
+      throw new Error(`Brevo error ${res.status}: ${body}`)
     }
     return
   }

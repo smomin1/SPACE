@@ -78,7 +78,7 @@ Prisma reads from `.env` by default, and Next.js also reads `.env.local`. Create
 DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/space_evaluator"
 AUTH_SECRET="super-secret-key-change-this-in-production"
 NEXTAUTH_URL="http://localhost:3000"
-SENDGRID_API_KEY=""
+BREVO_API_KEY=""
 EMAIL_FROM="SPACE <noreply@space-eval.app>"
 ANTHROPIC_API_KEY=""
 ```
@@ -92,7 +92,7 @@ Replace `YOUR_PASSWORD` with the PostgreSQL password you set during installation
 DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/space_evaluator"
 AUTH_SECRET="super-secret-key-change-this-in-production"
 NEXTAUTH_URL="http://localhost:3000"
-SENDGRID_API_KEY=""
+BREVO_API_KEY=""
 EMAIL_FROM="SPACE <noreply@space-eval.app>"
 ANTHROPIC_API_KEY=""
 "@ | Out-File .env.local -Encoding UTF8
@@ -108,8 +108,8 @@ The app works without these keys, but some features will be disabled until they 
 
 | Variable | Required? | What it powers | Where to get it |
 |---|---|---|---|
-| `SENDGRID_API_KEY` | Optional | Outbound email (temp passwords, password resets, access-request approvals). If empty, emails are logged to the server console instead of being sent. | [SendGrid dashboard → API Keys](https://app.sendgrid.com/settings/api_keys) (key starts with `SG.`) |
-| `EMAIL_FROM` | Optional | The "From" address on outbound emails. Must match a sender you have verified in SendGrid, otherwise sends will fail. Format: `"Display Name <email@domain.com>"`. | Your verified sender in SendGrid |
+| `BREVO_API_KEY` | Optional | Outbound email (temp passwords, password resets, access-request approvals). If empty, emails are logged to the server console instead of being sent. | [Brevo dashboard → SMTP & API → API Keys](https://app.brevo.com/settings/keys/api) |
+| `EMAIL_FROM` | Optional | The "From" address on outbound emails. Must match a sender/domain you have verified in Brevo, otherwise sends will fail. Format: `"Display Name <email@domain.com>"`. | Your verified sender in Brevo |
 | `ANTHROPIC_API_KEY` | Required for tool scanner | The Claude-powered tool scanner at `/api/tool-scanner/evaluate`. Without it, that route will throw. | [console.anthropic.com → API Keys](https://console.anthropic.com/settings/keys) (key starts with `sk-ant-`) |
 
 Restart `npm run dev` after editing `.env.local` so Next.js picks up the new values.
@@ -270,8 +270,8 @@ This application is designed to run on **Vercel** with any PostgreSQL provider (
    - `DATABASE_URL` - your production PostgreSQL connection string
    - `AUTH_SECRET` - a securely generated secret (`openssl rand -base64 32`)
    - `NEXTAUTH_URL` - your deployed URL (e.g. `https://your-app.vercel.app`)
-   - `SENDGRID_API_KEY` - optional, enables real email delivery (see API Keys above)
-   - `EMAIL_FROM` - optional, "From" address for emails (must be a verified SendGrid sender)
+   - `BREVO_API_KEY` - optional, enables real email delivery (see API Keys above)
+   - `EMAIL_FROM` - optional, "From" address for emails (must be a verified Brevo sender)
    - `ANTHROPIC_API_KEY` - required if you use the tool-scanner feature
 4. Vercel will build and deploy automatically on each push
 5. Run migrations against the production database once:
